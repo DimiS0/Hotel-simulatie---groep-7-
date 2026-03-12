@@ -1,4 +1,4 @@
-package hotel;
+package Simulator;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,6 +13,7 @@ public class HoofdSimulator {
 
 public void start() {
     Scanner scanner = new Scanner(System.in);
+    Hotel hotel = new Hotel();
 
     swingGui.guiStart();
     System.out.println("Voer een naam van een .layout bestand in");
@@ -32,5 +33,6 @@ public void start() {
         System.out.println("Bestand niet gevonden: " + e.getMessage());
 
          }
+    hotel.hotelStart();
     }
 }

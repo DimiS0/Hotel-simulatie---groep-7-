@@ -1,4 +1,4 @@
-package hotel;
+package Simulator;
 
 public class Main {
 

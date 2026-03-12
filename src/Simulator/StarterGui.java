@@ -1,4 +1,4 @@
-package hotel;
+package Simulator;
 
 import javax.swing.*;
 import java.awt.*;
