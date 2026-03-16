@@ -34,6 +34,6 @@ public void start() {
         System.out.println("Bestand niet gevonden: " + e.getMessage());
 
          }
-    hotel.hotelStart();
+    hotel.hotelLayout();
     }
 }

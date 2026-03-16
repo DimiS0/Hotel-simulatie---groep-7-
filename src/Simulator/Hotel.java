@@ -1,7 +1,9 @@
 package Simulator;
 
+import java.util.ArrayList;
+
 public class Hotel {
-    private HotelRuimte vakje;
+    private Hotel vakje;
     private HotelRuimte hotelRuimte;
     private Gast gast;
     private Schoonmaker schoonmaker;
@@ -13,7 +15,7 @@ public class Hotel {
         this.vakje = null;
     }
 
-    public void hotelStart(){
-
+    public void hotelLayout(){
+        ArrayList hotelVakjes = new ArrayList();
     }
 }

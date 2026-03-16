@@ -1,5 +1,7 @@
 package Simulator;
 
+import java.util.Random;
+
 public class Evenement {
     private String evenementNaam;
 
@@ -7,7 +9,8 @@ public class Evenement {
         evenementNaam = null;
 
     }
-    public void hallo(){
+    public void evenementGenereren(){
+        Random eventGen = new Random();
 
     }
 }

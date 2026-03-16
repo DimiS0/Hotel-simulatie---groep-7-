@@ -1,4 +1,5 @@
 package Simulator;
+import java.util.ArrayList;
 
 public class HotelRuimte {
     private int hoogte;

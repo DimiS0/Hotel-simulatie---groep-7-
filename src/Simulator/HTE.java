@@ -1,11 +1,11 @@
 package Simulator;
 
 public class HTE {
-    private String HTE = null;
+    private int hte;
 
 
     public HTE(){
-       this.HTE = HTE;
+       this.hte = hte;
 
     }
 }
