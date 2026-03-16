@@ -5,7 +5,8 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 public class HoofdSimulator {
     private StarterGui swingGui;
-
+    private Evenement event;
+    private HTE hte;
 
     public HoofdSimulator() {
         swingGui = new StarterGui();

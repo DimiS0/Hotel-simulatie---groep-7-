@@ -1,15 +1,15 @@
 package Simulator;
 
 public class Hotel {
-    private Kamer vakje;
-    private Kamer kamer;
+    private HotelRuimte vakje;
+    private HotelRuimte hotelRuimte;
     private Gast gast;
     private Schoonmaker schoonmaker;
 
     public Hotel(){
         this.gast = new Gast();
         this.schoonmaker = new Schoonmaker();
-        this.kamer = new Kamer();
+        this.hotelRuimte = new HotelRuimte();
         this.vakje = null;
     }
 
