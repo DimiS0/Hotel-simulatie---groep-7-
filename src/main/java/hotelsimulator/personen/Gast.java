@@ -1,16 +1,9 @@
 package hotelsimulator.personen;
 
-import hotelsimulator.ruimtes.HotelRuimte;
-
-public class Gast {
-	private HotelRuimte hotelRuimte;
+public class Gast extends Persoon {
 
 	public Gast() {
-
-	}
-
-	public void bewgegenNaar() {
-
+		super();
 	}
 
 	public void inChecken() {

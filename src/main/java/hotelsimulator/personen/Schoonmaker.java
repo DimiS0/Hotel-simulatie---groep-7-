@@ -1,12 +1,9 @@
 package hotelsimulator.personen;
 
-import hotelsimulator.ruimtes.HotelRuimte;
-
-public class Schoonmaker {
-	private HotelRuimte hotelRuimte;
+public class Schoonmaker extends Persoon {
 
 	public Schoonmaker() {
-
+		super();
 	}
 
 	public void kamersSchoonmaken() {
