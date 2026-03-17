@@ -3,12 +3,15 @@ package Simulator;
 import javax.swing.*;
 import java.awt.*;
 
+
 public class StarterGui {
+    private HoofdSimulator hoofdSimulator;
 JFrame scherm1 = new JFrame();
 JPanel bestandinvoegen = new JPanel();
 JButton layout = new JButton("Kies .layout bestand");
 
-    public StarterGui() {
+    public StarterGui(HoofdSimulator hoofdSimulator) {
+        this.hoofdSimulator = hoofdSimulator;
 
         //titel, niet grotermaken, sluiten, border toevoegn
         scherm1.setTitle("Hotel Simulator");
@@ -30,7 +33,7 @@ JButton layout = new JButton("Kies .layout bestand");
 
         //actie als knop wordt geklikt
         layout.addActionListener(e -> {
-
+        this.hoofdSimulator.LayoutKiezer();
         });
 
 
