@@ -7,6 +7,7 @@ import java.util.Scanner;
 
 
 public class HoofdSimulator {
+    private Hotel hotel;
     private StarterGui swingGui;
     private Evenement event;
     private HTE hte;
@@ -17,27 +18,30 @@ public class HoofdSimulator {
 
 public void start() {
     Scanner scanner = new Scanner(System.in);
-    Hotel hotel = new Hotel();
 
     swingGui.guiStart();
 }
 
-    public void LayoutKiezer(){
+    public void LayoutKiezer() {
 
         //maakt het bestand venster aan
         JFileChooser fileChooser = new JFileChooser();
+        StringBuilder sb = new StringBuilder();
+        Hotel hotel = new Hotel();
+
         System.out.println("Voer een naam van een .layout bestand in");
 
         //opent het venster, geeft terug wat de gebruiker heeft geclicked
         int result = fileChooser.showOpenDialog(null);
 
         //als gebruiker op x klikt is result niet goedgekeurd
-        if(result != JFileChooser.APPROVE_OPTION){
+        if (result != JFileChooser.APPROVE_OPTION) {
             System.out.println("geen bestand gekozen");
             return;
         }
         //dit is het bestand dat de gebruiker gekozen heeft
         File file = fileChooser.getSelectedFile();
+        System.out.println("Gekozen bestand: " + file.getAbsolutePath());
 
         try {
             //opent het bestand met scanner om het te lezen
@@ -46,12 +50,20 @@ public void start() {
             //elke regel lezen + print de regel
             while (fileScanner.hasNextLine()) {
                 String regel = fileScanner.nextLine();
-
-                //dit vervangen met code later
-                System.out.println(swingGui.layout);
+                // optioneel: debug print
+                System.out.println(regel);
+                sb.append(regel);
             }
 
             fileScanner.close();
+            String layout = sb.toString();
+            hotel.maakHotelLayout(layout);
+
+            for (HotelRuimte r : hotel.getRuimtes()) {
+                System.out.println(
+                        r.getAreaType() + " " + r.getX() + " " + r.getY() + " breedte=" + r.getBreedte() + " sterren=" + r.getSterrenAantal() + " max=" + r.getMaxPersonen()
+                );
+            }
 
             //als het bestand ongeldig is / niet kan geopend worden
         } catch (FileNotFoundException e) {
