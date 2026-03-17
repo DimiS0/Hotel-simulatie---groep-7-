@@ -7,6 +7,7 @@ import java.util.Scanner;
 
 
 public class HoofdSimulator {
+    private Hotel hotel;
     private StarterGui swingGui;
     private Evenement event;
     private HTE hte;
@@ -18,24 +19,26 @@ public class HoofdSimulator {
         config = new SimulatieConfig();
     }
 
-    public void start() {
-        Scanner scanner = new Scanner(System.in);
-        Hotel hotel = new Hotel();
+public void start() {
+    Scanner scanner = new Scanner(System.in);
 
-        swingGui.guiStart();
-    }
+    swingGui.guiStart();
+}
 
-    public void LayoutKiezer(){
+    public void LayoutKiezer() {
 
         //maakt het bestand venster aan
         JFileChooser fileChooser = new JFileChooser();
+        StringBuilder sb = new StringBuilder();
+        Hotel hotel = new Hotel();
+
         System.out.println("Voer een naam van een .layout bestand in");
 
         //opent het venster, geeft terug wat de gebruiker heeft geclicked
         int result = fileChooser.showOpenDialog(null);
 
         //als gebruiker op x klikt is result niet goedgekeurd
-        if(result != JFileChooser.APPROVE_OPTION){
+        if (result != JFileChooser.APPROVE_OPTION) {
             System.out.println("geen bestand gekozen");
             return;
         }
@@ -49,12 +52,20 @@ public class HoofdSimulator {
             //elke regel lezen + print de regel
             while (fileScanner.hasNextLine()) {
                 String regel = fileScanner.nextLine();
-
-                //dit vervangen met code later
+                // optioneel: debug print
                 System.out.println(regel);
+                sb.append(regel);
             }
 
             fileScanner.close();
+            String layout = sb.toString();
+            hotel.maakHotelLayout(layout);
+
+            for (HotelRuimte r : hotel.getRuimtes()) {
+                System.out.println(
+                        r.getAreaType() + " " + r.getX() + " " + r.getY() + " breedte=" + r.getBreedte() + " sterren=" + r.getSterrenAantal() + " max=" + r.getMaxPersonen()
+                );
+            }
 
             //als het bestand ongeldig is / niet kan geopend worden
         } catch (FileNotFoundException e) {
