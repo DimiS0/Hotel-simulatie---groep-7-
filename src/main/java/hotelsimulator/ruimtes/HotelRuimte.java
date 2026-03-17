@@ -6,16 +6,17 @@ public class HotelRuimte {
 	protected int y;
 	protected int x;
 	protected int breedte;
+	protected int hoogte;
 	protected int maxPersonen;
 
-	public HotelRuimte(String areaType, String sterrenAantal, int y, int x, int breedte, int maxPersonen) {
+	public HotelRuimte(String areaType, String sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen) {
 		this.areaType = areaType;
 		this.sterrenAantal = sterrenAantal;
 		this.y = y;
 		this.x = x;
 		this.breedte = breedte;
+		this.hoogte = hoogte;
 		this.maxPersonen = maxPersonen;
-
 	}
 
 	public String getAreaType() {
@@ -36,6 +37,10 @@ public class HotelRuimte {
 
 	public int getBreedte() {
 		return breedte;
+	}
+
+	public int getHoogte() {
+		return hoogte;
 	}
 
 	public int getMaxPersonen() {
