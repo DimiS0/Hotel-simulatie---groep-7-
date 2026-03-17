@@ -1,19 +1,20 @@
 package Simulator;
-
+import java.util.Scanner;
 public class SpeedManager {
-    private int Factor;
-    private String Label;
-    private HTEclass n = new HTEclass();
-    public SpeedManager (int Factor, String Label) {
-        this.Factor = Factor;
-        this.Label = Label;
+    private NaarHTEOmzetten n;
+    private HTE currentSpeed;
+
+    public SpeedManager(){
+        this.n = new NaarHTEOmzetten();
     }
-    public HTE omzettenNaarHte(){
-        HTE HTEwaarde = n.fromLabel(Label);
-        return HTEwaarde;
+    public void kiesSnelheid(String label){
+
     }
     public void toonSnelheid(){
-        System.out.println(Factor);
-        System.out.println(Label);
+
+    }
+    public NaarHTEOmzetten omzettenNaarHte(String Label){
+        NaarHTEOmzetten snelheid = n.fromLabel(Label);
+        return NaarHTEOmzetten;
     }
 }
