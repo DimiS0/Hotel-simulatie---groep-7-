@@ -31,3 +31,6 @@ bin/
 
 ### Libraries ###
 lib/*.jar
+
+### Compiled ###
+target/
