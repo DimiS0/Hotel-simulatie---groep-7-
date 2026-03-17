@@ -1,6 +1,7 @@
 package hotelsimulator.core;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import hotelsimulator.config.HTE;
 import hotelsimulator.config.SimulatieConfig;
@@ -10,6 +11,7 @@ import hotelsimulator.ruimtes.HotelRuimte;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.Scanner;
 
 public class HoofdSimulator {
@@ -20,6 +22,7 @@ public class HoofdSimulator {
 	private SimulatieConfig config;
 
 	public HoofdSimulator() {
+		this.hotel = new Hotel();
 		swingGui = new StarterGui(this);
 		config = new SimulatieConfig();
 	}
@@ -28,14 +31,52 @@ public class HoofdSimulator {
 		swingGui.guiStart();
 	}
 
+	public void laadStandaardLayout() {
+		try {
+			// Leest het bestand direct uit de resources map
+			InputStream is = getClass().getResourceAsStream("/hotel_layout.json");
+			if (is == null) {
+				throw new FileNotFoundException("Standaard layout niet gevonden in resources.");
+			}
+
+			Scanner scanner = new Scanner(is);
+			StringBuilder sb = new StringBuilder();
+
+			while (scanner.hasNextLine()) {
+				sb.append(scanner.nextLine());
+			}
+			scanner.close();
+
+			String layoutStr = sb.toString();
+			hotel.maakHotelLayout(layoutStr);
+
+			for (HotelRuimte r : hotel.getRuimtes()) {
+				System.out.println(
+						r.getAreaType() + " " + r.getX() + " " + r.getY() + " breedte=" + r.getBreedte() + " sterren="
+								+ r.getSterrenAantal() + " max=" + r.getMaxPersonen());
+			}
+
+			System.out.println("Standaard layout succesvol ingeladen.");
+
+		} catch (Exception e) {
+			System.out.println("Fout bij laden standaard layout: " + e.getMessage());
+			JOptionPane.showMessageDialog(null, "Het standaard layoutbestand kan niet worden geladen.", "Fout",
+					JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
 	public void LayoutKiezer() {
 
 		// maakt het bestand venster aan
 		JFileChooser fileChooser = new JFileChooser();
-		StringBuilder sb = new StringBuilder();
-		Hotel hotel = new Hotel();
 
-		System.out.println("Voer een naam van een .layout bestand in");
+		// Voegt een filter toe zodat alleen json of layout bestanden gekozen kunnen
+		// worden
+		fileChooser.setFileFilter(new FileNameExtensionFilter("Layout Bestanden (*.json, *.layout)", "json", "layout"));
+
+		StringBuilder sb = new StringBuilder();
+
+		System.out.println("Voer een naam van een .layout of .json bestand in");
 
 		// opent het venster, geeft terug wat de gebruiker heeft geclicked
 		int result = fileChooser.showOpenDialog(null);
@@ -45,6 +86,7 @@ public class HoofdSimulator {
 			System.out.println("geen bestand gekozen");
 			return;
 		}
+
 		// dit is het bestand dat de gebruiker gekozen heeft
 		File file = fileChooser.getSelectedFile();
 
@@ -61,14 +103,16 @@ public class HoofdSimulator {
 			}
 
 			fileScanner.close();
-			String layout = sb.toString();
-			hotel.maakHotelLayout(layout);
+			String layoutStr = sb.toString();
+			hotel.maakHotelLayout(layoutStr);
 
 			for (HotelRuimte r : hotel.getRuimtes()) {
 				System.out.println(
 						r.getAreaType() + " " + r.getX() + " " + r.getY() + " breedte=" + r.getBreedte() + " sterren="
 								+ r.getSterrenAantal() + " max=" + r.getMaxPersonen());
 			}
+
+			System.out.println("Custom layout succesvol ingeladen.");
 
 			// als het bestand ongeldig is / niet kan geopend worden
 		} catch (FileNotFoundException e) {
