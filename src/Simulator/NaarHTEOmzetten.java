@@ -2,7 +2,7 @@ package Simulator;
 public class NaarHTEOmzetten {
 
     //zet label om naar HTE enum waarde
-    public NaarHTEOmzetten fromLabel(String label) {
+    public HTE fromLabel(String label) {
         for (HTE s : HTE.values()) {
             if (s.getLabel().equalsIgnoreCase(label)) {
                 return s;

@@ -1,20 +1,16 @@
 package Simulator;
-import java.util.Scanner;
 public class SpeedManager {
     private NaarHTEOmzetten n;
     private HTE currentSpeed;
 
     public SpeedManager(){
         this.n = new NaarHTEOmzetten();
+        this.currentSpeed = HTE.NORMAAL;
     }
-    public void kiesSnelheid(String label){
-
+    public void kiesSnelheid(String Label){
+        currentSpeed = n.fromLabel(Label);
     }
     public void toonSnelheid(){
-
-    }
-    public NaarHTEOmzetten omzettenNaarHte(String Label){
-        NaarHTEOmzetten snelheid = n.fromLabel(Label);
-        return NaarHTEOmzetten;
+        System.out.println(currentSpeed.getLabel());
     }
 }
