@@ -1,14 +1,17 @@
 package Simulator;
 
 public class Schoonmaker {
-    private HotelRuimte hotelRuimte;
-    public Schoonmaker(){
+	private HotelRuimte hotelRuimte;
 
-    }
-    public void kamersSchoonmaken(){
+	public Schoonmaker() {
 
-    }
-    public void cleaningEmergenciesAfhandelen(){
+	}
 
-    }
+	public void kamersSchoonmaken() {
+
+	}
+
+	public void cleaningEmergenciesAfhandelen() {
+
+	}
 }

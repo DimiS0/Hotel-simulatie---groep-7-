@@ -1,18 +1,21 @@
 package Simulator;
 
 public class Gast {
-    private HotelRuimte hotelRuimte;
-    public Gast(){
+	private HotelRuimte hotelRuimte;
 
-    }
-    public void bewgegenNaar(){
+	public Gast() {
 
-    }
-    public void inChecken(){
+	}
 
-    }
-    public void uitChecken(){
+	public void bewgegenNaar() {
 
+	}
 
-    }
+	public void inChecken() {
+
+	}
+
+	public void uitChecken() {
+
+	}
 }

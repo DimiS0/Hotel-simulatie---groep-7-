@@ -1,8 +1,8 @@
 package Simulator;
 
-public class HotelEvent extends Evenement{
-    public HotelEvent(){
-        super();
-    }
+public class HotelEvent extends Evenement {
+	public HotelEvent() {
+		super();
+	}
 
 }

@@ -5,85 +5,82 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-
 public class HoofdSimulator {
-    private Hotel hotel;
-    private StarterGui swingGui;
-    private Evenement event;
-    private HTE hte;
-    private SimulatieConfig config;
+	private Hotel hotel;
+	private StarterGui swingGui;
+	private Evenement event;
+	private HTE hte;
+	private SimulatieConfig config;
 
+	public HoofdSimulator() {
+		swingGui = new StarterGui(this);
+		config = new SimulatieConfig();
+	}
 
-    public HoofdSimulator() {
-        swingGui = new StarterGui(this);
-        config = new SimulatieConfig();
-    }
+	public void start() {
+		swingGui.guiStart();
+	}
 
-public void start() {
-    Scanner scanner = new Scanner(System.in);
+	public void LayoutKiezer() {
 
-    swingGui.guiStart();
-}
+		// maakt het bestand venster aan
+		JFileChooser fileChooser = new JFileChooser();
+		StringBuilder sb = new StringBuilder();
+		Hotel hotel = new Hotel();
 
-    public void LayoutKiezer() {
+		System.out.println("Voer een naam van een .layout bestand in");
 
-        //maakt het bestand venster aan
-        JFileChooser fileChooser = new JFileChooser();
-        StringBuilder sb = new StringBuilder();
-        Hotel hotel = new Hotel();
+		// opent het venster, geeft terug wat de gebruiker heeft geclicked
+		int result = fileChooser.showOpenDialog(null);
 
-        System.out.println("Voer een naam van een .layout bestand in");
+		// als gebruiker op x klikt is result niet goedgekeurd
+		if (result != JFileChooser.APPROVE_OPTION) {
+			System.out.println("geen bestand gekozen");
+			return;
+		}
+		// dit is het bestand dat de gebruiker gekozen heeft
+		File file = fileChooser.getSelectedFile();
 
-        //opent het venster, geeft terug wat de gebruiker heeft geclicked
-        int result = fileChooser.showOpenDialog(null);
+		try {
+			// opent het bestand met scanner om het te lezen
+			Scanner fileScanner = new Scanner(file);
 
-        //als gebruiker op x klikt is result niet goedgekeurd
-        if (result != JFileChooser.APPROVE_OPTION) {
-            System.out.println("geen bestand gekozen");
-            return;
-        }
-        //dit is het bestand dat de gebruiker gekozen heeft
-        File file = fileChooser.getSelectedFile();
+			// elke regel lezen + print de regel
+			while (fileScanner.hasNextLine()) {
+				String regel = fileScanner.nextLine();
+				// optioneel: debug print
+				System.out.println(regel);
+				sb.append(regel);
+			}
 
-        try {
-            //opent het bestand met scanner om het te lezen
-            Scanner fileScanner = new Scanner(file);
+			fileScanner.close();
+			String layout = sb.toString();
+			hotel.maakHotelLayout(layout);
 
-            //elke regel lezen + print de regel
-            while (fileScanner.hasNextLine()) {
-                String regel = fileScanner.nextLine();
-                // optioneel: debug print
-                System.out.println(regel);
-                sb.append(regel);
-            }
+			for (HotelRuimte r : hotel.getRuimtes()) {
+				System.out.println(
+						r.getAreaType() + " " + r.getX() + " " + r.getY() + " breedte=" + r.getBreedte() + " sterren="
+								+ r.getSterrenAantal() + " max=" + r.getMaxPersonen());
+			}
 
-            fileScanner.close();
-            String layout = sb.toString();
-            hotel.maakHotelLayout(layout);
+			// als het bestand ongeldig is / niet kan geopend worden
+		} catch (FileNotFoundException e) {
 
-            for (HotelRuimte r : hotel.getRuimtes()) {
-                System.out.println(
-                        r.getAreaType() + " " + r.getX() + " " + r.getY() + " breedte=" + r.getBreedte() + " sterren=" + r.getSterrenAantal() + " max=" + r.getMaxPersonen()
-                );
-            }
+			// Logt in de console waarom het mis ging
+			System.out.println("Bestand niet gevonden: " + e.getMessage());
 
-            //als het bestand ongeldig is / niet kan geopend worden
-        } catch (FileNotFoundException e) {
+			// messagebox: text is "het..geladen", de titel is: Fout, Error_Message zorgt
+			// voor rood icoontje
+			JOptionPane.showMessageDialog(
+					null,
+					"Het gekozen layoutbestand kan niet worden geladen.",
+					"Fout",
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+	}
 
-            //Logt in de console waarom het mis ging
-            System.out.println("Bestand niet gevonden: " + e.getMessage());
-
-            //messagebox: text is "het..geladen", de titel is: Fout, Error_Message zorgt voor rood icoontje
-            JOptionPane.showMessageDialog(
-                    null,
-                    "Het gekozen layoutbestand kan niet worden geladen.",
-                    "Fout",
-                    JOptionPane.ERROR_MESSAGE
-            );
-            return;
-        }
-    }
-    public SimulatieConfig getConfig() {
-        return config;
-    }
+	public SimulatieConfig getConfig() {
+		return config;
+	}
 }
