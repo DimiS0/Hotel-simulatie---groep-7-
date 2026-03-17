@@ -7,9 +7,12 @@ public class HoofdSimulator {
     private StarterGui swingGui;
     private Evenement event;
     private HTE hte;
+    private SimulatieConfig config;
+
 
     public HoofdSimulator() {
         swingGui = new StarterGui();
+        config = new SimulatieConfig();
     }
 
 public void start() {
@@ -35,5 +38,8 @@ public void start() {
 
          }
     hotel.hotelLayout();
+    }
+    public SimulatieConfig getConfig() {
+        return config;
     }
 }
