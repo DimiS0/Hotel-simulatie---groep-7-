@@ -11,9 +11,12 @@ public class HoofdSimulator {
     private StarterGui swingGui;
     private Evenement event;
     private HTE hte;
+    private SimulatieConfig config;
+
 
     public HoofdSimulator() {
         swingGui = new StarterGui(this);
+        config = new SimulatieConfig();
     }
 
 public void start() {
@@ -41,7 +44,6 @@ public void start() {
         }
         //dit is het bestand dat de gebruiker gekozen heeft
         File file = fileChooser.getSelectedFile();
-        System.out.println("Gekozen bestand: " + file.getAbsolutePath());
 
         try {
             //opent het bestand met scanner om het te lezen
@@ -80,5 +82,8 @@ public void start() {
             );
             return;
         }
+    }
+    public SimulatieConfig getConfig() {
+        return config;
     }
 }
