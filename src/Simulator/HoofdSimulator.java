@@ -14,16 +14,16 @@ public class HoofdSimulator {
 
 
     public HoofdSimulator() {
-        swingGui = new StarterGui();
+        swingGui = new StarterGui(this);
         config = new SimulatieConfig();
     }
 
-public void start() {
-    Scanner scanner = new Scanner(System.in);
-    Hotel hotel = new Hotel();
+    public void start() {
+        Scanner scanner = new Scanner(System.in);
+        Hotel hotel = new Hotel();
 
-    swingGui.guiStart();
-}
+        swingGui.guiStart();
+    }
 
     public void LayoutKiezer(){
 
@@ -51,7 +51,7 @@ public void start() {
                 String regel = fileScanner.nextLine();
 
                 //dit vervangen met code later
-                System.out.println(swingGui.layout);
+                System.out.println(regel);
             }
 
             fileScanner.close();
