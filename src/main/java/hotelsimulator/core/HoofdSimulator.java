@@ -115,6 +115,7 @@ public class HoofdSimulator {
 			}
 
 			System.out.println("Custom layout succesvol ingeladen.");
+            hotel.genereerLayout();
 
 			// als het bestand ongeldig is / niet kan geopend worden
 		} catch (FileNotFoundException e) {

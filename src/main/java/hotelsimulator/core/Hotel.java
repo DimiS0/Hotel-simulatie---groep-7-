@@ -64,6 +64,54 @@ public class Hotel {
 		}
 	}
 
+    public void genereerLayout() {
+        int maxX = 10;
+        int maxY = 10;
+        char[][] grid = new char[maxY][maxX];
+
+        // 1. vullen met '.'
+        for (int rij = 0; rij < maxY; rij++) {
+            for (int kolom = 0; kolom < maxX; kolom++) {
+                grid[rij][kolom] = '.';
+            }
+        }
+
+        // 2. kamers invullen
+        for (HotelRuimte r : getRuimtes()) {
+            int startRij = r.getY() - 1;     // Y
+            int startKolom = r.getX() - 1;   // X
+
+            char type = switch (r.getAreaType()) {
+                case "Room" -> 'K';
+                case "Restaurant" -> 'R';
+                case "Fitness" -> 'F';
+                case "Cinema" -> 'B';
+                case "Lift" -> 'L';
+                case "Trap" -> 'T';
+                default -> '.';
+            };
+
+            for (int l = 0; l < r.getHoogte(); l++) {      // hoogte = over rijen
+                for (int k = 0; k < r.getBreedte(); k++) { // breedte = over kolommen
+                    int rij = startRij + l;
+                    int kolom = startKolom + k;
+
+                    if (rij >= 0 && rij < maxY && kolom >= 0 && kolom < maxX) {
+                        grid[rij][kolom] = type;
+                    }
+                }
+            }
+        }
+
+
+        for (int rij = 0; rij < maxY; rij++) {
+            for (int kolom = 0; kolom < maxX; kolom++) {
+                System.out.print(grid[rij][kolom] + " ");
+            }
+            System.out.println();
+        }
+    }
+
 	private class JsonItem {
 		String AreaType, Position, Dimension, Capacity, Classification;
 	}
