@@ -6,6 +6,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import hotelsimulator.config.HTE;
 import hotelsimulator.config.SimulatieConfig;
 import hotelsimulator.events.Evenement;
+import hotelsimulator.gui.ConfigGui;
 import hotelsimulator.gui.StarterGui;
 import hotelsimulator.ruimtes.HotelRuimte;
 
@@ -29,6 +30,7 @@ public class HoofdSimulator {
 
 	public void start() {
 		swingGui.guiStart();
+        new ConfigGui(config);
 	}
 
 	public void laadStandaardLayout() {

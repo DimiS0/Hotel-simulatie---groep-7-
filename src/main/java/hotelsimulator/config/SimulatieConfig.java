@@ -1,7 +1,7 @@
 package hotelsimulator.config;
-
+import hotelsimulator.config.HTE;
 public class SimulatieConfig {
-	private int snelheid;
+	private HTE snelheid;
 	private int aantalGasten;
 	private int brightness;
 	private int volume;
@@ -9,7 +9,7 @@ public class SimulatieConfig {
 
 	// Constructor
 	public SimulatieConfig() {
-		this.snelheid = 1;
+		this.snelheid = HTE.NORMAAL;
 		this.aantalGasten = 10;
 		this.brightness = 50;
 		this.volume = 50;
@@ -17,7 +17,7 @@ public class SimulatieConfig {
 	}
 
 	// GETTERS
-	public int getSnelheid() {
+	public HTE getSnelheid() {
 		return snelheid;
 	}
 
@@ -38,8 +38,8 @@ public class SimulatieConfig {
 	}
 
 	// SETTERS
-	public void setSnelheid(int snelheid) {
-		if (snelheid > 0) {
+	public void setSnelheid(HTE snelheid) {
+		if (snelheid != null) {
 			this.snelheid = snelheid;
 		} else {
 			System.out.println("Ongeldige snelheid");
