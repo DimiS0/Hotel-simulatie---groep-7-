@@ -44,13 +44,15 @@ public class StarterGui {
 		customLayout.setFocusPainted(false);
 
 		// actie als knop wordt geklikt
-		defaultLayout.addActionListener(e -> {
-			this.hoofdSimulator.laadStandaardLayout();
-		});
+        defaultLayout.addActionListener(e -> {
+            scherm1.dispose();
+            this.hoofdSimulator.laadStandaardLayout();
+        });
 
-		customLayout.addActionListener(e -> {
-			this.hoofdSimulator.LayoutKiezer();
-		});
+        customLayout.addActionListener(e -> {
+            scherm1.dispose();
+            this.hoofdSimulator.LayoutKiezer();
+        });
 
 	}
 

@@ -1,6 +1,8 @@
 package hotelsimulator.ruimtes;
 
-public class HotelRuimte {
+import java.awt.*;
+
+public abstract class HotelRuimte {
 	protected String areaType;
 	protected String sterrenAantal;
 	protected int y;
@@ -46,4 +48,5 @@ public class HotelRuimte {
 	public int getMaxPersonen() {
 		return maxPersonen;
 	}
+    public abstract void print(Graphics g, int cellSize);
 }

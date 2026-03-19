@@ -7,6 +7,7 @@ import hotelsimulator.config.HTE;
 import hotelsimulator.config.SimulatieConfig;
 import hotelsimulator.events.Evenement;
 import hotelsimulator.gui.ConfigGui;
+import hotelsimulator.gui.HotelGui;
 import hotelsimulator.gui.StarterGui;
 import hotelsimulator.ruimtes.HotelRuimte;
 
@@ -30,42 +31,47 @@ public class HoofdSimulator {
 
 	public void start() {
 		swingGui.guiStart();
-        new ConfigGui(config);
+
 	}
 
 	public void laadStandaardLayout() {
-		try {
-			// Leest het bestand direct uit de resources map
-			InputStream is = getClass().getResourceAsStream("/hotel_layout.json");
-			if (is == null) {
-				throw new FileNotFoundException("Standaard layout niet gevonden in resources.");
-			}
+        StringBuilder sb = null;
+        try {
+            // Leest het bestand direct uit de resources map
+            InputStream is = getClass().getResourceAsStream("/hotel_layout.json");
+            if (is == null) {
+                throw new FileNotFoundException("Standaard layout niet gevonden in resources.");
+            }
 
-			Scanner scanner = new Scanner(is);
-			StringBuilder sb = new StringBuilder();
+            Scanner scanner = new Scanner(is);
+            sb = new StringBuilder();
 
-			while (scanner.hasNextLine()) {
-				sb.append(scanner.nextLine());
-			}
-			scanner.close();
+            while (scanner.hasNextLine()) {
+                sb.append(scanner.nextLine());
+            }
+            scanner.close();
 
-			String layoutStr = sb.toString();
-			hotel.maakHotelLayout(layoutStr);
+            String layoutStr = sb.toString();
+            hotel.maakHotelLayout(layoutStr);
 
-			for (HotelRuimte r : hotel.getRuimtes()) {
-				System.out.println(
-						r.getAreaType() + " " + r.getX() + " " + r.getY() + " breedte=" + r.getBreedte() + " sterren="
-								+ r.getSterrenAantal() + " max=" + r.getMaxPersonen());
-			}
+            for (HotelRuimte r : hotel.getRuimtes()) {
+                System.out.println(
+                        r.getAreaType() + " " + r.getX() + " " + r.getY() + " breedte=" + r.getBreedte() + " sterren="
+                                + r.getSterrenAantal() + " max=" + r.getMaxPersonen());
+            }
 
-			System.out.println("Standaard layout succesvol ingeladen.");
+            System.out.println("Standaard layout succesvol ingeladen.");
+            hotel.genereerLayout();
 
-		} catch (Exception e) {
-			System.out.println("Fout bij laden standaard layout: " + e.getMessage());
-			JOptionPane.showMessageDialog(null, "Het standaard layoutbestand kan niet worden geladen.", "Fout",
-					JOptionPane.ERROR_MESSAGE);
-		}
-	}
+        } catch (Exception e) {
+            System.out.println("Fout bij laden standaard layout: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Het standaard layoutbestand kan niet worden geladen.", "Fout",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+        HotelGui gui = new HotelGui(hotel);
+        gui.showGui();
+        new ConfigGui(config);
+    }
 
 	public void LayoutKiezer() {
 
@@ -132,6 +138,9 @@ public class HoofdSimulator {
 					JOptionPane.ERROR_MESSAGE);
 			return;
 		}
+        HotelGui gui = new HotelGui(hotel);
+        gui.showGui();
+        new ConfigGui(config);
 	}
 
 	public SimulatieConfig getConfig() {
