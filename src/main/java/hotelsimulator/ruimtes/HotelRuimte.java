@@ -14,7 +14,7 @@ public abstract class HotelRuimte {
 	public HotelRuimte(String areaType, String sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen) {
 		this.areaType = areaType;
 		this.sterrenAantal = sterrenAantal;
-		this.y = y;
+		this.y = 10 - y - hoogte + 1;
 		this.x = x;
 		this.breedte = breedte;
 		this.hoogte = hoogte;
