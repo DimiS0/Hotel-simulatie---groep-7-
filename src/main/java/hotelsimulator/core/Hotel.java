@@ -69,14 +69,14 @@ public class Hotel {
         int maxY = 10;
         char[][] grid = new char[maxY][maxX];
 
-        // 1. vullen met '.'
+        //vullen met .
         for (int rij = 0; rij < maxY; rij++) {
             for (int kolom = 0; kolom < maxX; kolom++) {
                 grid[rij][kolom] = '.';
             }
         }
 
-        // 2. kamers invullen
+        //kamers vullen
         for (HotelRuimte r : getRuimtes()) {
             int startRij = r.getY() - 1;     // Y
             int startKolom = r.getX() - 1;   // X
@@ -91,8 +91,8 @@ public class Hotel {
                 default -> '.';
             };
 
-            for (int l = 0; l < r.getHoogte(); l++) {      // hoogte = over rijen
-                for (int k = 0; k < r.getBreedte(); k++) { // breedte = over kolommen
+            for (int l = 0; l < r.getHoogte(); l++) {
+                for (int k = 0; k < r.getBreedte(); k++) {
                     int rij = startRij + l;
                     int kolom = startKolom + k;
 

@@ -8,10 +8,15 @@ public class Restaurant extends HotelRuimte {
 	}
     @Override
     public void print(Graphics g, int cellSize) {
-        g.setColor(Color.MAGENTA); // vulkleur
+        //vulkleur, kleur neerzetten
+        g.setColor(Color.MAGENTA);
         g.fillRect((x - 1) * cellSize, (y - 1) * cellSize, breedte * cellSize, hoogte * cellSize);
-        g.setColor(Color.BLACK); // outline
+
+        //outline kleur, outline neerzetten
+        g.setColor(Color.BLACK);
         g.drawRect((x - 1) * cellSize, (y - 1) * cellSize, breedte * cellSize, hoogte * cellSize);
+
+        //teksten kleur, tekst neerzetten
         g.setColor(Color.WHITE);
         g.drawString("Restaurant", (x - 1) * cellSize + 5, (y - 1) * cellSize + 15);
     }

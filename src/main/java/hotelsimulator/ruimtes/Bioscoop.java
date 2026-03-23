@@ -10,10 +10,15 @@ public class Bioscoop extends HotelRuimte {
 	}
     @Override
     public void print(Graphics g, int cellSize) {
-        g.setColor(Color.GREEN); // vulkleur
+        //vul kleur, waar hij moet vullen
+        g.setColor(Color.GREEN);
         g.fillRect((x-1)*cellSize, (y-1)*cellSize, breedte*cellSize, hoogte*cellSize);
-        g.setColor(Color.BLACK); // outline
+
+        //outline, waar hij een outline moet tekenen
+        g.setColor(Color.BLACK);
         g.drawRect((x-1)*cellSize, (y-1)*cellSize, breedte*cellSize, hoogte*cellSize);
+
+        //text kleur, waar hij de string moet neerzetten
         g.setColor(Color.WHITE);
         g.drawString("Bioscoop", (x-1)*cellSize + 5, (y-1)*cellSize + 15);
     }

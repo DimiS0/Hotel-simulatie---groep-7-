@@ -9,10 +9,15 @@ public class FitnessRuimtes extends HotelRuimte {
 	}
     @Override
     public void print(Graphics g, int cellSize) {
-        g.setColor(Color.ORANGE); // vulkleur
+        //vulkleur van het vakje, neerzetten waar hij moet vullen
+        g.setColor(Color.ORANGE);
         g.fillRect((x-1)*cellSize, (y-1)*cellSize, breedte*cellSize, hoogte*cellSize);
-        g.setColor(Color.BLACK); // outline
+
+        //outline, neeretten waar de outline moet komen.
+        g.setColor(Color.BLACK);
         g.drawRect((x-1)*cellSize, (y-1)*cellSize, breedte*cellSize, hoogte*cellSize);
+
+        //Tekst wit, tekst neerzetten
         g.setColor(Color.WHITE);
         g.drawString("FitnessRuimte", (x-1)*cellSize + 5, (y-1)*cellSize + 15);
 }}

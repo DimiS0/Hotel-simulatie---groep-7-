@@ -8,10 +8,15 @@ public class Lift extends HotelRuimte {
 	}
     @Override
     public void print(Graphics g, int cellSize) {
-        g.setColor(Color.GRAY); // vulkleur
+        //vulkleur, kleur neeretten
+        g.setColor(Color.GRAY);
         g.fillRect((x-1)*cellSize, (y-1)*cellSize, breedte*cellSize, hoogte*cellSize);
+
+        //outline, outline neerzetten
         g.setColor(Color.BLACK); // outline
         g.drawRect((x-1)*cellSize, (y-1)*cellSize, breedte*cellSize, hoogte*cellSize);
+
+        //tekst kleur, tekst locatie
         g.setColor(Color.WHITE);
         g.drawString("Lift", (x-1)*cellSize + 5, (y-1)*cellSize + 15);
 }}
