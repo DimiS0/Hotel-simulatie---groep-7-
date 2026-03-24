@@ -68,9 +68,8 @@ public class HoofdSimulator {
             JOptionPane.showMessageDialog(null, "Het standaard layoutbestand kan niet worden geladen.", "Fout",
                     JOptionPane.ERROR_MESSAGE);
         }
-        HotelGui gui = new HotelGui(hotel);
+        HotelGui gui = new HotelGui(hotel, config);
         gui.showGui();
-        new ConfigGui(config);
     }
 
 	public void LayoutKiezer() {
@@ -138,9 +137,8 @@ public class HoofdSimulator {
 					JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-        HotelGui gui = new HotelGui(hotel);
+        HotelGui gui = new HotelGui(hotel, config);
         gui.showGui();
-        new ConfigGui(config);
 	}
 
 	public SimulatieConfig getConfig() {

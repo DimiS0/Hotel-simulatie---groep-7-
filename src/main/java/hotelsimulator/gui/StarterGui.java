@@ -12,7 +12,7 @@ public class StarterGui {
 	JPanel bestandinvoegen = new JPanel();
 	JButton defaultLayout = new JButton("Laad standaard layout");
 	JButton customLayout = new JButton("Kies custom layout");
-
+    JButton instellingenBtn = new JButton("Instellingen");
 	public StarterGui(HoofdSimulator hoofdSimulator) {
 		this.hoofdSimulator = hoofdSimulator;
 
@@ -31,7 +31,7 @@ public class StarterGui {
 
 		bestandinvoegen.add(defaultLayout, gbc);
 		bestandinvoegen.add(customLayout, gbc);
-
+        bestandinvoegen.add(instellingenBtn, gbc);
 		// zet de panel zelf in het midden
 		scherm1.add(bestandinvoegen, BorderLayout.CENTER);
 
@@ -53,7 +53,9 @@ public class StarterGui {
             scherm1.dispose();
             this.hoofdSimulator.LayoutKiezer();
         });
-
+        instellingenBtn.addActionListener(e -> {
+            new ConfigGui(hoofdSimulator.getConfig());
+        });
 	}
 
 	public void guiStart() {
