@@ -54,7 +54,7 @@ public class StarterGui {
             this.hoofdSimulator.LayoutKiezer();
         });
         instellingenBtn.addActionListener(e -> {
-            new ConfigGui(hoofdSimulator.getConfig());
+            new ConfigGui(hoofdSimulator.getConfig(), value -> {});
         });
 	}
 

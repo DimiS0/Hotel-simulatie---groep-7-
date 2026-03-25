@@ -12,12 +12,21 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.util.Hashtable;
 
+import static hotelsimulator.config.HTE.LANGZAMER;
+import java.util.function.Consumer;
+
+
 public class ConfigGui {
+    private HTE valueHTE;
+    private final SimulatieConfig config;
+    private final Consumer<Integer> onSpeedChange;
+    private JLabel speed = new JLabel("1x");
 
-private final SimulatieConfig config;
 
-    public ConfigGui(SimulatieConfig config) {
+    public ConfigGui(SimulatieConfig config, Consumer<Integer> onSpeedChange) {
         this.config = config;
+        this.onSpeedChange = onSpeedChange;
+
         createAndShowGUI();}
 
     private void createAndShowGUI() {
@@ -54,6 +63,8 @@ private final SimulatieConfig config;
             int value = snelheidSlider.getValue();
             HTE snelheid = mapSliderToHTE(value);
             config.setSnelheid(snelheid);
+            valueHTE = snelheid;
+            onSpeedChange.accept(value);
         });
 
         panel.add(snelheidSlider);
@@ -123,6 +134,7 @@ private final SimulatieConfig config;
 
     // Mapping HTE -> slider
     private int mapHTEToSlider(HTE hte) {
+        this.valueHTE = hte;
         return switch (hte) {
             case LANGZAMER -> 1;
             case LANGZAAM -> 2;
@@ -131,4 +143,7 @@ private final SimulatieConfig config;
             case VIER_X -> 5;
             default -> 3;
         };}
+    public HTE getValue(){
+        return valueHTE;
+    }
 }
