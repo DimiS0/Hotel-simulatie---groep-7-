@@ -25,12 +25,11 @@ public class HotelGui extends JPanel {
         this.hotel = hotel;
         this.config = config;
         this.setDefaultSpeed = false;
-        this.speed = new JLabel("1x");
+
+        //zorgt ervoor dat StarterGui instellingenbtn werkt
+        this.speed = new JLabel(hteToText(config.getSnelheid()));
+
         setPreferredSize(new Dimension(10 * cellSize, 10 * cellSize));
-        config.addListener(() -> {
-            updateFromConfig();
-            repaint();
-        });
     }
 
     @Override
@@ -66,14 +65,15 @@ public class HotelGui extends JPanel {
         frame.add(speed, BorderLayout.SOUTH);
 
         instellingenBtn.addActionListener(e -> {
-            if (configGui == null) {
-                configGui = new ConfigGui(config);
-            }
+            new ConfigGui(config, value -> updateSpeedLabel(value));
+
         });
         frame.pack();
         frame.setLocationRelativeTo(null); // center scherm
         frame.setVisible(true);
     }
+
+    //update de speed label in real time
     public void updateSpeedLabel(int value){
         switch(value){
             case 1:
@@ -110,12 +110,14 @@ public class HotelGui extends JPanel {
         frame.add(speed, BorderLayout.SOUTH);
         frame.setVisible(true);
     }
-    private void updateFromConfig() {
-        speed.setText(config.getSnelheid().getLabel());
 
-        // brightness effect op hele GUI
-        int c = config.getBrightness() * 255 / 100;
-        setBackground(new Color(c, c, c));
-
-    }
-}
+    //zorgt ervoor dat StarterGui instellingenbtn werkt
+    private String hteToText(HTE hte) {
+        return switch (hte) {
+            case LANGZAMER -> "0.25x";
+            case LANGZAAM -> "0.50x";
+            case NORMAAL -> "1.0x";
+            case SNEL -> "2.0x";
+            case VIER_X -> "4.0x";
+        };
+}}
