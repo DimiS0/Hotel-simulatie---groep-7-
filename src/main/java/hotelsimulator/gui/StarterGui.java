@@ -13,9 +13,10 @@ public class StarterGui {
 	JButton defaultLayout = new JButton("Laad standaard layout");
 	JButton customLayout = new JButton("Kies custom layout");
     JButton instellingenBtn = new JButton("Instellingen");
+
 	public StarterGui(HoofdSimulator hoofdSimulator) {
 		this.hoofdSimulator = hoofdSimulator;
-
+        hoofdSimulator.getConfig().addListener(() -> updateFromConfig());
 		// titel, niet grotermaken, sluiten, border toevoegen
 		scherm1.setTitle("Hotel Simulator");
 		scherm1.setResizable(false);
@@ -54,10 +55,17 @@ public class StarterGui {
             this.hoofdSimulator.LayoutKiezer();
         });
         instellingenBtn.addActionListener(e -> {
-            new ConfigGui(hoofdSimulator.getConfig(), value -> {});
+            new ConfigGui(hoofdSimulator.getConfig());
         });
+        updateFromConfig();
 	}
+    private void updateFromConfig() {
+        int brightness = hoofdSimulator.getConfig().getBrightness();
+        int c = brightness * 255 / 100;
 
+        bestandinvoegen.setBackground(new Color(c, c, c));
+        scherm1.getContentPane().setBackground(new Color(c, c, c));
+    }
 	public void guiStart() {
 		scherm1.setVisible(true);
 	}

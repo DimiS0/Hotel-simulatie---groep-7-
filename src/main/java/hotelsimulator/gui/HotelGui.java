@@ -27,6 +27,10 @@ public class HotelGui extends JPanel {
         this.setDefaultSpeed = false;
         this.speed = new JLabel("1x");
         setPreferredSize(new Dimension(10 * cellSize, 10 * cellSize));
+        config.addListener(() -> {
+            updateFromConfig();
+            repaint();
+        });
     }
 
     @Override
@@ -62,8 +66,9 @@ public class HotelGui extends JPanel {
         frame.add(speed, BorderLayout.SOUTH);
 
         instellingenBtn.addActionListener(e -> {
-            new ConfigGui(config, value -> updateSpeedLabel(value));
-
+            if (configGui == null) {
+                configGui = new ConfigGui(config);
+            }
         });
         frame.pack();
         frame.setLocationRelativeTo(null); // center scherm
@@ -104,5 +109,13 @@ public class HotelGui extends JPanel {
         }
         frame.add(speed, BorderLayout.SOUTH);
         frame.setVisible(true);
+    }
+    private void updateFromConfig() {
+        speed.setText(config.getSnelheid().getLabel());
+
+        // brightness effect op hele GUI
+        int c = config.getBrightness() * 255 / 100;
+        setBackground(new Color(c, c, c));
+
     }
 }

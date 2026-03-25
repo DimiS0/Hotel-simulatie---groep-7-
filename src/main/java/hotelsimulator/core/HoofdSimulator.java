@@ -23,10 +23,10 @@ public class HoofdSimulator {
 	private HTE hte;
 	private SimulatieConfig config;
 
-	public HoofdSimulator() {
-		this.hotel = new Hotel();
-		swingGui = new StarterGui(this);
-		config = new SimulatieConfig();
+    public HoofdSimulator() {
+        this.hotel = new Hotel();
+        this.config = new SimulatieConfig();
+        this.swingGui = new StarterGui(this);
 	}
 
 	public void start() {

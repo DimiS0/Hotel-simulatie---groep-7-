@@ -19,16 +19,13 @@ import java.util.function.Consumer;
 public class ConfigGui {
     private HTE valueHTE;
     private final SimulatieConfig config;
-    private final Consumer<Integer> onSpeedChange;
     private JLabel speed = new JLabel("1x");
 
 
-    public ConfigGui(SimulatieConfig config, Consumer<Integer> onSpeedChange) {
+    public ConfigGui(SimulatieConfig config) {
         this.config = config;
-        this.onSpeedChange = onSpeedChange;
-
-        createAndShowGUI();}
-
+        createAndShowGUI();
+    }
     private void createAndShowGUI() {
         JFrame frame = new JFrame("Instellingen");
         frame.setSize(500, 350);
@@ -64,7 +61,6 @@ public class ConfigGui {
             HTE snelheid = mapSliderToHTE(value);
             config.setSnelheid(snelheid);
             valueHTE = snelheid;
-            onSpeedChange.accept(value);
         });
 
         panel.add(snelheidSlider);

@@ -1,12 +1,14 @@
 package hotelsimulator.config;
 import hotelsimulator.config.HTE;
+import java.util.ArrayList;
+import java.util.List;
+
 public class SimulatieConfig {
 	private HTE snelheid;
 	private int aantalGasten;
 	private int brightness;
 	private int volume;
 	private ScenarioType scenario;
-
 	// Constructor
 	public SimulatieConfig() {
 		this.snelheid = HTE.NORMAAL;
@@ -15,7 +17,18 @@ public class SimulatieConfig {
 		this.volume = 50;
 		this.scenario = ScenarioType.STANDAARD;
 	}
+    //  listeners
+    private final List<Runnable> listeners = new ArrayList<>();
 
+    public void addListener(Runnable r) {
+        listeners.add(r);
+    }
+
+    private void notifyListeners() {
+        for (Runnable r : listeners) {
+            r.run();
+        }
+    }
 	// GETTERS
 	public HTE getSnelheid() {
 		return snelheid;
@@ -38,43 +51,28 @@ public class SimulatieConfig {
 	}
 
 	// SETTERS
-	public void setSnelheid(HTE snelheid) {
-		if (snelheid != null) {
-			this.snelheid = snelheid;
-		} else {
-			System.out.println("Ongeldige snelheid");
-		}
-	}
+    public void setBrightness(int brightness) {
+        this.brightness = brightness;
+        notifyListeners();
+    }
 
-	public void setAantalGasten(int aantalGasten) {
-		if (aantalGasten >= 0) {
-			this.aantalGasten = aantalGasten;
-		} else {
-			System.out.println("Ongeldig aantal gasten");
-		}
-	}
+    public void setVolume(int volume) {
+        this.volume = volume;
+        notifyListeners();
+    }
 
-	public void setBrightness(int brightness) {
-		if (brightness >= 0 && brightness <= 100) {
-			this.brightness = brightness;
-		} else {
-			System.out.println("Brightness moet tussen 0 en 100 zijn");
-		}
-	}
+    public void setSnelheid(HTE snelheid) {
+        this.snelheid = snelheid;
+        notifyListeners();
+    }
 
-	public void setVolume(int volume) {
-		if (volume >= 0 && volume <= 100) {
-			this.volume = volume;
-		} else {
-			System.out.println("Volume moet tussen 0 en 100 zijn");
-		}
-	}
+    public void setAantalGasten(int aantalGasten) {
+        this.aantalGasten = aantalGasten;
+        notifyListeners();
+    }
 
-	public void setScenario(ScenarioType scenario) {
-		if (scenario != null) {
-			this.scenario = scenario;
-		} else {
-			System.out.println("Ongeldig scenario");
-		}
-	}
+    public void setScenario(ScenarioType scenario) {
+        this.scenario = scenario;
+        notifyListeners();
+    }
 }
