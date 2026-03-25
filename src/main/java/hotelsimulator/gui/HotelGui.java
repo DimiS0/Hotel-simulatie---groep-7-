@@ -25,7 +25,10 @@ public class HotelGui extends JPanel {
         this.hotel = hotel;
         this.config = config;
         this.setDefaultSpeed = false;
-        this.speed = new JLabel("1x");
+
+        //zorgt ervoor dat StarterGui instellingenbtn werkt
+        this.speed = new JLabel(hteToText(config.getSnelheid()));
+
         setPreferredSize(new Dimension(10 * cellSize, 10 * cellSize));
     }
 
@@ -69,6 +72,8 @@ public class HotelGui extends JPanel {
         frame.setLocationRelativeTo(null); // center scherm
         frame.setVisible(true);
     }
+
+    //update de speed label in real time
     public void updateSpeedLabel(int value){
         switch(value){
             case 1:
@@ -105,4 +110,14 @@ public class HotelGui extends JPanel {
         frame.add(speed, BorderLayout.SOUTH);
         frame.setVisible(true);
     }
-}
+
+    //zorgt ervoor dat StarterGui instellingenbtn werkt
+    private String hteToText(HTE hte) {
+        return switch (hte) {
+            case LANGZAMER -> "0.25x";
+            case LANGZAAM -> "0.50x";
+            case NORMAAL -> "1.0x";
+            case SNEL -> "2.0x";
+            case VIER_X -> "4.0x";
+        };
+}}
