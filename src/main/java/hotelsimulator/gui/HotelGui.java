@@ -25,10 +25,7 @@ public class HotelGui extends JPanel {
         this.hotel = hotel;
         this.config = config;
         this.setDefaultSpeed = false;
-
-        //zorgt ervoor dat StarterGui instellingenbtn werkt
-        this.speed = new JLabel(hteToText(config.getSnelheid()));
-
+        this.speed = new JLabel("1x");
         setPreferredSize(new Dimension(10 * cellSize, 10 * cellSize));
     }
 
@@ -36,14 +33,12 @@ public class HotelGui extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // grid tekenen
         g.setColor(Color.LIGHT_GRAY);
         for (int i = 0; i <= 10; i++) {
             g.drawLine(0, i * cellSize, 10 * cellSize, i * cellSize);
             g.drawLine(i * cellSize, 0, i * cellSize, 10 * cellSize);
         }
 
-        // kamers tekenen
         for (HotelRuimte r : hotel.getRuimtes()) {
             r.print(g, cellSize);
         }
@@ -53,9 +48,7 @@ public class HotelGui extends JPanel {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
-
         frame.add(this, BorderLayout.CENTER);
-
 
         JPanel topPanel = new JPanel();
         JButton instellingenBtn = new JButton("Instellingen");
@@ -66,17 +59,23 @@ public class HotelGui extends JPanel {
 
         instellingenBtn.addActionListener(e -> {
             new ConfigGui(config, value -> updateSpeedLabel(value));
-
         });
+
+        //frame pack past grootte aan van venster zodat alle knoppen precies passen
         frame.pack();
-        frame.setLocationRelativeTo(null); // center scherm
+
+        //zet het venster in het midden van de scherm, null -> in het midden van je hele beeldscherm
+        frame.setLocationRelativeTo(null);
+
+        //bij het openen van hotelGui lezen we snelheid van config, want zodat snelheid in starterGui meegnomen wordt.
+        updateSpeedLabel(mapHTEToSlider(config.getSnelheid()));
+
         frame.setVisible(true);
     }
 
-    //update de speed label in real time
-    public void updateSpeedLabel(int value){
-        switch(value){
-            case 1:
+    public void updateSpeedLabel(int value) {
+        switch (value) {
+            case 1 :
                 frame.remove(speed);
                 frame.revalidate();
                 frame.repaint();
@@ -111,13 +110,15 @@ public class HotelGui extends JPanel {
         frame.setVisible(true);
     }
 
-    //zorgt ervoor dat StarterGui instellingenbtn werkt
-    private String hteToText(HTE hte) {
+    // vertaalt HTE waarde naar getal, dus snel -> 4 en die wordt 2.0x
+    private int mapHTEToSlider(HTE hte) {
         return switch (hte) {
-            case LANGZAMER -> "0.25x";
-            case LANGZAAM -> "0.50x";
-            case NORMAAL -> "1.0x";
-            case SNEL -> "2.0x";
-            case VIER_X -> "4.0x";
+            case LANGZAMER -> 1;
+            case LANGZAAM  -> 2;
+            case NORMAAL   -> 3;
+            case SNEL      -> 4;
+            case VIER_X    -> 5;
+            default        -> 3;
         };
-}}
+    }
+}

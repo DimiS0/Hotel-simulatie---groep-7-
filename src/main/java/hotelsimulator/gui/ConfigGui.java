@@ -1,46 +1,42 @@
 package hotelsimulator.gui;
 
 import javax.swing.*;
-
 import hotelsimulator.config.HTE;
 import hotelsimulator.config.ScenarioType;
 import hotelsimulator.config.SimulatieConfig;
-import org.junit.jupiter.api.Test;
-
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.util.Hashtable;
-
-import static hotelsimulator.config.HTE.LANGZAMER;
 import java.util.function.Consumer;
-
 
 public class ConfigGui {
     private HTE valueHTE;
     private final SimulatieConfig config;
-    private JLabel speed = new JLabel("1x");
+    private final Consumer<Integer> onSpeedChange;
 
+    //frame is een veld nu, zodat we het aan startergui kunnnen geven met getframe()
+    private JFrame frame;
 
-    public ConfigGui(SimulatieConfig config) {
+    public ConfigGui(SimulatieConfig config, Consumer<Integer> onSpeedChange) {
         this.config = config;
-        createAndShowGUI();
-    }
+        this.onSpeedChange = onSpeedChange;
+
+        createAndShowGUI();}
+
     private void createAndShowGUI() {
-        JFrame frame = new JFrame("Instellingen");
+        frame = new JFrame("Instellingen");
         frame.setSize(500, 350);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
         JPanel panel = new JPanel(new GridLayout(5, 2, 10, 10));
 
-        // TEST LABEL
         JLabel testLabel = new JLabel("Volume: " + config.getVolume(), SwingConstants.CENTER);
         testLabel.setOpaque(true);
         testLabel.setBackground(Color.GRAY);
         frame.add(testLabel, BorderLayout.SOUTH);
 
-        //SNELHEID
         panel.add(new JLabel("Snelheid"));
         JSlider snelheidSlider = new JSlider(1, 5, mapHTEToSlider(config.getSnelheid()));
 
@@ -61,63 +57,55 @@ public class ConfigGui {
             HTE snelheid = mapSliderToHTE(value);
             config.setSnelheid(snelheid);
             valueHTE = snelheid;
+            onSpeedChange.accept(value);
         });
 
         panel.add(snelheidSlider);
 
-        // AANTAL GASTEN
         panel.add(new JLabel("Aantal gasten:"));
         JTextField gastenField = new JTextField(String.valueOf(config.getAantalGasten()));
         gastenField.addFocusListener(new FocusAdapter() {
 
             public void focusLost(FocusEvent e) {
-                try {int g = Integer.parseInt(gastenField.getText());
-                    config.setAantalGasten(g);}
-                catch (NumberFormatException ex) {
+                try {
+                    int g = Integer.parseInt(gastenField.getText());
+                    config.setAantalGasten(g);
+                } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(frame, "Ongeldige waarde");
                 }}});
 
         panel.add(gastenField);
 
-        //BRIGHTNESS
         panel.add(new JLabel("Brightness:"));
         JSlider brightnessSlider = new JSlider(0, 100, config.getBrightness());
-
         brightnessSlider.addChangeListener(e -> {
             int value = brightnessSlider.getValue();
             config.setBrightness(value);
-
-            // visuele test (donker/licht)
             int c = value * 255 / 100;
             testLabel.setBackground(new Color(c, c, c));
         });
-
         panel.add(brightnessSlider);
 
-        //VOLUME
         panel.add(new JLabel("Volume:"));
         JSlider volumeSlider = new JSlider(0, 100, config.getVolume());
-
         volumeSlider.addChangeListener(e -> {
             int value = volumeSlider.getValue();
             config.setVolume(value);
-
-            // visuele test
             testLabel.setText("Volume: " + value);
         });
-
         panel.add(volumeSlider);
 
-        // SCENARIO (nog niet actief)
         panel.add(new JLabel("Scenario:"));
         JComboBox<ScenarioType> scenarioBox = new JComboBox<>(ScenarioType.values());
         scenarioBox.setSelectedItem(config.getScenario());
         scenarioBox.addActionListener(e ->
                 config.setScenario((ScenarioType) scenarioBox.getSelectedItem()));
         panel.add(scenarioBox);
+
         frame.add(panel, BorderLayout.CENTER);
-        frame.setVisible(true);}
-    // Mapping slider -> HTE
+        frame.setVisible(true);
+    }
+
     private HTE mapSliderToHTE(int value) {
         return switch (value) {
             case 1 -> HTE.LANGZAMER;
@@ -126,20 +114,26 @@ public class ConfigGui {
             case 4 -> HTE.SNEL;
             case 5 -> HTE.VIER_X;
             default -> HTE.NORMAAL;
-        };}
+        };
+    }
 
-    // Mapping HTE -> slider
     private int mapHTEToSlider(HTE hte) {
         this.valueHTE = hte;
         return switch (hte) {
             case LANGZAMER -> 1;
-            case LANGZAAM -> 2;
-            case NORMAAL -> 3;
-            case SNEL -> 4;
-            case VIER_X -> 5;
-            default -> 3;
-        };}
-    public HTE getValue(){
+            case LANGZAAM  -> 2;
+            case NORMAAL   -> 3;
+            case SNEL      -> 4;
+            case VIER_X    -> 5;
+            default        -> 3;
+        };
+    }
+
+    public HTE getValue() {
         return valueHTE;
+    }
+    //geeft instelling venster, zodat we die kunnen sluiten
+    public JFrame getFrame() {
+        return frame;
     }
 }
