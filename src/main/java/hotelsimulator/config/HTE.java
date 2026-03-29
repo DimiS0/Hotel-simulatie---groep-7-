@@ -14,13 +14,4 @@ public enum HTE {
 		this.label = label;
 		this.factor = factor;
 	}
-
-	// String label
-	public String getLabel() {
-		return label;
-	}
-
-	public double getFactor() {
-		return factor;
-	}
 }
