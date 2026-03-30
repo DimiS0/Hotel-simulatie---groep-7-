@@ -11,13 +11,13 @@ public class FitnessRuimtes extends HotelRuimte {
     public void print(Graphics g, int cellSize) {
         //vulkleur van het vakje, neerzetten waar hij moet vullen
         g.setColor(Color.ORANGE);
-        g.fillRect((x-1)*cellSize, (y-1)*cellSize, breedte*cellSize, hoogte*cellSize);
+        g.fillRect((x+1)*cellSize, (y-1)*cellSize, breedte*cellSize, hoogte*cellSize);
 
         //outline, neeretten waar de outline moet komen.
         g.setColor(Color.BLACK);
-        g.drawRect((x-1)*cellSize, (y-1)*cellSize, breedte*cellSize, hoogte*cellSize);
+        g.drawRect((x+1)*cellSize, (y-1)*cellSize, breedte*cellSize, hoogte*cellSize);
 
         //Tekst wit, tekst neerzetten
         g.setColor(Color.WHITE);
-        g.drawString("FitnessRuimte", (x-1)*cellSize + 5, (y-1)*cellSize + 15);
+        g.drawString("FitnessRuimte", (x+1)*cellSize + 5, (y-1)*cellSize + 15);
 }}

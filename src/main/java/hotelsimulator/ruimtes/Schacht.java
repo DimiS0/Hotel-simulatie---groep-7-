@@ -2,21 +2,20 @@ package hotelsimulator.ruimtes;
 
 import java.awt.*;
 
-public class Trap extends HotelRuimte {
-	public Trap(String areaType, String sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen) {
+public class Schacht extends HotelRuimte {
+	public Schacht(String areaType, String sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen) {
 		super(areaType, sterrenAantal, y, x, breedte, hoogte, maxPersonen);
 	}
     @Override
     public void print(Graphics g, int cellSize) {
-        //vulkleur, vulkleur zetten
-        g.setColor(Color.ORANGE);
+        //vulkleur, kleur neeretten
+        g.setColor(Color.cyan);
         g.fillRect((x+1)*cellSize, (y-1)*cellSize, breedte*cellSize, hoogte*cellSize);
-
-        //outline kleur, outline zetten
+        //outline, outline neerzetten
         g.setColor(Color.BLACK); // outline
         g.drawRect((x+1)*cellSize, (y-1)*cellSize, breedte*cellSize, hoogte*cellSize);
 
-        //tekst kleur, kleur neerzetten
+        //tekst kleur, tekst locatie
         g.setColor(Color.WHITE);
-        g.drawString("Trap", (x+1)*cellSize + 5, (y-1)*cellSize + 15);}
-}
+        g.drawString("Schacht", (x+1)*cellSize + 5, (y-1)*cellSize + 15);
+}}

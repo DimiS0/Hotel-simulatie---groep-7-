@@ -60,15 +60,18 @@ public class Hotel {
 				case "Fitness" -> new FitnessRuimtes(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
 				case "Restaurant" -> new Restaurant(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
 				case "Room" -> new HotelKamer(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
-				case "Lift" -> new Lift(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
-				case "Trap" -> new Trap(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
-				case "Lobby" -> new Lobby(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
 				default -> null;
 			};
+            Schacht schacht = new Schacht("Lift","0",0,0,1,9,0);
+              Lobby lobby = new Lobby("Lobby","0",0,1,6,1,0);
+              Trap trap = new Trap("trap","0",0,7,1,9,0);
 
 			if (r != null)
 				//onthoudt waar de genoemde kamer is in de arraylijst ruimtes
-				ruimtes.add(r);
+                ruimtes.add(r);
+				ruimtes.add(schacht);
+                ruimtes.add(lobby);
+                ruimtes.add(trap);
 		}
 	}
 
