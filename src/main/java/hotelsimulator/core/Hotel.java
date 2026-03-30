@@ -27,13 +27,19 @@ public class Hotel {
 	}
 
 	public void maakHotelLayout(String layoutJson) {
+		//gson object aanmaken
 		Gson gson = new Gson();
-		Type listType = new TypeToken<List<JsonItem>>() {
-		}.getType();
+
+		//Onthoudt dat de lijst JsonItem-objecten bevat, anders vergeet Java het type
+		Type listType = new TypeToken<List<JsonItem>>() {}.getType();
+
+		//zet de JSON tekst om naar een lijst van json objecten
 		List<JsonItem> items = gson.fromJson(layoutJson, listType);
 
+		//Lijst leegmaken zodat oude data niet overblijft bij hergebruik
 		ruimtes.clear();
 
+		//loop door de lijst elke item krijgt een AreaType, een positie een breedte en hoogte, en een cappaciteit en sterren
 		for (JsonItem item : items) {
 			String areaType = item.AreaType;
 
@@ -48,6 +54,7 @@ public class Hotel {
 			int maxPersonen = (item.Capacity != null) ? Integer.parseInt(item.Capacity.trim()) : 0;
 			String sterrenAantal = (item.Classification != null) ? item.Classification : "";
 
+			//elke item maakt een nieuwe object aan met die specificaties
 			HotelRuimte r = switch (item.AreaType) {
 				case "Cinema" -> new Bioscoop(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
 				case "Fitness" -> new FitnessRuimtes(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
@@ -60,57 +67,10 @@ public class Hotel {
 			};
 
 			if (r != null)
+				//onthoudt waar de genoemde kamer is in de arraylijst ruimtes
 				ruimtes.add(r);
 		}
 	}
-
-    public void genereerLayout() {
-        int maxX = 10;
-        int maxY = 10;
-        char[][] grid = new char[maxY][maxX];
-
-        //vullen met .
-        for (int rij = 0; rij < maxY; rij++) {
-            for (int kolom = 0; kolom < maxX; kolom++) {
-                grid[rij][kolom] = '.';
-            }
-        }
-
-        //kamers vullen
-        for (HotelRuimte r : getRuimtes()) {
-            int startRij = r.getY() - 1;     // Y
-            int startKolom = r.getX() - 1;   // X
-
-            char type = switch (r.getAreaType()) {
-                case "Room" -> 'K';
-                case "Restaurant" -> 'R';
-                case "Fitness" -> 'F';
-                case "Cinema" -> 'B';
-                case "Lift" -> 'L';
-                case "Trap" -> 'T';
-                default -> '.';
-            };
-
-            for (int l = 0; l < r.getHoogte(); l++) {
-                for (int k = 0; k < r.getBreedte(); k++) {
-                    int rij = startRij + l;
-                    int kolom = startKolom + k;
-
-                    if (rij >= 0 && rij < maxY && kolom >= 0 && kolom < maxX) {
-                        grid[rij][kolom] = type;
-                    }
-                }
-            }
-        }
-
-
-        for (int rij = 0; rij < maxY; rij++) {
-            for (int kolom = 0; kolom < maxX; kolom++) {
-                System.out.print(grid[rij][kolom] + " ");
-            }
-            System.out.println();
-        }
-    }
 
 	private class JsonItem {
 		String AreaType, Position, Dimension, Capacity, Classification;

@@ -10,7 +10,7 @@ public class Bioscoop extends HotelRuimte {
 	}
     @Override
     public void print(Graphics g, int cellSize) {
-        //vul kleur, waar hij moet vullen
+        //vul kleur, waar hij moet vullen, x en y-1 omdat de grid bij 0 begint en de JSON bij 1 , breedte en hoogte ook want anders is elk kamer 1 pixel
         g.setColor(Color.GREEN);
         g.fillRect((x-1)*cellSize, (y-1)*cellSize, breedte*cellSize, hoogte*cellSize);
 

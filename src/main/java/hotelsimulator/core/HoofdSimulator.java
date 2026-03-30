@@ -51,17 +51,12 @@ public class HoofdSimulator {
             }
             scanner.close();
 
+			//stringbuilder naar string omzetten
             String layoutStr = sb.toString();
+			//hotel layout maken met string
             hotel.maakHotelLayout(layoutStr);
 
-            for (HotelRuimte r : hotel.getRuimtes()) {
-                System.out.println(
-                        r.getAreaType() + " " + r.getX() + " " + r.getY() + " breedte=" + r.getBreedte() + " sterren="
-                                + r.getSterrenAantal() + " max=" + r.getMaxPersonen());
-            }
-
             System.out.println("Standaard layout succesvol ingeladen.");
-            hotel.genereerLayout();
 
         } catch (Exception e) {
             System.out.println("Fout bij laden standaard layout: " + e.getMessage());
@@ -104,6 +99,7 @@ public class HoofdSimulator {
 			// elke regel lezen + print de regel
 			while (fileScanner.hasNextLine()) {
 				String regel = fileScanner.nextLine();
+
 				// optioneel: debug print
 				System.out.println(regel);
 				sb.append(regel);
@@ -113,14 +109,7 @@ public class HoofdSimulator {
 			String layoutStr = sb.toString();
 			hotel.maakHotelLayout(layoutStr);
 
-			for (HotelRuimte r : hotel.getRuimtes()) {
-				System.out.println(
-						r.getAreaType() + " " + r.getX() + " " + r.getY() + " breedte=" + r.getBreedte() + " sterren="
-								+ r.getSterrenAantal() + " max=" + r.getMaxPersonen());
-			}
-
 			System.out.println("Custom layout succesvol ingeladen.");
-            hotel.genereerLayout();
 
 			// als het bestand ongeldig is / niet kan geopend worden
 		} catch (FileNotFoundException e) {

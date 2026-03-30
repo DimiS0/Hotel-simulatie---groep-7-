@@ -129,9 +129,6 @@ public class ConfigGui {
         };
     }
 
-    public HTE getValue() {
-        return valueHTE;
-    }
     //geeft instelling venster, zodat we die kunnen sluiten
     public JFrame getFrame() {
         return frame;

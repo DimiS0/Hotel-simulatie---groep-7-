@@ -31,14 +31,18 @@ public class HotelGui extends JPanel {
 
     @Override
     protected void paintComponent(Graphics g) {
+        //maak scherm eerst leeg voordat je tekent
         super.paintComponent(g);
 
+        //tekent horizontaale en verticale lijnen wat ons rooster is
         g.setColor(Color.LIGHT_GRAY);
         for (int i = 0; i <= 10; i++) {
             g.drawLine(0, i * cellSize, 10 * cellSize, i * cellSize);
             g.drawLine(i * cellSize, 0, i * cellSize, 10 * cellSize);
         }
 
+        //loopt door elke ruimte heen en zegt dat hij zichzelf moet printen
+        //java kiest automatisch de juiste print op basis van het kamertype
         for (HotelRuimte r : hotel.getRuimtes()) {
             r.print(g, cellSize);
         }
@@ -47,6 +51,7 @@ public class HotelGui extends JPanel {
     public void showGui() {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
+        frame.setResizable(false);
 
         frame.add(this, BorderLayout.CENTER);
 
