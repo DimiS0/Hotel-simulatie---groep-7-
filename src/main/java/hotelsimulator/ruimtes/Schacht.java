@@ -9,7 +9,8 @@ public class Schacht extends HotelRuimte {
     @Override
     public void print(Graphics g, int cellSize) {
         //vulkleur, kleur neeretten
-        g.setColor(Color.cyan);
+            Color zwart = new Color(42,157,143);
+        g.setColor(zwart);
         g.fillRect((x+1)*cellSize, (y-1)*cellSize, breedte*cellSize, hoogte*cellSize);
         //outline, outline neerzetten
         g.setColor(Color.BLACK); // outline

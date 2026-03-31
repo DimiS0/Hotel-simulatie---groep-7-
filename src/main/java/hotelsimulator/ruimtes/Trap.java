@@ -9,7 +9,8 @@ public class Trap extends HotelRuimte {
     @Override
     public void print(Graphics g, int cellSize) {
         //vulkleur, vulkleur zetten
-        g.setColor(Color.ORANGE);
+        Color color = new Color(233,196,106);
+        g.setColor(color);
         g.fillRect((x+1)*cellSize, (y-1)*cellSize, breedte*cellSize, hoogte*cellSize);
 
         //outline kleur, outline zetten

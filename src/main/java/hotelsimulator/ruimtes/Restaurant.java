@@ -9,7 +9,8 @@ public class Restaurant extends HotelRuimte {
     @Override
     public void print(Graphics g, int cellSize) {
         //vulkleur, kleur neerzetten
-        g.setColor(Color.MAGENTA);
+        Color color = new Color(209,73,91);
+        g.setColor(color);
         g.fillRect((x+1) * cellSize, (y - 1) * cellSize, breedte * cellSize, hoogte * cellSize);
 
         //outline kleur, outline neerzetten
