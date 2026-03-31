@@ -10,7 +10,8 @@ public class HotelKamer extends HotelRuimte {
     @Override
     public void print(Graphics g, int cellSize) {
         //vullkleur, zetten waar de kleur komt
-        g.setColor(Color.BLUE);
+        Color blauw = new Color(74,111,165);
+        g.setColor(blauw);
         g.fillRect((x+1)*cellSize, (y-1)*cellSize, breedte*cellSize, hoogte*cellSize);
 
         //outline, outline neerzetten

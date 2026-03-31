@@ -10,7 +10,8 @@ public class FitnessRuimtes extends HotelRuimte {
     @Override
     public void print(Graphics g, int cellSize) {
         //vulkleur van het vakje, neerzetten waar hij moet vullen
-        g.setColor(Color.ORANGE);
+        Color color = new Color(244,162,97);
+        g.setColor(color);
         g.fillRect((x+1)*cellSize, (y-1)*cellSize, breedte*cellSize, hoogte*cellSize);
 
         //outline, neeretten waar de outline moet komen.

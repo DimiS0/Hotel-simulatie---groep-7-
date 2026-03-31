@@ -10,7 +10,8 @@ public class Lobby extends HotelRuimte {
     @Override
     public void print(Graphics g, int cellSize) {
         //vulkleur, kleur neerzetten
-        g.setColor(Color.darkGray);
+        Color paars = new Color(58,58,58);
+        g.setColor(paars);
         g.fillRect((x+1) * cellSize, (y - 1) * cellSize, breedte * cellSize, hoogte * cellSize);
 
         //outline kleur, outline neerzetten
