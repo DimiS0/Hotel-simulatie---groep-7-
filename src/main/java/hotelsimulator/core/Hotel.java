@@ -65,6 +65,7 @@ public class Hotel {
             Schacht schacht = new Schacht("Lift","0",0,0,1,9,0);
               Lobby lobby = new Lobby("Lobby","0",0,1,6,1,0);
               Trap trap = new Trap("trap","0",0,7,1,9,0);
+              Lift lift = new Lift("Lift","0",0,0,1,1,10);
 
 			if (r != null)
 				//onthoudt waar de genoemde kamer is in de arraylijst ruimtes
@@ -72,6 +73,7 @@ public class Hotel {
 				ruimtes.add(schacht);
                 ruimtes.add(lobby);
                 ruimtes.add(trap);
+                ruimtes.add(lift);
 		}
 	}
 
