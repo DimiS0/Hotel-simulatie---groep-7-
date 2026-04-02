@@ -1,6 +1,7 @@
 package hotelsimulator.config;
 
 import java.util.*;
+import javax.swing.Timer;
 
 public class TimerSim {
     private List<Observer> observers = new ArrayList<>();
@@ -22,7 +23,7 @@ public class TimerSim {
             if (seconden >= 60) {
                 seconden = 0;
                 minuten++;
-                if(minuten >= 60){
+                if(minuten == 60){
                     minuten = 0;
                     uren++;
                     if(uren >= 24){
@@ -31,9 +32,8 @@ public class TimerSim {
                     }
                 }
             }
-            notifyObservers(minuten + ":" + seconden);
+            System.out.println(dagen+":"+uren+":"+minuten+":"+seconden);
         });
+        timer.start();
     }
-    }
-
 }

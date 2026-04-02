@@ -2,6 +2,7 @@ package hotelsimulator.core;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import hotelsimulator.config.TimerSim;
 import hotelsimulator.personen.Gast;
 import hotelsimulator.personen.Schoonmaker;
 import hotelsimulator.ruimtes.*;
@@ -14,16 +15,22 @@ public class Hotel {
 	private ArrayList<HotelRuimte> ruimtes;
 	private Gast gast;
 	private Schoonmaker schoonmaker;
+    private TimerSim timerSim;
 
 	public Hotel() {
 		this.ruimtes = new ArrayList<>();
 		this.gast = new Gast();
 		this.schoonmaker = new Schoonmaker();
+        this.timerSim = new TimerSim();
 	}
 
 	public ArrayList<HotelRuimte> getRuimtes() {
 		return ruimtes;
 	}
+
+public TimerSim getTimerSim() {
+        return timerSim;
+    }
 
 	public void maakHotelLayout(String layoutJson) {
 		//gson object aanmaken
@@ -55,16 +62,16 @@ public class Hotel {
 
 			//elke item maakt een nieuwe object aan met die specificaties
 			HotelRuimte r = switch (item.AreaType) {
-				case "Cinema" -> new Bioscoop(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
-				case "Fitness" -> new FitnessRuimtes(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
-				case "Restaurant" -> new Restaurant(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
-				case "Room" -> new HotelKamer(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
+				case "Cinema" -> new Bioscoop(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen,getTimerSim());
+				case "Fitness" -> new FitnessRuimtes(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen,getTimerSim());
+				case "Restaurant" -> new Restaurant(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen,getTimerSim());
+				case "Room" -> new HotelKamer(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen,getTimerSim());
 				default -> null;
 			};
-            Schacht schacht = new Schacht("Lift","0",0,0,1,9,0);
-              Lobby lobby = new Lobby("Lobby","0",0,1,6,1,0);
-              Trap trap = new Trap("trap","0",0,7,1,9,0);
-              Lift lift = new Lift("Lift","0",0,0,1,1,10);
+            Schacht schacht = new Schacht("Lift","0",0,0,1,9,0,getTimerSim());
+              Lobby lobby = new Lobby("Lobby","0",0,1,6,1,0,getTimerSim());
+              Trap trap = new Trap("trap","0",0,7,1,9,0,getTimerSim());
+              Lift lift = new Lift("Lift","0",0,0,1,1,10,getTimerSim());
 
 			if (r != null)
 				//onthoudt waar de genoemde kamer is in de arraylijst ruimtes
@@ -74,6 +81,7 @@ public class Hotel {
                 ruimtes.add(trap);
                 ruimtes.add(lift);
 		}
+        timerSim.timeMethod();
     }
 
 	private class JsonItem {
