@@ -64,6 +64,7 @@ public class HoofdSimulator {
                     JOptionPane.ERROR_MESSAGE);
         }
         HotelGui gui = new HotelGui(hotel, config);
+		hotel.getTimerSim().timeMethod(hotel.getLift(), gui);
         gui.showGui();
     }
 
@@ -127,6 +128,7 @@ public class HoofdSimulator {
 			return;
 		}
         HotelGui gui = new HotelGui(hotel, config);
+		hotel.getTimerSim().timeMethod(hotel.getLift(), gui);
         gui.showGui();
 	}
 

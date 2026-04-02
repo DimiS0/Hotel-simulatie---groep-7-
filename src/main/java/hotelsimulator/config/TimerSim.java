@@ -1,10 +1,11 @@
 package hotelsimulator.config;
 
-import java.util.*;
+import hotelsimulator.gui.HotelGui;
+import hotelsimulator.ruimtes.Lift;
+
 import javax.swing.Timer;
 
 public class TimerSim {
-    private List<Observer> observers = new ArrayList<>();
     private int seconden;
     private int minuten;
     private int uren;
@@ -17,22 +18,24 @@ public class TimerSim {
         this.dagen = 0;
     }
 
-    public void timeMethod(){
+    public void timeMethod(Lift lift, HotelGui gui) {
         Timer timer = new Timer(1000, e -> {
             seconden++;
             if (seconden >= 60) {
                 seconden = 0;
                 minuten++;
-                if(minuten == 60){
+                if (minuten == 60) {
                     minuten = 0;
                     uren++;
-                    if(uren >= 24){
+                    if (uren >= 24) {
                         uren = 0;
                         dagen++;
                     }
                 }
             }
-            System.out.println(dagen+":"+uren+":"+minuten+":"+seconden);
+             lift.liftBwegen();
+             gui.repaint();
+            System.out.println(dagen + ":" + uren + ":" + minuten + ":" + seconden);
         });
         timer.start();
     }

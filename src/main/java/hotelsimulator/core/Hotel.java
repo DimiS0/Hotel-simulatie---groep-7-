@@ -16,6 +16,7 @@ public class Hotel {
 	private Gast gast;
 	private Schoonmaker schoonmaker;
     private TimerSim timerSim;
+	private Lift lift;
 
 	public Hotel() {
 		this.ruimtes = new ArrayList<>();
@@ -68,21 +69,26 @@ public TimerSim getTimerSim() {
 				case "Room" -> new HotelKamer(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen,getTimerSim());
 				default -> null;
 			};
-            Schacht schacht = new Schacht("Lift","0",0,0,1,9,0,getTimerSim());
-              Lobby lobby = new Lobby("Lobby","0",0,1,6,1,0,getTimerSim());
-              Trap trap = new Trap("trap","0",0,7,1,9,0,getTimerSim());
-              Lift lift = new Lift("Lift","0",0,0,1,1,10,getTimerSim());
-
 			if (r != null)
 				//onthoudt waar de genoemde kamer is in de arraylijst ruimtes
                 ruimtes.add(r);
-				ruimtes.add(schacht);
-                ruimtes.add(lobby);
-                ruimtes.add(trap);
-                ruimtes.add(lift);
 		}
-        timerSim.timeMethod();
+		Schacht schacht = new Schacht("Lift","0",0,0,1,9,0,getTimerSim());
+		Lobby lobby = new Lobby("Lobby","0",0,1,6,1,0,getTimerSim());
+		Trap trap = new Trap("trap","0",0,7,1,9,0,getTimerSim());
+		lift = new Lift("Lift","0",0,0,1,1,10,getTimerSim());
+
+		ruimtes.add(schacht);
+		ruimtes.add(lobby);
+		ruimtes.add(trap);
+		ruimtes.add(lift);
+
+
     }
+
+	public Lift getLift() {
+		return lift;
+	}
 
 	private class JsonItem {
 		String AreaType, Position, Dimension, Capacity, Classification;
