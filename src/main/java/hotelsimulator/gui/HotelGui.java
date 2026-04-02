@@ -4,6 +4,7 @@ import hotelsimulator.config.HTE;
 import hotelsimulator.core.Hotel;
 import hotelsimulator.config.SimulatieConfig;
 import hotelsimulator.ruimtes.HotelRuimte;
+import hotelsimulator.personen.Persoon;
 
 import javax.swing.*;
 import java.awt.*;
@@ -46,6 +47,11 @@ public class HotelGui extends JPanel {
         for (HotelRuimte r : hotel.getRuimtes()) {
             r.print(g, cellSize);
         }
+        if (hotel.getPersonen() != null) {
+            for (Persoon p : hotel.getPersonen()) {
+                p.print(g);
+            }
+        }
     }
 
     public void showGui() {
@@ -76,6 +82,18 @@ public class HotelGui extends JPanel {
         updateSpeedLabel(mapHTEToSlider(config.getSnelheid()));
 
         frame.setVisible(true);
+        hotel.maakPersonen(config.getAantalGasten());
+
+        Timer bewegingsTimer = new Timer(16, ev -> {
+            for (Persoon p : hotel.getPersonen()) {
+                if (p.isOpDoel()) {
+                    p.kiesRandomDoel(cellSize, 10);
+                }
+                p.beweeg();
+            }
+            repaint();
+        });
+        bewegingsTimer.start();
     }
 
     public void updateSpeedLabel(int value) {

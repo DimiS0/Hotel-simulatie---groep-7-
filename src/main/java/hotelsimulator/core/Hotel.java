@@ -4,8 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import hotelsimulator.config.TimerSim;
 import hotelsimulator.personen.Gast;
+import hotelsimulator.personen.Persoon;
 import hotelsimulator.personen.Schoonmaker;
 import hotelsimulator.ruimtes.*;
+
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -13,15 +15,13 @@ import java.util.List;
 
 public class Hotel {
 	private ArrayList<HotelRuimte> ruimtes;
-	private Gast gast;
-	private Schoonmaker schoonmaker;
+    private ArrayList<Persoon> personen;
     private TimerSim timerSim;
 	private Lift lift;
 
 	public Hotel() {
 		this.ruimtes = new ArrayList<>();
-		this.gast = new Gast();
-		this.schoonmaker = new Schoonmaker();
+		this.personen = new ArrayList<>();
         this.timerSim = new TimerSim();
 	}
 
@@ -93,4 +93,15 @@ public TimerSim getTimerSim() {
 	private class JsonItem {
 		String AreaType, Position, Dimension, Capacity, Classification;
 	}
-}
+    public void maakPersonen(int aantalGasten) {
+        personen = new ArrayList<>();
+        for (int i = 0; i < aantalGasten; i++) {
+            personen.add(new Gast(50, 450)); // beginnen in de lobby-area
+        }
+        // 1 schoonmaker altijd
+        personen.add(new Schoonmaker(50, 450));
+    }
+
+    public ArrayList<Persoon> getPersonen() {
+        return personen;
+}}
