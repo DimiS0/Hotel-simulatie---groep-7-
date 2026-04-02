@@ -2,7 +2,6 @@ package hotelsimulator.core;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
 import hotelsimulator.personen.Gast;
 import hotelsimulator.personen.Schoonmaker;
 import hotelsimulator.ruimtes.*;
@@ -75,7 +74,7 @@ public class Hotel {
                 ruimtes.add(trap);
                 ruimtes.add(lift);
 		}
-	}
+    }
 
 	private class JsonItem {
 		String AreaType, Position, Dimension, Capacity, Classification;
