@@ -10,16 +10,26 @@ public class TimerSim {
     private int minuten;
     private int uren;
     private int dagen;
+    private int factor;
+    private Timer timer;
+
 
     public TimerSim() {
         this.seconden = 0;
         this.minuten = 0;
         this.uren = 0;
         this.dagen = 0;
+        this.factor = 1;
+    }
+    public void updateTimerFactor(int factor){
+        this.factor = factor;
+        if (timer != null){
+            timer.setDelay(1000/this.factor);
+        }
     }
 
     public void timeMethod(Lift lift, HotelGui gui) {
-        Timer timer = new Timer(1000, e -> {
+        timer = new Timer((1000/factor), e -> {
             seconden++;
             if (seconden >= 60) {
                 seconden = 0;

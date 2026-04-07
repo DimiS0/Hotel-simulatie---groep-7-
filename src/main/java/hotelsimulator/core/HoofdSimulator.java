@@ -34,7 +34,7 @@ public class HoofdSimulator {
 
 	}
 
-	public void laadStandaardLayout() {
+    public void laadStandaardLayout() {
         StringBuilder sb = null;
         try {
             // Leest het bestand direct uit de resources map

@@ -1,6 +1,7 @@
 package hotelsimulator.gui;
 
 import hotelsimulator.config.HTE;
+import hotelsimulator.config.TimerSim;
 import hotelsimulator.core.Hotel;
 import hotelsimulator.config.SimulatieConfig;
 import hotelsimulator.ruimtes.HotelRuimte;
@@ -20,6 +21,7 @@ public class HotelGui extends JPanel {
     private JFrame frame;
     private JLabel speed;
     boolean setDefaultSpeed;
+    private TimerSim timerSim;
 
     public HotelGui(Hotel hotel, SimulatieConfig config) {
         this.frame = new JFrame("Hotel Layout");
@@ -27,6 +29,7 @@ public class HotelGui extends JPanel {
         this.config = config;
         this.setDefaultSpeed = false;
         this.speed = new JLabel("1x");
+        timerSim = hotel.getTimerSim();
         setPreferredSize(new Dimension(10 * cellSize, 10 * cellSize));
     }
 
@@ -69,7 +72,7 @@ public class HotelGui extends JPanel {
         frame.add(speed, BorderLayout.SOUTH);
 
         instellingenBtn.addActionListener(e -> {
-            new ConfigGui(config, value -> updateSpeedLabel(value));
+            new ConfigGui(config, value -> {updateSpeedLabel(value); timerSim.updateTimerFactor(value);});
         });
 
         //frame pack past grootte aan van venster zodat alle knoppen precies passen

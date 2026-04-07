@@ -4,6 +4,8 @@ import javax.swing.*;
 import hotelsimulator.config.HTE;
 import hotelsimulator.config.ScenarioType;
 import hotelsimulator.config.SimulatieConfig;
+import hotelsimulator.config.TimerSim;
+
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -18,11 +20,16 @@ public class ConfigGui {
     //frame is een veld nu, zodat we het aan startergui kunnnen geven met getframe()
     private JFrame frame;
 
-    public ConfigGui(SimulatieConfig config, Consumer<Integer> onSpeedChange) {
+    public ConfigGui(SimulatieConfig config, Consumer<Integer> onSpeedChange, int timerSim) {
         this.config = config;
         this.onSpeedChange = onSpeedChange;
 
         createAndShowGUI();}
+    public ConfigGui(SimulatieConfig config, Consumer<Integer> onSpeedChange){
+        this.config = config;
+        this.onSpeedChange = onSpeedChange;
+        createAndShowGUI();
+    }
 
     private void createAndShowGUI() {
         frame = new JFrame("Instellingen");

@@ -2,12 +2,16 @@ package hotelsimulator.gui;
 
 import javax.swing.*;
 
+import hotelsimulator.config.TimerSim;
 import hotelsimulator.core.HoofdSimulator;
+import hotelsimulator.core.Hotel;
 
 import java.awt.*;
 
 public class StarterGui {
 	private HoofdSimulator hoofdSimulator;
+    private TimerSim timerSim;
+    private Hotel hotel;
 	JFrame scherm1 = new JFrame();
 	JPanel bestandinvoegen = new JPanel();
 	JButton defaultLayout = new JButton("Laad standaard layout");
@@ -76,9 +80,9 @@ public class StarterGui {
 		instellingenBtn.addActionListener(e -> {
 
 			// sla het instellingen venster op in config, later als gebruiker layout kiest sluiten
-			configFrame = new ConfigGui(hoofdSimulator.getConfig(), value -> {
-			}).getFrame();
-		});
+            configFrame = new ConfigGui(hoofdSimulator.getConfig(), value -> {}).getFrame();
+
+        });
 	}
 
 	public void guiStart() {
