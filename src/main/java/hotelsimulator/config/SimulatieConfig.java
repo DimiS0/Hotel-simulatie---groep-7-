@@ -8,14 +8,12 @@ public class SimulatieConfig {
 	private int aantalGasten;
 	private int brightness;
 	private int volume;
-	private ScenarioType scenario;
 	// Constructor
 	public SimulatieConfig() {
 		this.snelheid = HTE.NORMAAL;
 		this.aantalGasten = 10;
 		this.brightness = 50;
 		this.volume = 50;
-		this.scenario = ScenarioType.STANDAARD;
 	}
     //  listeners
     private final List<Runnable> listeners = new ArrayList<>();
@@ -46,10 +44,6 @@ public class SimulatieConfig {
 		return volume;
 	}
 
-	public ScenarioType getScenario() {
-		return scenario;
-	}
-
 	// SETTERS
     public void setBrightness(int brightness) {
         this.brightness = brightness;
@@ -68,11 +62,6 @@ public class SimulatieConfig {
 
     public void setAantalGasten(int aantalGasten) {
         this.aantalGasten = aantalGasten;
-        notifyListeners();
-    }
-
-    public void setScenario(ScenarioType scenario) {
-        this.scenario = scenario;
         notifyListeners();
     }
 }

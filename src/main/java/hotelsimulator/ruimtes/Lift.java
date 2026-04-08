@@ -1,7 +1,5 @@
 package hotelsimulator.ruimtes;
 
-import hotelsimulator.config.TimerSim;
-
 import java.awt.*;
 
 public class Lift extends HotelRuimte {
@@ -11,8 +9,8 @@ public class Lift extends HotelRuimte {
     private boolean beschikbaar = true;
     private boolean omhoog = true;
 
-    public Lift(String areaType, String sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen, TimerSim timerSim) {
-        super(areaType, sterrenAantal, y, x, breedte, hoogte, maxPersonen, timerSim);
+    public Lift(String areaType, String sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen) {
+        super(areaType, sterrenAantal, y, x, breedte, hoogte, maxPersonen);
     }
     @Override
     public void print(Graphics g, int cellSize) {
@@ -31,21 +29,23 @@ public class Lift extends HotelRuimte {
     }
 
         public void liftBwegen() {
-        if (beschikbaar){
-            return;
-        }
+            if (beschikbaar){
+                return;
+            }
 
-        if (y > doelStopVerdieping){
-            y--;
-        } else if (y < doelStopVerdieping) {
-            y++;
-        }
+            if (y > doelStopVerdieping){
+                y--;
+            } else if (y < doelStopVerdieping) {
+                y++;
+            }
             if (y == doelStopVerdieping) {
                 stopPositie = doelStopVerdieping;
                 beschikbaar = true;
             }
+            System.out.println("y na beweging: " + y);
             System.out.println("Lift y: " + y);
         }
+
         public void roepLiftNaar(int verdieping){
             doelStopVerdieping = verdieping;
             beschikbaar = false;

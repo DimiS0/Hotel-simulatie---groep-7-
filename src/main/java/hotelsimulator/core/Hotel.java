@@ -2,7 +2,7 @@ package hotelsimulator.core;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import hotelsimulator.config.TimerSim;
+import hotelsimulator.config.SimulatieConfig;
 import hotelsimulator.personen.Gast;
 import hotelsimulator.personen.Persoon;
 import hotelsimulator.personen.Schoonmaker;
@@ -16,22 +16,16 @@ import java.util.List;
 public class Hotel {
 	private ArrayList<HotelRuimte> ruimtes;
     private ArrayList<Persoon> personen;
-    private TimerSim timerSim;
 	private Lift lift;
 
-	public Hotel() {
+	public Hotel(SimulatieConfig config) {
 		this.ruimtes = new ArrayList<>();
 		this.personen = new ArrayList<>();
-        this.timerSim = new TimerSim();
 	}
 
 	public ArrayList<HotelRuimte> getRuimtes() {
 		return ruimtes;
 	}
-
-public TimerSim getTimerSim() {
-        return timerSim;
-    }
 
 	public void maakHotelLayout(String layoutJson) {
         //gson object aanmaken
@@ -64,22 +58,22 @@ public TimerSim getTimerSim() {
 
             //elke item maakt een nieuwe object aan met die specificaties
             HotelRuimte r = switch (item.AreaType) {
-                case "Cinema" -> new Bioscoop(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen, getTimerSim());
+                case "Cinema" -> new Bioscoop(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
                 case "Fitness" ->
-                        new FitnessRuimtes(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen, getTimerSim());
+                        new FitnessRuimtes(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
                 case "Restaurant" ->
-                        new Restaurant(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen, getTimerSim());
-                case "Room" -> new HotelKamer(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen, getTimerSim());
+                        new Restaurant(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
+                case "Room" -> new HotelKamer(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
                 default -> null;
             };
             if (r != null)
                 //onthoudt waar de genoemde kamer is in de arraylijst ruimtes
                 ruimtes.add(r);
         }
-        Schacht schacht = new Schacht("Lift", "0", 0, 0, 1, 9, 0, getTimerSim());
-        Lobby lobby = new Lobby("Lobby", "0", 0, 1, 6, 1, 0, getTimerSim());
-        Trap trap = new Trap("trap", "0", 0, 7, 1, 9, 0, getTimerSim());
-        lift = new Lift("Lift", "0", 0, 0, 1, 1, 10, getTimerSim());
+        Schacht schacht = new Schacht("Lift", "0", 0, 0, 1, 9, 0);
+        Lobby lobby = new Lobby("Lobby", "0", 0, 1, 6, 1, 0);
+        Trap trap = new Trap("trap", "0", 0, 7, 1, 9, 0);
+        lift = new Lift("Lift", "0", 0, 0, 1, 1, 10);
 
         ruimtes.add(schacht);
         ruimtes.add(lobby);

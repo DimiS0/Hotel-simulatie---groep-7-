@@ -14,4 +14,11 @@ public enum HTE {
 		this.label = label;
 		this.factor = factor;
 	}
+	public double getFactor() {
+		return factor;
+	}
+
+	public int getDelay() {
+		return (int) (1000 / getFactor());
+	}
 }

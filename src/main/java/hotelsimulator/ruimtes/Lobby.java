@@ -1,13 +1,10 @@
 package hotelsimulator.ruimtes;
-
-import hotelsimulator.config.TimerSim;
-
 import java.awt.*;
 
 public class Lobby extends HotelRuimte {
 
-	public Lobby(String areaType, String sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen, TimerSim timerSim) {
-		super(areaType, sterrenAantal, y, x, breedte, hoogte, maxPersonen,timerSim);
+	public Lobby(String areaType, String sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen) {
+		super(areaType, sterrenAantal, y, x, breedte, hoogte, maxPersonen);
 	}
     @Override
     public void print(Graphics g, int cellSize) {

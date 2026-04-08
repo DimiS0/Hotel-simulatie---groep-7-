@@ -2,7 +2,6 @@ package hotelsimulator.gui;
 
 import javax.swing.*;
 import hotelsimulator.config.HTE;
-import hotelsimulator.config.ScenarioType;
 import hotelsimulator.config.SimulatieConfig;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
@@ -56,8 +55,6 @@ public class ConfigGui {
             int value = snelheidSlider.getValue();
             HTE snelheid = mapSliderToHTE(value);
             config.setSnelheid(snelheid);
-            valueHTE = snelheid;
-            onSpeedChange.accept(value);
         });
 
         panel.add(snelheidSlider);
@@ -95,13 +92,6 @@ public class ConfigGui {
         });
         panel.add(volumeSlider);
 
-        panel.add(new JLabel("Scenario:"));
-        JComboBox<ScenarioType> scenarioBox = new JComboBox<>(ScenarioType.values());
-        scenarioBox.setSelectedItem(config.getScenario());
-        scenarioBox.addActionListener(e ->
-                config.setScenario((ScenarioType) scenarioBox.getSelectedItem()));
-        panel.add(scenarioBox);
-
         frame.add(panel, BorderLayout.CENTER);
         frame.setVisible(true);
     }
@@ -125,7 +115,6 @@ public class ConfigGui {
             case NORMAAL   -> 3;
             case SNEL      -> 4;
             case VIER_X    -> 5;
-            default        -> 3;
         };
     }
 

@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.util.Scanner;
 
 public class HoofdSimulator {
+	private hotelevents.HotelEventManager eventManager;
 	private Hotel hotel;
 	private StarterGui swingGui;
 	private Evenement event;
@@ -24,9 +25,14 @@ public class HoofdSimulator {
 	private SimulatieConfig config;
 
     public HoofdSimulator() {
-        this.hotel = new Hotel();
-        this.config = new SimulatieConfig();
+		this.config = new SimulatieConfig();
+        this.hotel = new Hotel(config);
         this.swingGui = new StarterGui(this);
+		this.eventManager = new hotelevents.HotelEventManager();
+
+		config.addListener(() -> {
+			eventManager.setHte(config.getSnelheid().getDelay());
+		});
 	}
 
 	public void start() {
@@ -64,8 +70,18 @@ public class HoofdSimulator {
                     JOptionPane.ERROR_MESSAGE);
         }
         HotelGui gui = new HotelGui(hotel, config);
-		hotel.getTimerSim().timeMethod(hotel.getLift(), gui);
         gui.showGui();
+
+		eventManager.register(evt -> {
+			if (evt.getEventType() == hotelevents.HotelEventType.NONE) {
+				SwingUtilities.invokeLater(() -> {
+					hotel.getLift().liftBwegen();
+					gui.repaint();
+				});
+			}
+		});
+
+		eventManager.start(1);
     }
 
 	public void LayoutKiezer() {
@@ -128,8 +144,18 @@ public class HoofdSimulator {
 			return;
 		}
         HotelGui gui = new HotelGui(hotel, config);
-		hotel.getTimerSim().timeMethod(hotel.getLift(), gui);
         gui.showGui();
+
+		eventManager.register(evt -> {
+			if (evt.getEventType() == hotelevents.HotelEventType.NONE) {
+				SwingUtilities.invokeLater(() -> {
+					hotel.getLift().liftBwegen();
+					gui.repaint();
+				});
+			}
+		});
+
+		eventManager.start(1);
 	}
 
 	public SimulatieConfig getConfig() {
