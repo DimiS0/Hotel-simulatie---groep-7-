@@ -11,10 +11,12 @@ import hotelsimulator.ruimtes.*;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Hotel {
 	private ArrayList<HotelRuimte> ruimtes;
+    private LinkedList<Integer> liftOproepen = new LinkedList<Integer>();
     private ArrayList<Persoon> personen;
 	private Lift lift;
     private Schacht schacht;
@@ -27,6 +29,10 @@ public class Hotel {
 	public ArrayList<HotelRuimte> getRuimtes() {
 		return ruimtes;
 	}
+
+    public LinkedList<Integer> getLiftOproepen(){
+        return liftOproepen;
+    }
 
 	public void maakHotelLayout(String layoutJson) {
         //gson object aanmaken
@@ -74,7 +80,7 @@ public class Hotel {
          schacht = new Schacht("Lift", "0", 0, 0, 1, 9, 0);
         Lobby lobby = new Lobby("Lobby", "0", 0, 1, 6, 1, 0);
         Trap trap = new Trap("trap", "0", 0, 7, 1, 9, 0);
-        lift = new Lift("Lift", "0", 0, 0, 1, 1, 10);
+        lift = new Lift("Lift", "0", 0, 0, 1, 1, 10,this);
 
         ruimtes.add(schacht);
         ruimtes.add(lobby);
@@ -93,10 +99,10 @@ public class Hotel {
     public void maakPersonen(int aantalGasten) {
         personen = new ArrayList<>();
         for (int i = 0; i < aantalGasten; i++) {
-            personen.add(new Gast(50, 450,10,lift, schacht)); // beginnen in de lobby-area
+            personen.add(new Gast(50, 450,10,lift, schacht,this)); // beginnen in de lobby-area
         }
         // 1 schoonmaker altijd
-        personen.add(new Schoonmaker(50, 450,lift,schacht));
+        personen.add(new Schoonmaker(50, 450,lift,schacht,this));
     }
 
     public ArrayList<Persoon> getPersonen() {

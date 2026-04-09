@@ -1,5 +1,7 @@
 package hotelsimulator.ruimtes;
 
+import hotelsimulator.core.Hotel;
+
 import java.awt.*;
 
 public class Lift extends HotelRuimte {
@@ -8,9 +10,11 @@ public class Lift extends HotelRuimte {
    private int doelStopVerdieping = 10;
     private boolean beschikbaar = true;
     private boolean omhoog = true;
+    private Hotel hotel;
 
-    public Lift(String areaType, String sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen) {
+    public Lift(String areaType, String sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen, Hotel hotel) {
         super(areaType, sterrenAantal, y, x, breedte, hoogte, maxPersonen);
+        this.hotel = hotel;
     }
     @Override
     public void print(Graphics g, int cellSize) {
@@ -29,6 +33,7 @@ public class Lift extends HotelRuimte {
     }
 
         public void liftBwegen() {
+
             if (beschikbaar){
                 return;
             }
@@ -40,10 +45,15 @@ public class Lift extends HotelRuimte {
             }
             if (y == doelStopVerdieping) {
                 stopPositie = doelStopVerdieping;
+                hotel.getLiftOproepen().removeFirst();
                 beschikbaar = true;
+
+                //lijst niet leeg? pak volgende
+                if (!hotel.getLiftOproepen().isEmpty()){
+                    roepLiftNaar(hotel.getLiftOproepen().getFirst());
+                }
             }
             System.out.println("y na beweging: " + y);
-            System.out.println("Lift y: " + y);
         }
 
         public void roepLiftNaar(int verdieping){
@@ -52,5 +62,8 @@ public class Lift extends HotelRuimte {
         }
         public int [] getVerdiepingenY(){
             return verdiepingenY;
+        }
+        public boolean getBeschikbaar(){
+            return beschikbaar;
         }
     }

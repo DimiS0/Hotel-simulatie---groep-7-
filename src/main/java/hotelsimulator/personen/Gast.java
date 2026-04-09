@@ -1,5 +1,6 @@
 package hotelsimulator.personen;
 
+import hotelsimulator.core.Hotel;
 import hotelsimulator.ruimtes.Lift;
 import hotelsimulator.ruimtes.Schacht;
 
@@ -11,8 +12,8 @@ public class Gast extends Persoon {
     private int stopVerdieping;
 
 
-    public Gast(int startX, int startY,int stopVerdieping, Lift lift, Schacht schacht) {
-        super(startX, startY,lift,schacht);
+    public Gast(int startX, int startY, int stopVerdieping, Lift lift, Schacht schacht, Hotel hotel) {
+        super(startX, startY,lift,schacht,hotel);
         this.schacht = schacht;
         this.lift = lift;
         this.stopVerdieping = stopVerdieping;

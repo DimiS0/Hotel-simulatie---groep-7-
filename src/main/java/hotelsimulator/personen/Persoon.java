@@ -1,25 +1,28 @@
 package hotelsimulator.personen;
 
+import hotelsimulator.core.Hotel;
 import hotelsimulator.ruimtes.HotelRuimte;
 import hotelsimulator.ruimtes.Lift;
 import hotelsimulator.ruimtes.Schacht;
 
 import java.awt.*;
-import java.util.Queue;
 import java.util.Random;
 
 public abstract class Persoon {
+    private boolean heeftVerzoekIngediend = false;
     protected HotelRuimte huidigeRuimte;
     protected int pixelX;
     protected int pixelY;
     protected int doelX;
     protected int doelY;
+    protected Hotel hotel;
     protected Schacht schacht;
     protected Lift lift;
     protected static final int SNELHEID = 2;
     protected static final Random random = new Random();
 
-    public Persoon(int startX, int startY, Lift lift, Schacht schacht) {
+    public Persoon(int startX, int startY, Lift lift, Schacht schacht, Hotel hotel) {
+        this.hotel = hotel;
         this.schacht  = schacht;
         this.lift  = lift;
         this.pixelX = startX;
@@ -45,6 +48,9 @@ public abstract class Persoon {
                     liftVerzoek(gridY);
                 }
             }
+        } else {
+            //als ze niet op het vakje zijn
+            heeftVerzoekIngediend = false;
         }
 
 
@@ -64,7 +70,22 @@ public abstract class Persoon {
     }
 
     public void liftVerzoek(int stopVerdieping){
-        lift.roepLiftNaar(stopVerdieping);
+
+        //verzoeken boolean zodat ze niet elke seconde 100den verzoeken maken
+        if (!heeftVerzoekIngediend) {
+            heeftVerzoekIngediend = true;
+
+            //niet opgeroepen worden als de lift dezelfde y heeft
+            if (lift.getY() != stopVerdieping) {
+                hotel.getLiftOproepen().addLast(stopVerdieping);
+                System.out.println("verzoek " + hotel.getLiftOproepen().size());
+
+                //bechikbaar? lift naar locatie sturen van gast/schoonmaker
+                if (lift.getBeschikbaar()) {
+                    lift.roepLiftNaar(hotel.getLiftOproepen().getFirst());
+                }
+            }
+        }
     }
 
     public abstract void print(Graphics g);

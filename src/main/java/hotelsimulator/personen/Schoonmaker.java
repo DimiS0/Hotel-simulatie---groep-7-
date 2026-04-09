@@ -1,5 +1,6 @@
 package hotelsimulator.personen;
 
+import hotelsimulator.core.Hotel;
 import hotelsimulator.ruimtes.Lift;
 import hotelsimulator.ruimtes.Schacht;
 
@@ -10,8 +11,8 @@ public class Schoonmaker extends Persoon {
     private Lift lift;
 
 
-    public Schoonmaker(int startX, int startY, Lift lift, Schacht schacht) {
-        super(startX, startY, lift,schacht);
+    public Schoonmaker(int startX, int startY, Lift lift, Schacht schacht, Hotel hotel) {
+        super(startX, startY, lift,schacht, hotel);
         this.schacht = schacht;
         this.lift = lift;
     }
