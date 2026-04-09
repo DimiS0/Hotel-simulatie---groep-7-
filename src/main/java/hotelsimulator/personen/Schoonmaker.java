@@ -1,11 +1,19 @@
 package hotelsimulator.personen;
 
+import hotelsimulator.ruimtes.Lift;
+import hotelsimulator.ruimtes.Schacht;
+
 import java.awt.*;
 
 public class Schoonmaker extends Persoon {
+    private Schacht schacht;
+    private Lift lift;
 
-    public Schoonmaker(int startX, int startY) {
-        super(startX, startY);
+
+    public Schoonmaker(int startX, int startY, Lift lift, Schacht schacht) {
+        super(startX, startY, lift,schacht);
+        this.schacht = schacht;
+        this.lift = lift;
     }
 
     @Override

@@ -17,6 +17,7 @@ public class Hotel {
 	private ArrayList<HotelRuimte> ruimtes;
     private ArrayList<Persoon> personen;
 	private Lift lift;
+    private Schacht schacht;
 
 	public Hotel(SimulatieConfig config) {
 		this.ruimtes = new ArrayList<>();
@@ -70,7 +71,7 @@ public class Hotel {
                 //onthoudt waar de genoemde kamer is in de arraylijst ruimtes
                 ruimtes.add(r);
         }
-        Schacht schacht = new Schacht("Lift", "0", 0, 0, 1, 9, 0);
+         schacht = new Schacht("Lift", "0", 0, 0, 1, 9, 0);
         Lobby lobby = new Lobby("Lobby", "0", 0, 1, 6, 1, 0);
         Trap trap = new Trap("trap", "0", 0, 7, 1, 9, 0);
         lift = new Lift("Lift", "0", 0, 0, 1, 1, 10);
@@ -80,7 +81,6 @@ public class Hotel {
         ruimtes.add(trap);
         ruimtes.add(lift);
 
-        lift.roepLiftNaar(3);
     }
 
 	public Lift getLift() {
@@ -93,10 +93,10 @@ public class Hotel {
     public void maakPersonen(int aantalGasten) {
         personen = new ArrayList<>();
         for (int i = 0; i < aantalGasten; i++) {
-            personen.add(new Gast(50, 450,10,lift)); // beginnen in de lobby-area
+            personen.add(new Gast(50, 450,10,lift, schacht)); // beginnen in de lobby-area
         }
         // 1 schoonmaker altijd
-        personen.add(new Schoonmaker(50, 450));
+        personen.add(new Schoonmaker(50, 450,lift,schacht));
     }
 
     public ArrayList<Persoon> getPersonen() {

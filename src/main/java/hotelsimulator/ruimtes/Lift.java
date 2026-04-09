@@ -3,7 +3,7 @@ package hotelsimulator.ruimtes;
 import java.awt.*;
 
 public class Lift extends HotelRuimte {
-   private int [] verdieoingenY = {10,7,4};
+   private int [] verdiepingenY = {10,7,4};
    private int stopPositie = 10;
    private int doelStopVerdieping = 10;
     private boolean beschikbaar = true;
@@ -49,5 +49,8 @@ public class Lift extends HotelRuimte {
         public void roepLiftNaar(int verdieping){
             doelStopVerdieping = verdieping;
             beschikbaar = false;
+        }
+        public int [] getVerdiepingenY(){
+            return verdiepingenY;
         }
     }
