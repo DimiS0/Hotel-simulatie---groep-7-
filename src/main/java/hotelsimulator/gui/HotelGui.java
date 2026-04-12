@@ -61,17 +61,19 @@ public class HotelGui extends JPanel {
 
         frame.add(this, BorderLayout.CENTER);
 
-        JPanel topPanel = new JPanel();
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JButton instellingenBtn = new JButton("Instellingen");
 
         topPanel.add(instellingenBtn);
+        topPanel.add(speed);
         frame.add(topPanel, BorderLayout.NORTH);
-        frame.add(speed, BorderLayout.SOUTH);
 
         instellingenBtn.addActionListener(e -> {
             new ConfigGui(config, value -> updateSpeedLabel(value));
         });
 
+        HotelOverzicht overzicht = new HotelOverzicht(hotel);
+        frame.add(overzicht, BorderLayout.SOUTH);
         //frame pack past grootte aan van venster zodat alle knoppen precies passen
         frame.pack();
 
@@ -93,44 +95,36 @@ public class HotelGui extends JPanel {
             }
             repaint();
         });
+        this.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                int gridX = e.getX() / cellSize;
+                int gridY = e.getY() / cellSize;
+
+                for (HotelRuimte r : hotel.getRuimtes()) {
+                    if (r instanceof hotelsimulator.ruimtes.Lobby) {
+                        // zelfde offset als in Lobby.print()
+                        int lobbyX = r.getX() + 1;
+                        int lobbyY = r.getY() - 1;
+                        if (gridX >= lobbyX && gridX < lobbyX + r.getBreedte() &&
+                                gridY >= lobbyY && gridY < lobbyY + r.getHoogte()) {
+                            overzicht.setVisible(!overzicht.isVisible());
+                        }
+                    }
+                }
+            }
+        });
         bewegingsTimer.start();
     }
 
     public void updateSpeedLabel(int value) {
         switch (value) {
-            case 1 :
-                frame.remove(speed);
-                frame.revalidate();
-                frame.repaint();
-                speed.setText("0.25x");
-                break;
-            case 2:
-                frame.remove(speed);
-                frame.revalidate();
-                frame.repaint();
-                speed.setText("0.50x");
-                break;
-            case 3:
-                frame.remove(speed);
-                frame.revalidate();
-                frame.repaint();
-                speed.setText("1.0x");
-                break;
-            case 4:
-                frame.remove(speed);
-                frame.revalidate();
-                frame.repaint();
-                speed.setText("2.0x");
-                break;
-            case 5:
-                frame.remove(speed);
-                frame.revalidate();
-                frame.repaint();
-                speed.setText("4.0x");
-                break;
+            case 1 -> speed.setText("0.25x");
+            case 2 -> speed.setText("0.50x");
+            case 3 -> speed.setText("1.0x");
+            case 4 -> speed.setText("2.0x");
+            case 5 -> speed.setText("4.0x");
         }
-        frame.add(speed, BorderLayout.SOUTH);
-        frame.setVisible(true);
     }
 
     // vertaalt HTE waarde naar getal, dus snel -> 4 en die wordt 2.0x

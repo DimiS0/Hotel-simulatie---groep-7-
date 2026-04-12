@@ -55,6 +55,7 @@ public class ConfigGui {
             int value = snelheidSlider.getValue();
             HTE snelheid = mapSliderToHTE(value);
             config.setSnelheid(snelheid);
+            onSpeedChange.accept(value);
         });
 
         panel.add(snelheidSlider);

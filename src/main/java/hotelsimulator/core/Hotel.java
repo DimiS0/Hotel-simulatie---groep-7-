@@ -26,10 +26,6 @@ public class Hotel {
 		this.personen = new ArrayList<>();
 	}
 
-	public ArrayList<HotelRuimte> getRuimtes() {
-		return ruimtes;
-	}
-
     public LinkedList<Integer> getLiftOproepen(){
         return liftOproepen;
     }
@@ -87,6 +83,9 @@ public class Hotel {
         ruimtes.add(trap);
         ruimtes.add(lift);
 
+    }
+    public ArrayList<HotelRuimte> getRuimtes() {
+        return ruimtes;
     }
 
 	public Lift getLift() {
