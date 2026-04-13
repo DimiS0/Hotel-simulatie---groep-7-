@@ -34,3 +34,8 @@ lib/*.jar
 
 ### Compiled ###
 target/
+
+### Visual Paradigm ###
+*.vpp.lck
+*.vpp.bak*
+*.vpp.vbak

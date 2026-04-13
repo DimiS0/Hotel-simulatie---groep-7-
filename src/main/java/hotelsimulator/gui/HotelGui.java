@@ -1,14 +1,15 @@
 package hotelsimulator.gui;
 
 import hotelsimulator.config.HTE;
-import hotelsimulator.config.TimerSim;
 import hotelsimulator.core.Hotel;
 import hotelsimulator.config.SimulatieConfig;
+import hotelsimulator.personen.Gast;
 import hotelsimulator.ruimtes.HotelRuimte;
 import hotelsimulator.personen.Persoon;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 import static hotelsimulator.config.HTE.*;
 
@@ -21,15 +22,15 @@ public class HotelGui extends JPanel {
     private JFrame frame;
     private JLabel speed;
     boolean setDefaultSpeed;
-    private TimerSim timerSim;
-
+    private int liftTeller = 0;
+    private final int[] LIFT_STOPS = {8, 5, 2}; // Grid-Y posities van de lifthaltes
+    private int liftStopIndex = 0;
     public HotelGui(Hotel hotel, SimulatieConfig config) {
         this.frame = new JFrame("Hotel Layout");
         this.hotel = hotel;
         this.config = config;
         this.setDefaultSpeed = false;
         this.speed = new JLabel("1x");
-        timerSim = hotel.getTimerSim();
         setPreferredSize(new Dimension(10 * cellSize, 10 * cellSize));
     }
 
@@ -64,17 +65,18 @@ public class HotelGui extends JPanel {
 
         frame.add(this, BorderLayout.CENTER);
 
-        JPanel topPanel = new JPanel();
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JButton instellingenBtn = new JButton("Instellingen");
 
         topPanel.add(instellingenBtn);
+        topPanel.add(speed);
         frame.add(topPanel, BorderLayout.NORTH);
         frame.add(speed, BorderLayout.SOUTH);
 
-        instellingenBtn.addActionListener(e -> {
-            new ConfigGui(config, value -> {updateSpeedLabel(value); timerSim.updateTimerFactor(value);});
-        });
+        instellingenBtn.addActionListener(e -> new ConfigGui(config, value -> updateSpeedLabel(value)));
 
+        HotelOverzicht overzicht = new HotelOverzicht(hotel);
+        frame.add(overzicht, BorderLayout.SOUTH);
         //frame pack past grootte aan van venster zodat alle knoppen precies passen
         frame.pack();
 
@@ -85,55 +87,85 @@ public class HotelGui extends JPanel {
         updateSpeedLabel(mapHTEToSlider(config.getSnelheid()));
 
         frame.setVisible(true);
+
         hotel.maakPersonen(config.getAantalGasten());
 
-        Timer bewegingsTimer = new Timer(16, ev -> {
-            for (Persoon p : hotel.getPersonen()) {
-                if (p.isOpDoel()) {
-                    p.kiesRandomDoel(cellSize, 10);
+        // Spawn één gast per 2 seconden vanuit de lobby
+        List<Persoon> personen = hotel.getPersonen();
+        final int[] spawnIndex = {0};
+
+        Timer spawnTimer = new Timer(2000, ev -> {
+            while (spawnIndex[0] < personen.size()) {
+                Persoon p = personen.get(spawnIndex[0]);
+                if (p instanceof Gast gast && !gast.isGespawnd()) {
+                    gast.activeer();
+                    spawnIndex[0]++;
+                    break;
                 }
-                p.beweeg();
+                spawnIndex[0]++;
+            }
+        });
+        spawnTimer.start();
+
+        // Bewegingstimer: ~60 FPS
+        Timer bewegingsTimer = new Timer(16, ev -> {
+            // Lift laten rijden (partner's code)
+            // Elke ~5 seconden de lift naar volgende verdieping sturen
+            liftTeller++;
+            if (liftTeller >= 300) {
+                liftTeller = 0;
+                int volgendeStop = LIFT_STOPS[liftStopIndex % LIFT_STOPS.length];
+
+                // Eerst aan wachtrij toevoegen, dan lift starten
+                hotel.getLiftOproepen().add(volgendeStop);
+                if (hotel.getLift().getBeschikbaar()) {
+                    hotel.getLift().roepLiftNaar(volgendeStop);
+                }
+                liftStopIndex++;
+            }
+            for (Persoon p : hotel.getPersonen()) {
+                if (p instanceof Gast gast) {
+                    gast.update();
+                } else {
+                    p.beweeg();
+                }
             }
             repaint();
+        });
+        this.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                int gridX = e.getX() / cellSize;
+                int gridY = e.getY() / cellSize;
+
+                for (HotelRuimte r : hotel.getRuimtes()) {
+                    if (r instanceof hotelsimulator.ruimtes.Lobby) {
+                        // zelfde offset als in Lobby.print()
+                        int lobbyX = r.getX() + 1;
+                        int lobbyY = r.getY() - 1;
+                        if (gridX >= lobbyX && gridX < lobbyX + r.getBreedte() &&
+                                gridY >= lobbyY && gridY < lobbyY + r.getHoogte()) {
+                            overzicht.setVisible(!overzicht.isVisible());
+                        }
+                    }
+                }
+            }
         });
         bewegingsTimer.start();
     }
 
     public void updateSpeedLabel(int value) {
         switch (value) {
-            case 1 :
-                frame.remove(speed);
-                frame.revalidate();
-                frame.repaint();
-                speed.setText("0.25x");
-                break;
-            case 2:
-                frame.remove(speed);
-                frame.revalidate();
-                frame.repaint();
-                speed.setText("0.50x");
-                break;
-            case 3:
-                frame.remove(speed);
-                frame.revalidate();
-                frame.repaint();
-                speed.setText("1.0x");
-                break;
-            case 4:
-                frame.remove(speed);
-                frame.revalidate();
-                frame.repaint();
-                speed.setText("2.0x");
-                break;
-            case 5:
-                frame.remove(speed);
-                frame.revalidate();
-                frame.repaint();
-                speed.setText("4.0x");
-                break;
+            case 1 -> speed.setText("0.25x");
+            case 2 -> speed.setText("0.50x");
+            case 3 -> speed.setText("1.0x");
+            case 4 -> speed.setText("2.0x");
+            case 5 -> speed.setText("4.0x");
         }
+        frame.remove(speed);
         frame.add(speed, BorderLayout.SOUTH);
-        frame.setVisible(true);
+        frame.revalidate();
+        frame.repaint();
     }
 
     // vertaalt HTE waarde naar getal, dus snel -> 4 en die wordt 2.0x

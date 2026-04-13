@@ -2,7 +2,7 @@ package hotelsimulator.core;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import hotelsimulator.config.TimerSim;
+import hotelsimulator.config.SimulatieConfig;
 import hotelsimulator.personen.Gast;
 import hotelsimulator.personen.Persoon;
 import hotelsimulator.personen.Schoonmaker;
@@ -11,26 +11,23 @@ import hotelsimulator.ruimtes.*;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Hotel {
 	private ArrayList<HotelRuimte> ruimtes;
+    private LinkedList<Integer> liftOproepen = new LinkedList<Integer>();
     private ArrayList<Persoon> personen;
-    private TimerSim timerSim;
 	private Lift lift;
+    private Schacht schacht;
 
-	public Hotel() {
+	public Hotel(SimulatieConfig config) {
 		this.ruimtes = new ArrayList<>();
 		this.personen = new ArrayList<>();
-        this.timerSim = new TimerSim();
 	}
 
-	public ArrayList<HotelRuimte> getRuimtes() {
-		return ruimtes;
-	}
-
-public TimerSim getTimerSim() {
-        return timerSim;
+    public LinkedList<Integer> getLiftOproepen(){
+        return liftOproepen;
     }
 
 	public void maakHotelLayout(String layoutJson) {
@@ -64,29 +61,31 @@ public TimerSim getTimerSim() {
 
             //elke item maakt een nieuwe object aan met die specificaties
             HotelRuimte r = switch (item.AreaType) {
-                case "Cinema" -> new Bioscoop(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen, getTimerSim());
+                case "Cinema" -> new Bioscoop(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
                 case "Fitness" ->
-                        new FitnessRuimtes(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen, getTimerSim());
+                        new FitnessRuimtes(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
                 case "Restaurant" ->
-                        new Restaurant(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen, getTimerSim());
-                case "Room" -> new HotelKamer(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen, getTimerSim());
+                        new Restaurant(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
+                case "Room" -> new HotelKamer(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
                 default -> null;
             };
             if (r != null)
                 //onthoudt waar de genoemde kamer is in de arraylijst ruimtes
                 ruimtes.add(r);
         }
-        Schacht schacht = new Schacht("Lift", "0", 0, 0, 1, 9, 0, getTimerSim());
-        Lobby lobby = new Lobby("Lobby", "0", 0, 1, 6, 1, 0, getTimerSim());
-        Trap trap = new Trap("trap", "0", 0, 7, 1, 9, 0, getTimerSim());
-        lift = new Lift("Lift", "0", 0, 0, 1, 1, 10, getTimerSim());
+         schacht = new Schacht("Lift", "0", 0, 0, 1, 9, 0);
+        Lobby lobby = new Lobby("Lobby", "0", 0, 1, 6, 1, 0);
+        Trap trap = new Trap("trap", "0", 0, 7, 1, 9, 0);
+        lift = new Lift("Lift", "0", 0, 0, 1, 1, 10,this);
 
         ruimtes.add(schacht);
         ruimtes.add(lobby);
         ruimtes.add(trap);
         ruimtes.add(lift);
 
-        lift.roepLiftNaar(3);
+    }
+    public ArrayList<HotelRuimte> getRuimtes() {
+        return ruimtes;
     }
 
 	public Lift getLift() {
@@ -99,12 +98,21 @@ public TimerSim getTimerSim() {
     public void maakPersonen(int aantalGasten) {
         personen = new ArrayList<>();
         for (int i = 0; i < aantalGasten; i++) {
-            personen.add(new Gast(50, 450,10,lift)); // beginnen in de lobby-area
+            personen.add(new Gast(lift, schacht, this));
         }
-        // 1 schoonmaker altijd
-        personen.add(new Schoonmaker(50, 450));
+        personen.add(new Schoonmaker(50, 450, lift, schacht, this));
     }
-
+    // In Hotel.java — voeg toe als class-methode
+    public List<HotelRuimte> getKamers() {
+        List<HotelRuimte> result = new ArrayList<>();
+        for (HotelRuimte r : ruimtes) {
+            if (r instanceof HotelKamer || r instanceof Restaurant ||
+                    r instanceof Bioscoop  || r instanceof FitnessRuimtes) {
+                result.add(r);
+            }
+        }
+        return result;
+    }
     public ArrayList<Persoon> getPersonen() {
         return personen;
 }}

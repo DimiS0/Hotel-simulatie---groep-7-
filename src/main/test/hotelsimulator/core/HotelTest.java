@@ -1,5 +1,6 @@
 package hotelsimulator.core;
 
+import hotelsimulator.config.SimulatieConfig;
 import hotelsimulator.ruimtes.HotelRuimte;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,10 +9,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class HotelTest {
     private Hotel hotel;
+    private SimulatieConfig config;
 
     @BeforeEach
     void setUp() {
-        hotel = new Hotel();
+        config = new SimulatieConfig();
+        hotel = new Hotel(config);
 
 
     }
@@ -23,7 +26,7 @@ class HotelTest {
 
         HotelRuimte hotelRuimte = hotel.getRuimtes().get(0);
 
-        assertEquals(1,hotel.getRuimtes().size());
+        assertEquals(5,hotel.getRuimtes().size());
         assertEquals("Cinema",hotel.getRuimtes().get(0).getAreaType());
         assertEquals(1, hotelRuimte.getX());
         assertEquals(1, hotelRuimte.getY());
