@@ -91,7 +91,9 @@ public abstract class Persoon {
             }
         }
     }
-
+    public HotelRuimte getHuidigeRuimte() {
+        return null; // Standaard: persoon zit nergens in
+    }
     public abstract void print(Graphics g);
 
     public int getPixelX() { return pixelX; }

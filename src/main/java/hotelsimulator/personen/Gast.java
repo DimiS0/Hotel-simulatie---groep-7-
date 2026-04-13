@@ -256,4 +256,13 @@ public class Gast extends Persoon {
         g.setColor(Color.WHITE);
         g.drawString("G", pixelX - 4, pixelY + 5);
     }
+    @Override
+    public HotelRuimte getHuidigeRuimte() {
+        if (status == Status.IN_KAMER ||
+                status == Status.BETREEDT_KAMER ||
+                status == Status.VERLAAT_KAMER) {
+            return doelKamer;
+        }
+        return null;
+    }
 }
