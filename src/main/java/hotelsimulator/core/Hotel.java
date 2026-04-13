@@ -73,7 +73,7 @@ public class Hotel {
                 //onthoudt waar de genoemde kamer is in de arraylijst ruimtes
                 ruimtes.add(r);
         }
-         schacht = new Schacht("Lift", "0", 0, 0, 1, 9, 0);
+         schacht = new Schacht("Schacht", "0", 0, 0, 1, 9, 0);
         Lobby lobby = new Lobby("Lobby", "0", 0, 1, 6, 1, 0);
         Trap trap = new Trap("trap", "0", 0, 7, 1, 9, 0);
         lift = new Lift("Lift", "0", 0, 0, 1, 1, 10,this);

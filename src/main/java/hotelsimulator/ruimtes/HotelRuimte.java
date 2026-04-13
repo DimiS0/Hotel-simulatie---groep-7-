@@ -60,4 +60,5 @@ public abstract class HotelRuimte {
 		return maxPersonen;
 	}
     public abstract void print(Graphics g, int cellSize);
+
 }

@@ -3,45 +3,53 @@ package hotelsimulator.gui;
 import hotelsimulator.core.Hotel;
 import hotelsimulator.personen.Gast;
 import hotelsimulator.ruimtes.HotelRuimte;
+import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
+import java.util.Comparator;
+
 
 public class HotelOverzicht extends JFrame {
 
-    private final Hotel hotel;
-    private final JTextArea tekst = new JTextArea();
-
     public HotelOverzicht(Hotel hotel) {
-        this.hotel = hotel;
-
         setTitle("Hotel Overzicht");
-        setSize(400, 300);
+        setSize(600, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(false);
         setLocationRelativeTo(null);
 
-        tekst.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        tekst.setEditable(false);
+        JPanel mainPanel = new JPanel(new GridBagLayout());
 
-        add(new JScrollPane(tekst), BorderLayout.CENTER);
+        JScrollPane scrollPane = new JScrollPane(mainPanel,
+                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+
+        add(scrollPane, BorderLayout.CENTER);
+
+        for (HotelRuimte ruimte : hotel.getRuimtes()) {
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.gridx      = ruimte.getX();
+            gbc.gridy      = ruimte.getY();
+            gbc.gridwidth  = ruimte.getBreedte();
+            gbc.gridheight = ruimte.getHoogte();
+            gbc.fill       = GridBagConstraints.BOTH;
+            gbc.insets     = new Insets(2, 2, 2, 2);
+            gbc.weightx    = 1.0;
+            gbc.weighty    = 1.0;
+
+            JButton btn = new JButton(ruimte.getAreaType());
+            btn.addActionListener(e -> JOptionPane.showMessageDialog(this,
+                    "Sterren: " + ruimte.getSterrenAantal() + "\n" +
+                            "Max: " + ruimte.getMaxPersonen() + " pers.",
+                    ruimte.getAreaType(),
+                    JOptionPane.INFORMATION_MESSAGE));
+
+            mainPanel.add(btn, gbc);
+        }
 
         setVisible(true);
-
-        new Timer(500, e -> verversen()).start();
-    }
-
-    private void verversen() {
-        StringBuilder sb = new StringBuilder();
-        for (HotelRuimte ruimte : hotel.getRuimtes()) {
-            long aantal = hotel.getPersonen().stream()
-                    .filter(p -> p.getHuidigeRuimte() == ruimte)
-                    .count();
-            if (aantal > 0)
-                sb.append(ruimte.getAreaType()).append(": ").append(aantal).append("\n");
-        }
-        long totaal = hotel.getPersonen().stream()
-                .filter(p -> p instanceof Gast).count();
-        sb.append("\nTotaal gasten: ").append(totaal);
-        tekst.setText(sb.toString());
     }
 }
