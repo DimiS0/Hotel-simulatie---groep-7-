@@ -99,12 +99,21 @@ public class Hotel {
     public void maakPersonen(int aantalGasten) {
         personen = new ArrayList<>();
         for (int i = 0; i < aantalGasten; i++) {
-            personen.add(new Gast(50, 450,10,lift, schacht,this)); // beginnen in de lobby-area
+            personen.add(new Gast(lift, schacht, this));
         }
-        // 1 schoonmaker altijd
-        personen.add(new Schoonmaker(50, 450,lift,schacht,this));
+        personen.add(new Schoonmaker(50, 450, lift, schacht, this));
     }
-
+    // In Hotel.java — voeg toe als class-methode
+    public List<HotelRuimte> getKamers() {
+        List<HotelRuimte> result = new ArrayList<>();
+        for (HotelRuimte r : ruimtes) {
+            if (r instanceof HotelKamer || r instanceof Restaurant ||
+                    r instanceof Bioscoop  || r instanceof FitnessRuimtes) {
+                result.add(r);
+            }
+        }
+        return result;
+    }
     public ArrayList<Persoon> getPersonen() {
         return personen;
 }}

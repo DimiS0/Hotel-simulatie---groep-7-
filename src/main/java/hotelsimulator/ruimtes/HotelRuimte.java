@@ -10,7 +10,7 @@ public abstract class HotelRuimte {
 	protected int breedte;
 	protected int hoogte;
 	protected int maxPersonen;
-
+    private int aantalAanwezig = 0;
 	public HotelRuimte(String areaType, String sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen) {
 		this.areaType = areaType;
 		this.sterrenAantal = sterrenAantal;
@@ -20,7 +20,18 @@ public abstract class HotelRuimte {
 		this.hoogte = hoogte;
 		this.maxPersonen = maxPersonen;
 	}
-
+    public boolean isVol() {
+        return maxPersonen > 0 && aantalAanwezig >= maxPersonen;
+    }
+    public synchronized void betreed() {
+        aantalAanwezig++;
+    }
+    public synchronized void verlaat() {
+        if (aantalAanwezig > 0) aantalAanwezig--;
+    }
+    public int getAantalAanwezig() {
+        return aantalAanwezig;
+    }
 	public String getAreaType() {
 		return areaType;
 	}
