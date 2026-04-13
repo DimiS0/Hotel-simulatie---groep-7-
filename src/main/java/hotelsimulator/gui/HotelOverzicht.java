@@ -7,7 +7,7 @@ import hotelsimulator.ruimtes.HotelRuimte;
 import javax.swing.*;
 import java.awt.*;
 
-public class HotelOverzicht extends JPanel {
+public class HotelOverzicht extends JFrame {
 
     private final Hotel hotel;
     private final JTextArea tekst = new JTextArea();
@@ -15,9 +15,17 @@ public class HotelOverzicht extends JPanel {
     public HotelOverzicht(Hotel hotel) {
         this.hotel = hotel;
 
+        setTitle("Hotel Overzicht");
+        setSize(400, 300);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
         tekst.setFont(new Font("Monospaced", Font.PLAIN, 12));
         tekst.setEditable(false);
-        add(new JScrollPane(tekst));
+
+        add(new JScrollPane(tekst), BorderLayout.CENTER);
+
+        setVisible(true);
 
         new Timer(500, e -> verversen()).start();
     }

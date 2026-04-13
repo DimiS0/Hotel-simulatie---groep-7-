@@ -2,7 +2,6 @@ package hotelsimulator.gui;
 
 import javax.swing.*;
 
-import hotelsimulator.config.TimerSim;
 import hotelsimulator.core.HoofdSimulator;
 import hotelsimulator.core.Hotel;
 
@@ -10,7 +9,6 @@ import java.awt.*;
 
 public class StarterGui {
 	private HoofdSimulator hoofdSimulator;
-    private TimerSim timerSim;
     private Hotel hotel;
 	JFrame scherm1 = new JFrame();
 	JPanel bestandinvoegen = new JPanel();

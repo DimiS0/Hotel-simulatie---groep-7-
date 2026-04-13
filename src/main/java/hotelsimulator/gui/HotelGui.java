@@ -25,6 +25,7 @@ public class HotelGui extends JPanel {
     private int liftTeller = 0;
     private final int[] LIFT_STOPS = {8, 5, 2}; // Grid-Y posities van de lifthaltes
     private int liftStopIndex = 0;
+    private HotelOverzicht overzicht;
     public HotelGui(Hotel hotel, SimulatieConfig config) {
         this.frame = new JFrame("Hotel Layout");
         this.hotel = hotel;
@@ -75,8 +76,6 @@ public class HotelGui extends JPanel {
 
         instellingenBtn.addActionListener(e -> new ConfigGui(config, value -> updateSpeedLabel(value)));
 
-        HotelOverzicht overzicht = new HotelOverzicht(hotel);
-        frame.add(overzicht, BorderLayout.SOUTH);
         //frame pack past grootte aan van venster zodat alle knoppen precies passen
         frame.pack();
 
@@ -86,9 +85,10 @@ public class HotelGui extends JPanel {
         //bij het openen van hotelGui lezen we snelheid van config, want zodat snelheid in starterGui meegnomen wordt.
         updateSpeedLabel(mapHTEToSlider(config.getSnelheid()));
 
+        hotel.maakPersonen(config.getAantalGasten());
         frame.setVisible(true);
 
-        hotel.maakPersonen(config.getAantalGasten());
+
 
         // Spawn één gast per 2 seconden vanuit de lobby
         List<Persoon> personen = hotel.getPersonen();
@@ -145,7 +145,15 @@ public class HotelGui extends JPanel {
                         int lobbyY = r.getY() - 1;
                         if (gridX >= lobbyX && gridX < lobbyX + r.getBreedte() &&
                                 gridY >= lobbyY && gridY < lobbyY + r.getHoogte()) {
-                            overzicht.setVisible(!overzicht.isVisible());
+                            if (overzicht == null || !overzicht.isVisible()){
+                                overzicht = new HotelOverzicht(hotel);
+                            }
+                            else{
+                                overzicht.dispose();
+                                overzicht = null;
+                            }
+
+
                         }
                     }
                 }
