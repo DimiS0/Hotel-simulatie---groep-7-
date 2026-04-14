@@ -1,5 +1,6 @@
 package hotelsimulator.gui;
 
+import hotelevents.HotelEventManager;
 import hotelsimulator.config.HTE;
 import hotelsimulator.core.Hotel;
 import hotelsimulator.config.SimulatieConfig;
@@ -11,11 +12,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
-import static hotelsimulator.config.HTE.*;
-
 public class HotelGui extends JPanel {
 
     private Hotel hotel;
+    private HotelEventManager hotelEventManager;
     private SimulatieConfig config;
     private final int cellSize = 50;
     private ConfigGui configGui;
@@ -26,9 +26,10 @@ public class HotelGui extends JPanel {
     private final int[] LIFT_STOPS = {8, 5, 2}; // Grid-Y posities van de lifthaltes
     private int liftStopIndex = 0;
     private HotelOverzicht overzicht;
-    public HotelGui(Hotel hotel, SimulatieConfig config) {
+    public HotelGui(Hotel hotel, SimulatieConfig config, HotelEventManager eventManager) {
         this.frame = new JFrame("Hotel Layout");
         this.hotel = hotel;
+        this.hotelEventManager = eventManager;
         this.config = config;
         this.setDefaultSpeed = false;
         this.speed = new JLabel("1x");
@@ -146,7 +147,7 @@ public class HotelGui extends JPanel {
                         if (gridX >= lobbyX && gridX < lobbyX + r.getBreedte() &&
                                 gridY >= lobbyY && gridY < lobbyY + r.getHoogte()) {
                             if (overzicht == null || !overzicht.isVisible()){
-                                overzicht = new HotelOverzicht(hotel);
+                                overzicht = new HotelOverzicht(hotel,hotelEventManager);
                             }
                             else{
                                 overzicht.dispose();

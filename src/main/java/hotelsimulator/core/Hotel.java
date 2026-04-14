@@ -2,6 +2,7 @@ package hotelsimulator.core;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import hotelevents.HotelEventManager;
 import hotelsimulator.config.SimulatieConfig;
 import hotelsimulator.personen.Gast;
 import hotelsimulator.personen.Persoon;
@@ -15,13 +16,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Hotel {
+    private HotelEventManager hotelEventManager;
 	private ArrayList<HotelRuimte> ruimtes;
     private LinkedList<Integer> liftOproepen = new LinkedList<Integer>();
     private ArrayList<Persoon> personen;
 	private Lift lift;
     private Schacht schacht;
 
-	public Hotel(SimulatieConfig config) {
+	public Hotel(SimulatieConfig config, HotelEventManager eventManager) {
+        this.hotelEventManager = eventManager;
 		this.ruimtes = new ArrayList<>();
 		this.personen = new ArrayList<>();
 	}
@@ -62,10 +65,8 @@ public class Hotel {
             //elke item maakt een nieuwe object aan met die specificaties
             HotelRuimte r = switch (item.AreaType) {
                 case "Cinema" -> new Bioscoop(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
-                case "Fitness" ->
-                        new FitnessRuimtes(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
-                case "Restaurant" ->
-                        new Restaurant(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
+                case "Fitness" -> new FitnessRuimtes(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
+                case "Restaurant" -> new Restaurant(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
                 case "Room" -> new HotelKamer(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
                 default -> null;
             };
@@ -73,10 +74,10 @@ public class Hotel {
                 //onthoudt waar de genoemde kamer is in de arraylijst ruimtes
                 ruimtes.add(r);
         }
-         schacht = new Schacht("Schacht", "0", 0, 0, 1, 9, 0);
-        Lobby lobby = new Lobby("Lobby", "0", 0, 1, 6, 1, 0);
-        Trap trap = new Trap("trap", "0", 0, 7, 1, 9, 0);
-        lift = new Lift("Lift", "0", 0, 0, 1, 1, 10,this);
+         schacht = new Schacht("Schacht", "", 0, 0, 1, 9, 0);
+        Lobby lobby = new Lobby("Lobby", "", 0, 1, 6, 1, 0);
+        Trap trap = new Trap("trap", "", 0, 7, 1, 9, 0);
+        lift = new Lift("Lift", "", 0, 0, 1, 1, 10,this);
 
         ruimtes.add(schacht);
         ruimtes.add(lobby);

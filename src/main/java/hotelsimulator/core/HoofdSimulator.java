@@ -6,10 +6,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import hotelsimulator.config.HTE;
 import hotelsimulator.config.SimulatieConfig;
 import hotelsimulator.events.Evenement;
-import hotelsimulator.gui.ConfigGui;
 import hotelsimulator.gui.HotelGui;
 import hotelsimulator.gui.StarterGui;
-import hotelsimulator.ruimtes.HotelRuimte;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,7 +24,7 @@ public class HoofdSimulator {
 
     public HoofdSimulator() {
 		this.config = new SimulatieConfig();
-        this.hotel = new Hotel(config);
+        this.hotel = new Hotel(config,eventManager);
         this.swingGui = new StarterGui(this);
 		this.eventManager = new hotelevents.HotelEventManager();
 
@@ -69,7 +67,7 @@ public class HoofdSimulator {
             JOptionPane.showMessageDialog(null, "Het standaard layoutbestand kan niet worden geladen.", "Fout",
                     JOptionPane.ERROR_MESSAGE);
         }
-        HotelGui gui = new HotelGui(hotel, config);
+        HotelGui gui = new HotelGui(hotel, config,eventManager);
         gui.showGui();
 
 		eventManager.register(evt -> {
@@ -143,7 +141,7 @@ public class HoofdSimulator {
 					JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-        HotelGui gui = new HotelGui(hotel, config);
+        HotelGui gui = new HotelGui(hotel, config, eventManager);
         gui.showGui();
 
 		eventManager.register(evt -> {
