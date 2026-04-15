@@ -1,5 +1,7 @@
 package hotelsimulator.personen;
 
+import hotelevents.HotelEventManager;
+import hotelsimulator.config.SimulatieConfig;
 import hotelsimulator.core.Hotel;
 import hotelsimulator.pathfinding.Pathfinder;
 import hotelsimulator.ruimtes.*;
@@ -34,8 +36,8 @@ public class Schoonmaker extends Persoon {
     private int doelVerdieping   = 8;
     private int huidigeVerdieping = 8;
 
-    public Schoonmaker(int startX, int startY, hotelsimulator.ruimtes.Lift lift, hotelsimulator.ruimtes.Schacht schacht, Hotel hotel) {
-        super(startX, startY, lift, schacht, hotel);
+    public Schoonmaker(int startX, int startY, Lift lift, Schacht schacht, Hotel hotel, HotelEventManager hotelEventManager, SimulatieConfig simulatieConfig) {
+        super(startX, startY, lift, schacht, hotel, hotelEventManager, simulatieConfig);
     }
 
     public void update() {

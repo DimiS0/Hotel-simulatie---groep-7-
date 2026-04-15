@@ -1,6 +1,7 @@
 package hotelsimulator.gui;
 
 import hotelevents.HotelEventManager;
+import hotelevents.HotelEventType;
 import hotelsimulator.config.HTE;
 import hotelsimulator.core.Hotel;
 import hotelsimulator.config.SimulatieConfig;
@@ -150,7 +151,6 @@ public class HotelGui extends JPanel {
 
         // Klik op de lobby om het overzichtvenster te openen of te sluiten
         this.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
                 int gridX = e.getX() / cellSize;
                 int gridY = e.getY() / cellSize;

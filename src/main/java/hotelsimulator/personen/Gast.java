@@ -1,5 +1,7 @@
 package hotelsimulator.personen;
 
+import hotelevents.HotelEventManager;
+import hotelsimulator.config.SimulatieConfig;
 import hotelsimulator.core.Hotel;
 import hotelsimulator.pathfinding.Pathfinder;
 import hotelsimulator.ruimtes.*;
@@ -35,8 +37,8 @@ public class Gast extends Persoon {
     private int doelVerdieping    = 8; // Verdieping waar de gast naartoe wil
     private int huidigeVerdieping = 8; // Verdieping waar de gast nu is (start altijd op 8)
 
-    public Gast(Lift lift, Schacht schacht, Hotel hotel) {
-        super(SPAWN_X, SPAWN_Y, lift, schacht, hotel);
+    public Gast(Lift lift, Schacht schacht, Hotel hotel, HotelEventManager hotelEventManager, SimulatieConfig simulatieConfig) {
+        super(SPAWN_X, SPAWN_Y, lift, schacht, hotel,hotelEventManager,simulatieConfig);
     }
 
 

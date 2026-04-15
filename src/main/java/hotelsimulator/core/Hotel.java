@@ -17,14 +17,16 @@ import java.util.List;
 
 public class Hotel {
     private HotelEventManager hotelEventManager;
+    private SimulatieConfig simulatieConfig;
 	private ArrayList<HotelRuimte> ruimtes;
     private LinkedList<Integer> liftOproepen = new LinkedList<Integer>();
     private ArrayList<Persoon> personen;
 	private Lift lift;
     private Schacht schacht;
 
-	public Hotel(SimulatieConfig config, HotelEventManager eventManager) {
+	public Hotel(SimulatieConfig config, HotelEventManager eventManager, SimulatieConfig simulatieConfig) {
         this.hotelEventManager = eventManager;
+        this.simulatieConfig = simulatieConfig;
 		this.ruimtes = new ArrayList<>();
 		this.personen = new ArrayList<>();
 	}
@@ -107,12 +109,12 @@ public class Hotel {
 
             // Voeg een groep van maximaal 5 gasten toe
             for (int i = 0; i < 5 && gastIndex < aantalGasten; i++, gastIndex++) {
-                personen.add(new Gast(lift, schacht, this));
+                personen.add(new Gast(lift, schacht, this,hotelEventManager,simulatieConfig));
             }
 
             // Voeg daarna maximaal 2 schoonmakers toe
             for (int i = 0; i < 2 && schoonmakerIndex < aantalSchoonmakers; i++, schoonmakerIndex++) {
-                personen.add(new Schoonmaker(50, 450, lift, schacht, this));
+                personen.add(new Schoonmaker(50, 450, lift, schacht, this,hotelEventManager,simulatieConfig));
             }
         }
     }

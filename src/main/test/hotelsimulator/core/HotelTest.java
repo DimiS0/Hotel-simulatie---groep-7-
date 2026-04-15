@@ -17,7 +17,7 @@ class HotelTest {
     void setUp() {
         hotelEventManager = new HotelEventManager();
         config = new SimulatieConfig();
-        hotel = new Hotel(config, hotelEventManager);
+        hotel = new Hotel(config, hotelEventManager, config);
 
 
     }

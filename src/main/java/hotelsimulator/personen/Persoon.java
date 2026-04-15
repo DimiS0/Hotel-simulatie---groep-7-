@@ -1,5 +1,7 @@
 package hotelsimulator.personen;
 
+import hotelevents.HotelEventManager;
+import hotelsimulator.config.SimulatieConfig;
 import hotelsimulator.core.Hotel;
 import hotelsimulator.ruimtes.HotelRuimte;
 import hotelsimulator.ruimtes.Lift;
@@ -18,8 +20,10 @@ public abstract class Persoon {
 
     // Verwijzingen naar de kernonderdelen van de simulatie
     protected Hotel hotel;
+    private SimulatieConfig simulatieConfig;
     protected Schacht schacht;
     protected Lift lift;
+    protected  HotelEventManager hotelEventManager;
 
     // De reeks waypoints die de persoon moet doorlopen
     protected LinkedList<Point> pad = new LinkedList<>();
@@ -31,10 +35,12 @@ public abstract class Persoon {
     // Voorkomt dat een liftverzoek meerdere keren wordt ingediend
     private boolean heeftVerzoekIngediend = false;
 
-    public Persoon(int startX, int startY, Lift lift, Schacht schacht, Hotel hotel) {
+    public Persoon(int startX, int startY, Lift lift, Schacht schacht, Hotel hotel, HotelEventManager hotelEventManager, SimulatieConfig simulatieConfig) {
         this.hotel   = hotel;
+        this.simulatieConfig = simulatieConfig;
         this.schacht = schacht;
         this.lift    = lift;
+        this.hotelEventManager = hotelEventManager;
         this.pixelX  = startX;
         this.pixelY  = startY;
     }
@@ -44,20 +50,21 @@ public abstract class Persoon {
      * Beweegt ALLEEN horizontaal OF verticaal — nooit diagonaal.
      */
     public void beweeg() {
+
         if (pad.isEmpty()) return;
 
         Point doelPunt = pad.peek();
 
         if (pixelX != doelPunt.x) {
-            // Eerst horizontaal bewegen totdat X overeenkomt
+            // Eerst horizontaal bewegen
             if (pixelX < doelPunt.x) pixelX = Math.min(pixelX + SNELHEID, doelPunt.x);
             else                      pixelX = Math.max(pixelX - SNELHEID, doelPunt.x);
         } else if (pixelY != doelPunt.y) {
-            // Dan verticaal bewegen totdat Y overeenkomt
+            // Dan verticaal bewegen
             if (pixelY < doelPunt.y) pixelY = Math.min(pixelY + SNELHEID, doelPunt.y);
             else                      pixelY = Math.max(pixelY - SNELHEID, doelPunt.y);
         } else {
-            // Waypoint bereikt: verwijder het en ga naar het volgende
+            // Waypoint bereikt, verwijder het en ga naar de volgende
             pad.poll();
         }
 

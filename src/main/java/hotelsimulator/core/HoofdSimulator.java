@@ -24,7 +24,7 @@ public class HoofdSimulator {
 
     public HoofdSimulator() {
 		this.config = new SimulatieConfig();
-        this.hotel = new Hotel(config,eventManager);
+        this.hotel = new Hotel(config,eventManager,config);
         this.swingGui = new StarterGui(this);
 		this.eventManager = new hotelevents.HotelEventManager();
 
