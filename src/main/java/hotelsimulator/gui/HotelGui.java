@@ -1,5 +1,6 @@
 package hotelsimulator.gui;
 
+import hotelevents.HotelEventManager;
 import hotelsimulator.config.HTE;
 import hotelsimulator.core.Hotel;
 import hotelsimulator.config.SimulatieConfig;
@@ -17,6 +18,7 @@ import static hotelsimulator.config.HTE.*;
 public class HotelGui extends JPanel {
 
     private Hotel hotel;
+    private HotelEventManager hotelEventManager;
     private SimulatieConfig config;
     private final int cellSize = 50;
     private ConfigGui configGui;
@@ -28,9 +30,10 @@ public class HotelGui extends JPanel {
     private int liftStopIndex = 0;
     private HotelOverzicht overzicht;
 
-    public HotelGui(Hotel hotel, SimulatieConfig config) {
+    public HotelGui(Hotel hotel, SimulatieConfig config, HotelEventManager eventManager) {
         this.frame = new JFrame("Hotel Layout");
         this.hotel = hotel;
+        this.hotelEventManager = eventManager;
         this.config = config;
         this.setDefaultSpeed = false;
         this.speed = new JLabel("1x");
@@ -53,8 +56,6 @@ public class HotelGui extends JPanel {
         for (HotelRuimte r : hotel.getRuimtes()) {
             r.print(g, cellSize);
         }
-
-        // Laat elke persoon zichzelf tekenen
         if (hotel.getPersonen() != null) {
             for (Persoon p : hotel.getPersonen()) {
                 p.print(g);
@@ -125,6 +126,8 @@ public class HotelGui extends JPanel {
             if (liftTeller >= 300) {
                 liftTeller = 0;
                 int volgendeStop = LIFT_STOPS[liftStopIndex % LIFT_STOPS.length];
+
+                // Eerst aan wachtrij toevoegen, dan lift starten
                 hotel.getLiftOproepen().add(volgendeStop);
                 if (hotel.getLift().getBeschikbaar()) {
                     hotel.getLift().roepLiftNaar(volgendeStop);
@@ -154,16 +157,20 @@ public class HotelGui extends JPanel {
 
                 for (HotelRuimte r : hotel.getRuimtes()) {
                     if (r instanceof hotelsimulator.ruimtes.Lobby) {
+                        // zelfde offset als in Lobby.print()
                         int lobbyX = r.getX() + 1;
                         int lobbyY = r.getY() - 1;
                         if (gridX >= lobbyX && gridX < lobbyX + r.getBreedte() &&
                                 gridY >= lobbyY && gridY < lobbyY + r.getHoogte()) {
-                            if (overzicht == null || !overzicht.isVisible()) {
-                                overzicht = new HotelOverzicht(hotel);
-                            } else {
+                            if (overzicht == null || !overzicht.isVisible()){
+                                overzicht = new HotelOverzicht(hotel,hotelEventManager);
+                            }
+                            else{
                                 overzicht.dispose();
                                 overzicht = null;
                             }
+
+
                         }
                     }
                 }

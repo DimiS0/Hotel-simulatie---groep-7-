@@ -8,22 +8,25 @@ import hotelsimulator.personen.Persoon;
 import hotelsimulator.personen.Schoonmaker;
 import hotelsimulator.ruimtes.*;
 
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Hotel {
-    private ArrayList<HotelRuimte> ruimtes;
+    private HotelEventManager hotelEventManager;
+	private ArrayList<HotelRuimte> ruimtes;
     private LinkedList<Integer> liftOproepen = new LinkedList<Integer>();
     private ArrayList<Persoon> personen;
-    private Lift lift;
+	private Lift lift;
     private Schacht schacht;
 
-    public Hotel(SimulatieConfig config) {
-        this.ruimtes = new ArrayList<>();
-        this.personen = new ArrayList<>();
-    }
+	public Hotel(SimulatieConfig config, HotelEventManager eventManager) {
+        this.hotelEventManager = eventManager;
+		this.ruimtes = new ArrayList<>();
+		this.personen = new ArrayList<>();
+	}
 
     public LinkedList<Integer> getLiftOproepen(){
         return liftOproepen;
@@ -33,8 +36,11 @@ public class Hotel {
         Gson gson = new Gson();
         Type listType = new TypeToken<List<JsonItem>>() {}.getType();
         List<JsonItem> items = gson.fromJson(layoutJson, listType);
+
+        //Lijst leegmaken zodat oude data niet overblijft bij hergebruik
         ruimtes.clear();
 
+        //loop door de lijst elke item krijgt een AreaType, een positie een breedte en hoogte, en een cappaciteit en sterren
         for (JsonItem item : items) {
             String areaType = item.AreaType;
 
@@ -49,6 +55,7 @@ public class Hotel {
             int maxPersonen = (item.Capacity != null) ? Integer.parseInt(item.Capacity.trim()) : 0;
             String sterrenAantal = (item.Classification != null) ? item.Classification : "";
 
+            //elke item maakt een nieuwe object aan met die specificaties
             HotelRuimte r = switch (item.AreaType) {
                 case "Cinema" -> new Bioscoop(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
                 case "Fitness" -> new FitnessRuimtes(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
@@ -57,18 +64,19 @@ public class Hotel {
                 default -> null;
             };
             if (r != null)
+                //onthoudt waar de genoemde kamer is in de arraylijst ruimtes
                 ruimtes.add(r);
         }
-
-        schacht = new Schacht("Schacht", "0", 0, 0, 1, 9, 0);
-        Lobby lobby = new Lobby("Lobby", "0", 0, 1, 6, 1, 0);
-        Trap trap = new Trap("trap", "0", 0, 7, 1, 9, 0);
-        lift = new Lift("Lift", "0", 0, 0, 1, 1, 10, this);
+         schacht = new Schacht("Schacht", "", 0, 0, 1, 9, 0);
+        Lobby lobby = new Lobby("Lobby", "", 0, 1, 6, 1, 0);
+        Trap trap = new Trap("trap", "", 0, 7, 1, 9, 0);
+        lift = new Lift("Lift", "", 0, 0, 1, 1, 10,this);
 
         ruimtes.add(schacht);
         ruimtes.add(lobby);
         ruimtes.add(trap);
         ruimtes.add(lift);
+
     }
 
     public ArrayList<HotelRuimte> getRuimtes() {

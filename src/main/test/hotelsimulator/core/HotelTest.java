@@ -1,5 +1,6 @@
 package hotelsimulator.core;
 
+import hotelevents.HotelEventManager;
 import hotelsimulator.config.SimulatieConfig;
 import hotelsimulator.ruimtes.HotelRuimte;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,11 +11,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class HotelTest {
     private Hotel hotel;
     private SimulatieConfig config;
+    private HotelEventManager hotelEventManager;
 
     @BeforeEach
     void setUp() {
+        hotelEventManager = new HotelEventManager();
         config = new SimulatieConfig();
-        hotel = new Hotel(config);
+        hotel = new Hotel(config, hotelEventManager);
 
 
     }
