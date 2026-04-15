@@ -77,5 +77,9 @@ public abstract class HotelRuimte {
         return maxPersonen;
     }
 
+    public long getVerblijfMs() {
+        return 5000;
+    }
+
     public abstract void print(Graphics g, int cellSize);
 }

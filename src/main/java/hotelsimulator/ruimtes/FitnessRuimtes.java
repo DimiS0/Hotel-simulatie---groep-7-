@@ -21,4 +21,9 @@ public class FitnessRuimtes extends HotelRuimte {
         //Tekst wit, tekst neerzetten
         g.setColor(Color.WHITE);
         g.drawString("FitnessRuimte", (x+1)*cellSize + 5, (y-1)*cellSize + 15);
-}}
+    }
+    @Override
+    public long getVerblijfMs() {
+        return 30000;
+    }
+}

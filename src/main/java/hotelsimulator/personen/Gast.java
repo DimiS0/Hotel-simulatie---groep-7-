@@ -27,7 +27,7 @@ public class Gast extends Persoon {
     private Status status = Status.WACHT_OP_SPAWN;
     private HotelRuimte doelKamer;
     private long verblijfEinde = 0;
-    private static final long VERBLIJF_MS = 5000; // 5 seconden in de kamer
+    static final long VERBLIJF_MS = 5000; // 5 seconden in de kamer
 
     public static final int SPAWN_X = 200; // Startpositie in pixels (lobby)
     public static final int SPAWN_Y = 500;
@@ -39,6 +39,7 @@ public class Gast extends Persoon {
 
     public Gast(Lift lift, Schacht schacht, Hotel hotel, HotelEventManager hotelEventManager, SimulatieConfig simulatieConfig) {
         super(SPAWN_X, SPAWN_Y, lift, schacht, hotel,hotelEventManager,simulatieConfig);
+        this.simulatieConfig = simulatieConfig;
     }
 
 
@@ -106,7 +107,7 @@ public class Gast extends Persoon {
                 } else {
                     // In het midden aangekomen — start de 5-seconden verblijftimer
                     status = Status.IN_KAMER;
-                    verblijfEinde = System.currentTimeMillis() + VERBLIJF_MS;
+                    verblijfEinde = System.currentTimeMillis() + (long)(doelKamer.getVerblijfMs() / simulatieConfig.getSnelheid().getFactor());
                 }
                 break;
 

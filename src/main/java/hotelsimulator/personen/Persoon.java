@@ -17,10 +17,12 @@ public abstract class Persoon {
     // Huidige positie van de persoon in pixels
     protected int pixelX;
     protected int pixelY;
+    private double pixelXD;
+    private double pixelYD;
 
     // Verwijzingen naar de kernonderdelen van de simulatie
     protected Hotel hotel;
-    private SimulatieConfig simulatieConfig;
+    SimulatieConfig simulatieConfig;
     protected Schacht schacht;
     protected Lift lift;
     protected  HotelEventManager hotelEventManager;
@@ -43,6 +45,8 @@ public abstract class Persoon {
         this.hotelEventManager = hotelEventManager;
         this.pixelX  = startX;
         this.pixelY  = startY;
+        this.pixelXD = pixelX;
+        this.pixelYD = pixelY;
     }
 
     /**
@@ -50,23 +54,30 @@ public abstract class Persoon {
      * Beweegt ALLEEN horizontaal OF verticaal — nooit diagonaal.
      */
     public void beweeg() {
+        //pixelXD en pixelYD zijn gewoon pixelX en PixelY alleen dan in een double want ik wist niet of ik die waardes naar int mocht veranderen
+
+        double stapFactor = simulatieConfig.getSnelheid().getFactor();
+
+        //de stap berekenen met 2 * de factor in HTE snelheid enum. 2 * 0,25 = 0,5 stap per frame
+        double stap = SNELHEID * stapFactor;
 
         if (pad.isEmpty()) return;
 
         Point doelPunt = pad.peek();
 
-        if (pixelX != doelPunt.x) {
-            // Eerst horizontaal bewegen
-            if (pixelX < doelPunt.x) pixelX = Math.min(pixelX + SNELHEID, doelPunt.x);
-            else                      pixelX = Math.max(pixelX - SNELHEID, doelPunt.x);
-        } else if (pixelY != doelPunt.y) {
-            // Dan verticaal bewegen
-            if (pixelY < doelPunt.y) pixelY = Math.min(pixelY + SNELHEID, doelPunt.y);
-            else                      pixelY = Math.max(pixelY - SNELHEID, doelPunt.y);
+        if (pixelXD != doelPunt.x) {
+            if (pixelXD < doelPunt.x) pixelXD = Math.min(pixelXD + stap, doelPunt.x);
+            else                       pixelXD = Math.max(pixelXD - stap, doelPunt.x);
+        } else if (pixelYD != doelPunt.y) {
+            if (pixelYD < doelPunt.y) pixelYD = Math.min(pixelYD + stap, doelPunt.y);
+            else                       pixelYD = Math.max(pixelYD - stap, doelPunt.y);
         } else {
-            // Waypoint bereikt, verwijder het en ga naar de volgende
             pad.poll();
         }
+
+        //de orginelewaardes updaten anders geven ze steeds dezelfde waardes aan pixelXD en pixelYD
+        pixelX = (int) pixelXD;
+        pixelY = (int) pixelYD;
 
         // Bereken de huidige rasterpositie op basis van pixelcoördinaten
         int gridX = pixelX / 50;

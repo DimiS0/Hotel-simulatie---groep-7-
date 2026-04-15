@@ -105,7 +105,7 @@ public class HotelGui extends JPanel {
         List<Persoon> personen = hotel.getPersonen();
         final int[] spawnIndex = {0};
 
-        Timer spawnTimer = new Timer(2000, ev -> {
+        Timer spawnTimer = new Timer(1000, ev -> {
             while (spawnIndex[0] < personen.size()) {
                 Persoon p = personen.get(spawnIndex[0]);
                 if (p instanceof Gast gast && !gast.isGespawnd()) {

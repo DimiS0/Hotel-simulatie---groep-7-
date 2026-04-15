@@ -21,4 +21,8 @@ public class Restaurant extends HotelRuimte {
         g.setColor(Color.WHITE);
         g.drawString("Restaurant", (x+1) * cellSize + 5, (y - 1) * cellSize + 15);
     }
+    @Override
+    public long getVerblijfMs() {
+        return 45000;
+    }
 }

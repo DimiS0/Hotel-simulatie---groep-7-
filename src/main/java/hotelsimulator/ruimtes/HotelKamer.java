@@ -21,4 +21,9 @@ public class HotelKamer extends HotelRuimte {
         //tekst kleur, tekst neeretten
         g.setColor(Color.WHITE);
         g.drawString("Kamer", (x+1)*cellSize + 5, (y-1)*cellSize + 15);
-}}
+    }
+    @Override
+    public long getVerblijfMs() {
+        return 15000;
+    }
+}
