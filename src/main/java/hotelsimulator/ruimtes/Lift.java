@@ -2,6 +2,7 @@ package hotelsimulator.ruimtes;
 
 import hotelsimulator.core.Hotel;
 import hotelsimulator.personen.Gast;
+import hotelsimulator.personen.Schoonmaker;
 
 import java.awt.*;
 import java.util.*;
@@ -15,14 +16,20 @@ public class Lift extends HotelRuimte {
     private boolean omhoog = true;
     private Hotel hotel;
 
+    // Gasten in de lift
     private final List<Gast> gastenInLift = new ArrayList<>();
-    private final Map<Integer, List<Gast>> wachtrij = new HashMap<>();
+    private final Map<Integer, List<Gast>> gastWachtrij = new HashMap<>();
+
+    // Schoonmakers in de lift
+    private final List<Schoonmaker> schoonmakersInLift = new ArrayList<>();
+    private final Map<Integer, List<Schoonmaker>> schoonmakerWachtrij = new HashMap<>();
 
     public Lift(String areaType, String sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen, Hotel hotel) {
         super(areaType, sterrenAantal, y, x, breedte, hoogte, maxPersonen);
         this.hotel = hotel;
         for (int stop : verdiepingenY) {
-            wachtrij.put(stop, new ArrayList<>());
+            gastWachtrij.put(stop, new ArrayList<>());
+            schoonmakerWachtrij.put(stop, new ArrayList<>());
         }
     }
 
@@ -40,7 +47,6 @@ public class Lift extends HotelRuimte {
     public void liftBwegen() {
         if (beschikbaar) return;
 
-        // Beweeg één stap richting doel
         if (y > doelStopVerdieping) {
             y--;
             omhoog = true;
@@ -49,30 +55,35 @@ public class Lift extends HotelRuimte {
             omhoog = false;
         }
 
-        // Tussenhalte: stop als iemand hier wil in/uitstappen ÉN het ligt op de weg
         if (y != doelStopVerdieping) {
             for (int stop : verdiepingenY) {
                 if (y == stop) {
-                    boolean uitstappers = gastenInLift.stream().anyMatch(g -> g.getDoelVerdieping() == stop);
-                    List<Gast> wachtend = wachtrij.getOrDefault(stop, Collections.emptyList());
+                    boolean uitstappersGast = gastenInLift.stream().anyMatch(g -> g.getDoelVerdieping() == stop);
+                    boolean uitstappersSchoonmaker = schoonmakersInLift.stream().anyMatch(s -> s.getDoelVerdieping() == stop);
+                    List<Gast> wachtendGast = gastWachtrij.getOrDefault(stop, Collections.emptyList());
+                    List<Schoonmaker> wachtendSchoonmaker = schoonmakerWachtrij.getOrDefault(stop, Collections.emptyList());
                     boolean opDeWeg = omhoog
-                            ? (stop >= doelStopVerdieping)   // omhoog: stop moet hoger of gelijk aan doel liggen
-                            : (stop <= doelStopVerdieping);  // omlaag: stop moet lager of gelijk liggen
-                    if ((uitstappers || !wachtend.isEmpty()) && opDeWeg) {
+                            ? (stop >= doelStopVerdieping)
+                            : (stop <= doelStopVerdieping);
+                    if ((uitstappersGast || uitstappersSchoonmaker || !wachtendGast.isEmpty() || !wachtendSchoonmaker.isEmpty()) && opDeWeg) {
                         ladenEnLossen(stop);
                     }
                 }
             }
         }
 
-        // Aankomst bij bestemming
         if (y == doelStopVerdieping) {
             ladenEnLossen(doelStopVerdieping);
             stopPositie = doelStopVerdieping;
 
-            // Zijn er nog passagiers die ergens heen willen?
-            if (!gastenInLift.isEmpty()) {
-                int volgendeDoel = gastenInLift.get(0).getDoelVerdieping();
+            boolean nogPassagiers = !gastenInLift.isEmpty() || !schoonmakersInLift.isEmpty();
+            if (nogPassagiers) {
+                int volgendeDoel;
+                if (!gastenInLift.isEmpty()) {
+                    volgendeDoel = gastenInLift.get(0).getDoelVerdieping();
+                } else {
+                    volgendeDoel = schoonmakersInLift.get(0).getDoelVerdieping();
+                }
                 if (!hotel.getLiftOproepen().isEmpty()) {
                     hotel.getLiftOproepen().removeFirst();
                 }
@@ -90,26 +101,50 @@ public class Lift extends HotelRuimte {
     }
 
     private void ladenEnLossen(int verdieping) {
-        // Uitstappen
-        Iterator<Gast> it = gastenInLift.iterator();
-        while (it.hasNext()) {
-            Gast g = it.next();
+        // Gasten uitstappen
+        Iterator<Gast> gastIt = gastenInLift.iterator();
+        while (gastIt.hasNext()) {
+            Gast g = gastIt.next();
             if (g.getDoelVerdieping() == verdieping) {
                 g.stapUit((verdieping - 1) * 50 + 25);
-                it.remove();
+                gastIt.remove();
             }
         }
 
-        // Instappen (maximaal maxPersonen)
-        List<Gast> wachtend = wachtrij.getOrDefault(verdieping, new ArrayList<>());
-        for (Gast g : new ArrayList<>(wachtend)) {
-            if (gastenInLift.size() < maxPersonen) {
+        // Schoonmakers uitstappen
+        Iterator<Schoonmaker> schoonmakerIt = schoonmakersInLift.iterator();
+        while (schoonmakerIt.hasNext()) {
+            Schoonmaker s = schoonmakerIt.next();
+            if (s.getDoelVerdieping() == verdieping) {
+                s.stapUit((verdieping - 1) * 50 + 25);
+                schoonmakerIt.remove();
+            }
+        }
+
+        // Gasten instappen
+        List<Gast> wachtendGast = gastWachtrij.getOrDefault(verdieping, new ArrayList<>());
+        for (Gast g : new ArrayList<>(wachtendGast)) {
+            if (gastenInLift.size() + schoonmakersInLift.size() < maxPersonen) {
                 g.stapIn();
                 gastenInLift.add(g);
-                wachtend.remove(g);
+                wachtendGast.remove(g);
 
-                // Voeg bestemming van instappende gast toe aan wachtrij
                 int doel = g.getDoelVerdieping();
+                if (!hotel.getLiftOproepen().contains(doel)) {
+                    hotel.getLiftOproepen().add(doel);
+                }
+            }
+        }
+
+        // Schoonmakers instappen
+        List<Schoonmaker> wachtendSchoonmaker = schoonmakerWachtrij.getOrDefault(verdieping, new ArrayList<>());
+        for (Schoonmaker s : new ArrayList<>(wachtendSchoonmaker)) {
+            if (gastenInLift.size() + schoonmakersInLift.size() < maxPersonen) {
+                s.stapIn();
+                schoonmakersInLift.add(s);
+                wachtendSchoonmaker.remove(s);
+
+                int doel = s.getDoelVerdieping();
                 if (!hotel.getLiftOproepen().contains(doel)) {
                     hotel.getLiftOproepen().add(doel);
                 }
@@ -117,19 +152,25 @@ public class Lift extends HotelRuimte {
         }
     }
 
-    /**
-     * Registreer een wachtende gast. Roep lift op als logisch qua richting.
-     */
     public void voegWachtendeGastToe(Gast gast, int verdieping) {
-        wachtrij.computeIfAbsent(verdieping, k -> new ArrayList<>()).add(gast);
+        if (gast == null) return;
+        gastWachtrij.computeIfAbsent(verdieping, k -> new ArrayList<>()).add(gast);
 
         if (beschikbaar) {
             hotel.getLiftOproepen().add(verdieping);
             roepLiftNaar(verdieping);
-        } else if (isOpDeWeg(verdieping)) {
-            // Lift komt hier langs — wordt afgehandeld in liftBwegen
-        } else {
-            // Niet op de weg: plan voor na de huidige rit
+        } else if (!isOpDeWeg(verdieping)) {
+            hotel.getLiftOproepen().add(verdieping);
+        }
+    }
+
+    public void voegWachtendeSchoonmakerToe(Schoonmaker schoonmaker, int verdieping) {
+        schoonmakerWachtrij.computeIfAbsent(verdieping, k -> new ArrayList<>()).add(schoonmaker);
+
+        if (beschikbaar) {
+            hotel.getLiftOproepen().add(verdieping);
+            roepLiftNaar(verdieping);
+        } else if (!isOpDeWeg(verdieping)) {
             hotel.getLiftOproepen().add(verdieping);
         }
     }

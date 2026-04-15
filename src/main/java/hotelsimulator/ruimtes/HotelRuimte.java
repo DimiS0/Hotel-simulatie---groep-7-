@@ -10,7 +10,8 @@ public abstract class HotelRuimte {
 	protected int breedte;
 	protected int hoogte;
 	protected int maxPersonen;
-    private int aantalAanwezig = 0;
+    private int aantalGasten = 0;
+    private int aantalSchoonmakers = 0;
 	public HotelRuimte(String areaType, String sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen) {
 		this.areaType = areaType;
 		this.sterrenAantal = sterrenAantal;
@@ -21,44 +22,60 @@ public abstract class HotelRuimte {
 		this.maxPersonen = maxPersonen;
 	}
     public boolean isVol() {
-        return maxPersonen > 0 && aantalAanwezig >= maxPersonen;
+        return maxPersonen > 0 && (aantalGasten + aantalSchoonmakers) >= maxPersonen;
     }
-    public synchronized void betreed() {
-        aantalAanwezig++;
+
+    public synchronized void betreedAlsGast() {
+        aantalGasten++;
     }
     public synchronized void verlaat() {
-        if (aantalAanwezig > 0) aantalAanwezig--;
+        if (aantalGasten > 0) aantalGasten--;
+    }
+
+    public synchronized void betreedAlsSchoonmaker() {
+        aantalSchoonmakers++;
+    }
+    public synchronized void verlaatAlsSchoonmaker() {
+        if (aantalSchoonmakers > 0) aantalSchoonmakers--;
+    }
+
+    public int getAantalGasten() {
+        return aantalGasten;
+    }
+    public int getAantalSchoonmakers() {
+        return aantalSchoonmakers;
     }
     public int getAantalAanwezig() {
-        return aantalAanwezig;
+        return aantalGasten + aantalSchoonmakers;
     }
-	public String getAreaType() {
-		return areaType;
-	}
 
-	public String getSterrenAantal() {
-		return sterrenAantal;
-	}
+    public String getAreaType() {
+        return areaType;
+    }
 
-	public int getY() {
-		return y;
-	}
+    public String getSterrenAantal() {
+        return sterrenAantal;
+    }
 
-	public int getX() {
-		return x;
-	}
+    public int getY() {
+        return y;
+    }
 
-	public int getBreedte() {
-		return breedte;
-	}
+    public int getX() {
+        return x;
+    }
 
-	public int getHoogte() {
-		return hoogte;
-	}
+    public int getBreedte() {
+        return breedte;
+    }
 
-	public int getMaxPersonen() {
-		return maxPersonen;
-	}
+    public int getHoogte() {
+        return hoogte;
+    }
+
+    public int getMaxPersonen() {
+        return maxPersonen;
+    }
+
     public abstract void print(Graphics g, int cellSize);
-
 }
