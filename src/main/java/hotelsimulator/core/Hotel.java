@@ -2,6 +2,7 @@ package hotelsimulator.core;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import hotelevents.HotelEventManager;
 import hotelsimulator.config.SimulatieConfig;
 import hotelsimulator.personen.Gast;
 import hotelsimulator.personen.Persoon;

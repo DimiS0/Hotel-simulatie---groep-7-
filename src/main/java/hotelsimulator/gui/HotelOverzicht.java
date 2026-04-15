@@ -93,7 +93,7 @@ public class HotelOverzicht extends JFrame {
         Runnable updateInfo = () -> infoArea.setText(
                 "Sterren: " + ruimte.getSterrenAantal() + "\n" +
                         "Aantal gasten: " + ruimte.getAantalGasten() + "\n" +
-                        "Aantal Schoonmakers " + ruimte.getAantalSchoonmakers+ "\n" +
+                        "Aantal Schoonmakers " + ruimte.getAantalSchoonmakers()+ "\n" +
                         "Max personen: " + ruimte.getMaxPersonen() + "\n"
         );
 
