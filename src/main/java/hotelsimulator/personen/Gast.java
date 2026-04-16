@@ -1,5 +1,6 @@
 package hotelsimulator.personen;
 
+import com.sun.source.tree.BinaryTree;
 import hotelevents.HotelEventManager;
 import hotelsimulator.config.SimulatieConfig;
 import hotelsimulator.core.Hotel;
@@ -231,8 +232,10 @@ public class Gast extends Persoon {
 
     // Aangeroepen door de Lift wanneer de gast zijn doelverdieping bereikt
     public void stapUit(int pixelYPos) {
-        pixelX = SCHACHT_PIXEL_X; // Stap de gang in naast de schacht
-        pixelY = pixelYPos;
+        // setPositie() updates pixelX, pixelY, pixelXD én pixelYD tegelijk.
+        // Zonder dit gebruikte beweeg() nog de oude double-positie (de instaapplek)
+        // en liep de persoon door verdiepingen heen naar zijn bestemming.
+        setPositie(SCHACHT_PIXEL_X, pixelYPos);
         huidigeVerdieping = doelVerdieping;
 
         // Zoek direct een pad naar de kamer op de nieuwe verdieping
@@ -289,12 +292,11 @@ public class Gast extends Persoon {
         if (status == Status.WACHT_OP_SPAWN) return;
 
         Color kleur = switch (status) {
-            case IN_KAMER           -> new Color(0, 180, 0);   // Groen = in kamer
-            case WACHT_OP_LIFT      -> Color.ORANGE;            // Oranje = wacht op lift
-            case IN_LIFT            -> Color.RED;               // Rood = rijdt in lift
+            case WACHT_OP_LIFT      -> new Color(100, 255, 150);         // Oranje = wacht op lift
             case BETREEDT_KAMER,
-                 VERLAAT_KAMER      -> new Color(0, 100, 255);  // Blauw = loopt kamer in/uit
-            default                 -> Color.BLUE;              // Blauw = loopt in de gang
+                 VERLAAT_KAMER,
+                 IN_KAMER           -> new Color(150, 255, 0);  // Blauw = loopt kamer in/uit
+            default                 -> new Color(50, 255, 50);          // Blauw = loopt in de gang
         };
 
         // Vul de cirkel met de statuskleur
@@ -306,5 +308,22 @@ public class Gast extends Persoon {
         // Teken de letter G in het midden
         g.setColor(Color.WHITE);
         g.drawString("G", pixelX - 4, pixelY + 5);
+
+        if (doelKamer != null && (status == Status.BETREEDT_KAMER
+                || status == Status.IN_KAMER
+                || status == Status.VERLAAT_KAMER)) {
+            String emoji = switch (doelKamer.getAreaType()) {
+                case "Cinema"     -> "🎬";
+                case "Restaurant" -> "🍽";
+                case "Fitness"    -> "💪";
+                case "Room"       -> "🛏";
+                default           -> "";
+            };
+            if (!emoji.isEmpty()) {
+                g.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 13));
+                g.setColor(Color.BLACK);
+                g.drawString(emoji, pixelX - 8, pixelY - 13);
+            }
+        }
     }
 }

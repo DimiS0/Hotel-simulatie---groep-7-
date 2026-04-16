@@ -191,8 +191,10 @@ public class Schoonmaker extends Persoon {
     }
 
     public void stapUit(int pixelYPos) {
-        pixelX = SCHACHT_PIXEL_X;
-        pixelY = pixelYPos;
+        // setPositie() updates pixelX, pixelY, pixelXD én pixelYD tegelijk.
+        // Zonder dit gebruikte beweeg() nog de oude double-positie (de instaapplek)
+        // en liep de persoon door verdiepingen heen naar zijn bestemming.
+        setPositie(SCHACHT_PIXEL_X, pixelYPos);
         huidigeVerdieping = doelVerdieping;
 
         if (doelKamer != null) {
@@ -239,11 +241,10 @@ public class Schoonmaker extends Persoon {
         if (status == Status.WACHT_OP_SPAWN) return;
 
         Color kleur = switch (status) {
-            case IN_KAMER           -> new Color(148, 0, 211);
             case WACHT_OP_LIFT      -> new Color(200, 100, 255);
-            case IN_LIFT            -> new Color(100, 0, 150);
             case BETREEDT_KAMER,
-                 VERLAAT_KAMER      -> new Color(180, 50, 220);
+                 VERLAAT_KAMER,
+                 IN_KAMER  -> new Color(180, 50, 220);
             default                 -> new Color(160, 32, 240);
         };
 
@@ -253,5 +254,13 @@ public class Schoonmaker extends Persoon {
         g.drawOval(pixelX - 10, pixelY - 10, 20, 20);
         g.setColor(Color.WHITE);
         g.drawString("S", pixelX - 4, pixelY + 5);
+
+        if (doelKamer != null && (status == Status.BETREEDT_KAMER
+                || status == Status.IN_KAMER
+                || status == Status.VERLAAT_KAMER)) {
+            g.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 13));
+            g.setColor(Color.BLACK);
+            g.drawString("🧹", pixelX - 8, pixelY - 13);
+        }
     }
 }

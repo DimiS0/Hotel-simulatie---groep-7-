@@ -14,9 +14,12 @@ import java.util.Random;
 
 public abstract class Persoon {
 
-    // Huidige positie van de persoon in pixels
+    // Huidige positie van de persoon in pixels (int, voor tekenen)
     protected int pixelX;
     protected int pixelY;
+
+    // Dezelfde positie als doubles — nodig voor vloeiende beweging bij lagere snelheden
+    // BELANGRIJK: deze moeten altijd synchroon lopen met pixelX en pixelY
     private double pixelXD;
     private double pixelYD;
 
@@ -25,12 +28,12 @@ public abstract class Persoon {
     SimulatieConfig simulatieConfig;
     protected Schacht schacht;
     protected Lift lift;
-    protected  HotelEventManager hotelEventManager;
+    protected HotelEventManager hotelEventManager;
 
     // De reeks waypoints die de persoon moet doorlopen
     protected LinkedList<Point> pad = new LinkedList<>();
 
-    // Bewegingssnelheid in pixels per stap
+    // Bewegingssnelheid in pixels per stap (basis)
     protected static final int SNELHEID = 2;
     protected static final Random random = new Random();
 
@@ -38,56 +41,68 @@ public abstract class Persoon {
     private boolean heeftVerzoekIngediend = false;
 
     public Persoon(int startX, int startY, Lift lift, Schacht schacht, Hotel hotel, HotelEventManager hotelEventManager, SimulatieConfig simulatieConfig) {
-        this.hotel   = hotel;
-        this.simulatieConfig = simulatieConfig;
-        this.schacht = schacht;
-        this.lift    = lift;
+        this.hotel            = hotel;
+        this.simulatieConfig  = simulatieConfig;
+        this.schacht          = schacht;
+        this.lift             = lift;
         this.hotelEventManager = hotelEventManager;
+        // Initialiseer alle vier posities tegelijk zodat ze vanaf het begin synchroon zijn
         this.pixelX  = startX;
         this.pixelY  = startY;
-        this.pixelXD = pixelX;
-        this.pixelYD = pixelY;
+        this.pixelXD = startX;
+        this.pixelYD = startY;
+    }
+
+    /**
+     * Zet de positie van de persoon en houdt int én double velden synchroon.
+     * Gebruik deze methode altijd als je de persoon naar een nieuwe positie teleporteert
+     * (bijv. na uitstappen uit de lift), anders loopt pixelXD/YD uit de pas en
+     * beweegt de persoon via de verkeerde beginpositie.
+     */
+    protected void setPositie(int x, int y) {
+        this.pixelX  = x;
+        this.pixelY  = y;
+        this.pixelXD = x;
+        this.pixelYD = y;
     }
 
     /**
      * Beweegt één stap richting het volgende waypoint.
+     * Gebruikt doubles voor vloeiende beweging bij lagere HTE-snelheden.
      * Beweegt ALLEEN horizontaal OF verticaal — nooit diagonaal.
      */
     public void beweeg() {
-        //pixelXD en pixelYD zijn gewoon pixelX en PixelY alleen dan in een double want ik wist niet of ik die waardes naar int mocht veranderen
-
-        double stapFactor = simulatieConfig.getSnelheid().getFactor();
-
-        //de stap berekenen met 2 * de factor in HTE snelheid enum. 2 * 0,25 = 0,5 stap per frame
-        double stap = SNELHEID * stapFactor;
-
         if (pad.isEmpty()) return;
+
+        // Stapgrootte schalen op basis van de HTE-snelheid (bijv. 0.25x → 0.5 pixels/frame)
+        double stap = SNELHEID * simulatieConfig.getSnelheid().getFactor();
 
         Point doelPunt = pad.peek();
 
         if (pixelXD != doelPunt.x) {
+            // Horizontaal bewegen
             if (pixelXD < doelPunt.x) pixelXD = Math.min(pixelXD + stap, doelPunt.x);
             else                       pixelXD = Math.max(pixelXD - stap, doelPunt.x);
         } else if (pixelYD != doelPunt.y) {
+            // Verticaal bewegen
             if (pixelYD < doelPunt.y) pixelYD = Math.min(pixelYD + stap, doelPunt.y);
             else                       pixelYD = Math.max(pixelYD - stap, doelPunt.y);
         } else {
+            // Waypoint bereikt: verwijder het en ga naar het volgende
             pad.poll();
         }
 
-        //de orginelewaardes updaten anders geven ze steeds dezelfde waardes aan pixelXD en pixelYD
+        // Zet de int-velden bij vanuit de doubles (voor tekenen en positiecontroles)
         pixelX = (int) pixelXD;
         pixelY = (int) pixelYD;
 
-        // Bereken de huidige rasterpositie op basis van pixelcoördinaten
+        // Controleer of de persoon bij de liftschacht staat op een geldige verdieping
         int gridX = pixelX / 50;
         int gridY = pixelY / 50;
 
-        // Controleer of de persoon bij de liftschacht staat op een geldige verdieping
         if (gridX == schacht.getX()) {
             for (int verdieping : lift.getVerdiepingenY()) {
                 if (gridY == verdieping) {
-                    // Dien een liftverzoek in voor deze verdieping
                     liftVerzoek(gridY);
                 }
             }
@@ -116,11 +131,9 @@ public abstract class Persoon {
         if (!heeftVerzoekIngediend) {
             heeftVerzoekIngediend = true;
 
-            // Voeg verzoek toe als de lift niet al op deze verdieping staat
             if (lift.getY() != stopVerdieping) {
                 hotel.getLiftOproepen().addLast(stopVerdieping);
 
-                // Stuur de lift meteen als die beschikbaar is
                 if (lift.getBeschikbaar()) {
                     lift.roepLiftNaar(hotel.getLiftOproepen().getFirst());
                 }
