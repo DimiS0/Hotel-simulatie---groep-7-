@@ -30,6 +30,7 @@ public class HotelGui extends JPanel {
     private final int[] LIFT_STOPS = {8, 5, 2}; // Grid-Y posities van de lifthaltes
     private int liftStopIndex = 0;
     private HotelOverzicht overzicht;
+    private Timer bewegingsTimer;
 
     public HotelGui(Hotel hotel, SimulatieConfig config, HotelEventManager eventManager) {
         this.frame = new JFrame("Hotel Layout");
@@ -121,7 +122,7 @@ public class HotelGui extends JPanel {
         spawnTimer.start();
 
         // Bewegingstimer: ~60 FPS — beweegt alle personen en hertekent het scherm
-        Timer bewegingsTimer = new Timer(16, ev -> {
+         bewegingsTimer = new Timer(16, ev -> {
             // Elke ~5 seconden de lift naar de volgende verdieping sturen
             liftTeller++;
             if (liftTeller >= 300) {
@@ -163,9 +164,13 @@ public class HotelGui extends JPanel {
                         if (gridX >= lobbyX && gridX < lobbyX + r.getBreedte() &&
                                 gridY >= lobbyY && gridY < lobbyY + r.getHoogte()) {
                             if (overzicht == null || !overzicht.isVisible()){
+                                hotelEventManager.pauze();
+                                bewegingsTimer.stop();
                                 overzicht = new HotelOverzicht(hotel,hotelEventManager);
                             }
                             else{
+                                hotelEventManager.pauze();
+                                bewegingsTimer.start();
                                 overzicht.dispose();
                                 overzicht = null;
                             }
