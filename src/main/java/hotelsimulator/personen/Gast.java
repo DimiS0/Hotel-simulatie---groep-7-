@@ -20,6 +20,8 @@ public class Gast extends Persoon {
         LOOPT_NAAR_SCHACHT, // Loopt naar de wachtplek bij de lift
         WACHT_OP_LIFT,      // Staat stil, wacht tot de lift aankomt
         IN_LIFT,            // Rijdt mee in de lift
+        LOOP_DOOR_TRAP,
+        LOOP_NAAR_TRAP,
         BETREEDT_KAMER,     // Loopt de kamer in (van deur naar midden)
         IN_KAMER,           // Zit in de kamer, wacht 5 seconden
         VERLAAT_KAMER       // Loopt de kamer uit terug naar de gang
@@ -34,6 +36,7 @@ public class Gast extends Persoon {
     public static final int SPAWN_Y = 500;
     private static final int LIFT_CENTER_X   = 75;  // Horizontaal midden van de liftcel
     private static final int SCHACHT_PIXEL_X = 100; // Gangzijde naast de schacht
+    private static final int TRAP_PIXEL_X = 425;
 
     private int doelVerdieping    = 8; // Verdieping waar de gast naartoe wil
     private int huidigeVerdieping = 8; // Verdieping waar de gast nu is (start altijd op 8)
@@ -139,6 +142,55 @@ public class Gast extends Persoon {
                     kiesEnLoopNaarKamer();
                 }
                 break;
+            case LOOP_NAAR_TRAP:
+                if (!pad.isEmpty()) {
+                    beweeg();
+                }
+                else {
+                    pixelX = TRAP_PIXEL_X;
+                    pixelYDouble = pixelY;
+                    status = Status.LOOP_DOOR_TRAP;
+                }
+                break;
+
+
+            case LOOP_DOOR_TRAP:
+                int doelY = doelVerdieping  * 50;
+
+
+                // Aangekomen op doelverdieping?
+                if (Math.abs(this.pixelY - doelY) <= SNELHEID) {
+                    setPositie(TRAP_PIXEL_X, doelY);
+
+                    pixelX  = (TRAP_PIXEL_X / 50) * 50;
+                    pixelXD = pixelX;
+                    huidigeVerdieping = doelVerdieping;
+
+                    // Loop naar de kamer
+                    if (doelKamer != null) {
+                        Point ingang = Pathfinder.getKamerIngang(doelKamer);
+                        List<Point> padNaarKamer = Pathfinder.vindPad(
+                                pixelX, pixelY, ingang.x, ingang.y, hotel.getRuimtes());
+                        if (!padNaarKamer.isEmpty()) {
+                            setPad(padNaarKamer);
+                            status = Status.LOOPT_NAAR_INGANG;
+                            break;
+                        }
+                        doelKamer.verlaat();
+                        doelKamer = null;
+                    }
+                    kiesEnLoopNaarKamer();
+                } else {
+                    // Loop omhoog of omlaag door de trap
+                    if (doelY > this.pixelYDouble) {
+                        this.pixelYDouble += (2.0*getFactor())/3;  // Omlaag
+                    } else {
+                        this.pixelYDouble -= (2.0*getFactor())/3;  // Omhoog
+                    }
+                    this.pixelY = (int)this.pixelYDouble;
+                }
+                break;
+
         }
     }
 
@@ -181,8 +233,9 @@ public class Gast extends Persoon {
                 kandidaat.betreedAlsGast(); // ← was: betreed()
                 doelKamer = kandidaat;
                 doelVerdieping = kamerVerdieping;
-                loopNaarSchacht();
+                loopNaarSchachtOfTrap();
                 if (status == Status.LOOPT_NAAR_SCHACHT) return;
+                if (status == Status.LOOP_NAAR_TRAP) return;
                 // Pad naar schacht niet gevonden — kamer vrijgeven en opnieuw proberen
                 doelKamer.verlaat();
                 doelKamer = null;
@@ -191,15 +244,30 @@ public class Gast extends Persoon {
     }
 
 
-    // Zoek een pad naar de wachtplek bij de lift op de huidige verdieping
-    private void loopNaarSchacht() {
-        int wachtPixelY = (huidigeVerdieping - 1) * 50;
-        List<Point> schachtPad = Pathfinder.vindPad(
-                pixelX, pixelY, SCHACHT_PIXEL_X, wachtPixelY, hotel.getRuimtes());
-        if (!schachtPad.isEmpty()) {
-            setPad(schachtPad);
-            status = Status.LOOPT_NAAR_SCHACHT;
+    // Zoek een pad naar de wachtplek bij de lift op de huidige verdieping of stuur gast naar trapingang
+    private void loopNaarSchachtOfTrap() {
+
+        //kiest random of gasten lift/trap nemen
+        int kiesTransport = random.nextInt(1,3);
+        if(kiesTransport == 1){
+            int wachtPixelY = (huidigeVerdieping - 1) * 50;
+            List<Point> schachtPad = Pathfinder.vindPad(
+                    pixelX, pixelY, SCHACHT_PIXEL_X, wachtPixelY, hotel.getRuimtes());
+            if (!schachtPad.isEmpty()) {
+                setPad(schachtPad);
+                status = Status.LOOPT_NAAR_SCHACHT;
+            }
         }
+        if(kiesTransport == 2){
+            int wachtPixelY = getNabijeStop(huidigeVerdieping) * 50; // dichtstbijzijnde ingang
+            List<Point> trapPad = Pathfinder.vindPad(
+                    pixelX, pixelY, TRAP_PIXEL_X, wachtPixelY, hotel.getRuimtes());
+            if (!trapPad.isEmpty()) {
+                setPad(trapPad);
+                status = Status.LOOP_NAAR_TRAP;
+            }
+        }
+
     }
 
 

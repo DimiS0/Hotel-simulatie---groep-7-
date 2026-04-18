@@ -72,8 +72,8 @@ public class Hotel {
         }
          schacht = new Schacht("Schacht", "", 0, 0, 1, 9, 0);
         Lobby lobby = new Lobby("Lobby", "", 0, 1, 6, 1, 0);
-        Trap trap = new Trap("trap", "", 0, 7, 1, 9, 0);
-        lift = new Lift("Lift", "", 0, 0, 1, 1, 10,this);
+        Trap trap = new Trap("trap", "", 0, 7, 1, 9, 999);
+        lift = new Lift("Lift", "", 0, 0, 1, 1, 5,this);
 
         ruimtes.add(schacht);
         ruimtes.add(lobby);

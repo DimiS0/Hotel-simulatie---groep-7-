@@ -20,7 +20,9 @@ public class Schoonmaker extends Persoon {
         IN_LIFT,
         BETREEDT_KAMER,
         IN_KAMER,
-        VERLAAT_KAMER
+        VERLAAT_KAMER,
+        LOOP_NAAR_TRAP,
+        LOOP_DOOR_TRAP
     }
 
     private Status status = Status.WACHT_OP_SPAWN;
@@ -32,6 +34,7 @@ public class Schoonmaker extends Persoon {
     public static final int SPAWN_Y = 400;
     private static final int LIFT_CENTER_X   = 75;
     private static final int SCHACHT_PIXEL_X = 100;
+    private static final int TRAP_PIXEL_X = 425;
 
     private int doelVerdieping   = 8;
     private int huidigeVerdieping = 8;
@@ -121,6 +124,55 @@ public class Schoonmaker extends Persoon {
                     kiesEnLoopNaarKamer();
                 }
                 break;
+
+            case LOOP_NAAR_TRAP:
+                if (!pad.isEmpty()) {
+                    beweeg();
+                }
+                else {
+                    pixelX = TRAP_PIXEL_X;
+                    pixelYDouble = pixelY;
+                    status = Status.LOOP_DOOR_TRAP;
+                }
+                break;
+
+
+            case LOOP_DOOR_TRAP:
+                int doelY = doelVerdieping  * 50;
+
+
+                // Aangekomen op doelverdieping?
+                if (Math.abs(this.pixelY - doelY) <= SNELHEID) {
+                    setPositie(TRAP_PIXEL_X, doelY);
+
+                    pixelX  = (TRAP_PIXEL_X / 50) * 50;
+                    pixelXD = pixelX;
+                    huidigeVerdieping = doelVerdieping;
+
+                    // Loop naar de kamer
+                    if (doelKamer != null) {
+                        Point ingang = Pathfinder.getKamerIngang(doelKamer);
+                        List<Point> padNaarKamer = Pathfinder.vindPad(
+                                pixelX, pixelY, ingang.x, ingang.y, hotel.getRuimtes());
+                        if (!padNaarKamer.isEmpty()) {
+                            setPad(padNaarKamer);
+                            status = Status.LOOPT_NAAR_INGANG;
+                            break;
+                        }
+                        doelKamer.verlaat();
+                        doelKamer = null;
+                    }
+                    kiesEnLoopNaarKamer();
+                } else {
+                    // Loop omhoog of omlaag door de trap
+                    if (doelY > this.pixelYDouble) {
+                        this.pixelYDouble += (SNELHEID*getFactor())/3;  // Omlaag
+                    } else {
+                        this.pixelYDouble -= (SNELHEID*getFactor())/3;  // Omhoog
+                    }
+                    this.pixelY = (int)this.pixelYDouble;
+                }
+                break;
         }
     }
 
@@ -152,22 +204,39 @@ public class Schoonmaker extends Persoon {
                 kandidaat.betreedAlsSchoonmaker();
                 doelKamer = kandidaat;
                 doelVerdieping = kamerVerdieping;
-                loopNaarSchacht();
+                loopNaarSchachtOfTrap();
                 if (status == Status.LOOPT_NAAR_SCHACHT) return;
+                if (status == Status.LOOP_NAAR_TRAP) return;
                 doelKamer.verlaatAlsSchoonmaker();
                 doelKamer = null;
             }
         }
     }
 
-    private void loopNaarSchacht() {
-        int wachtPixelY = (huidigeVerdieping - 1) * 50;
-        List<Point> schachtPad = Pathfinder.vindPad(
-                pixelX, pixelY, SCHACHT_PIXEL_X, wachtPixelY, hotel.getRuimtes());
-        if (!schachtPad.isEmpty()) {
-            setPad(schachtPad);
-            status = Status.LOOPT_NAAR_SCHACHT;
+    // Zoek een pad naar de wachtplek bij de lift op de huidige verdieping of sturen schoonmakers naar de trap
+    private void loopNaarSchachtOfTrap() {
+
+        //kiest random of schoonmakers lift/trap nemen
+        int kies = random.nextInt(1,3);
+        if(kies == 1){
+            int wachtPixelY = (huidigeVerdieping - 1) * 50;
+            List<Point> schachtPad = Pathfinder.vindPad(
+                    pixelX, pixelY, SCHACHT_PIXEL_X, wachtPixelY, hotel.getRuimtes());
+            if (!schachtPad.isEmpty()) {
+                setPad(schachtPad);
+                status = Status.LOOPT_NAAR_SCHACHT;
+            }
         }
+        if(kies == 2){
+            int wachtPixelY = getNabijeStop(huidigeVerdieping) * 50; // dichtstbijzijnde ingang
+            List<Point> trapPad = Pathfinder.vindPad(
+                    pixelX, pixelY, TRAP_PIXEL_X, wachtPixelY, hotel.getRuimtes());
+            if (!trapPad.isEmpty()) {
+                setPad(trapPad);
+                status = Status.LOOP_NAAR_TRAP;
+            }
+        }
+
     }
 
     private int getNabijeStop(int gridY) {

@@ -101,6 +101,16 @@ public class Pathfinder {
     private static boolean isStapToegestaan(int gx, int gy, int nx, int ny,
                                             List<HotelRuimte> ruimtes) {
         for (HotelRuimte r : ruimtes) {
+            // Trap: blokkeer x=7 BEHALVE bij ingangen (y=1, 4, 7)
+            if (r instanceof Trap) {
+                int trapGx = r.getX() + 1; // dynamisch berekend = 8, niet hardcoded 7
+                if (nx == trapGx && gx != trapGx) {
+                    boolean isIngang = (ny == 2 || ny == 5 || ny == 8);
+                    if (!isIngang) return false;
+                }
+                continue;
+            }
+
             if (!(r instanceof HotelKamer)    &&
                     !(r instanceof Bioscoop)       &&
                     !(r instanceof FitnessRuimtes) &&
@@ -150,6 +160,19 @@ public class Pathfinder {
                 for (int y = boven + 1; y < onder; y++)
                     if (x >= 0 && x < n && y >= 0 && y < n)
                         loopbaar[x][y] = false;
+
+        }
+        for (HotelRuimte r : ruimtes) {
+            if (r instanceof Trap) {
+                int trapGx = r.getX() + 1; // = 8
+                for (int y = 0; y <= GRID_GROOTTE; y++) {
+                    loopbaar[trapGx][y] = false;
+                }
+                // Alleen de 3 ingangen zijn beloopbaar
+                loopbaar[trapGx][2] = true;
+                loopbaar[trapGx][5] = true;
+                loopbaar[trapGx][8] = true;
+            }
         }
         return loopbaar;
     }

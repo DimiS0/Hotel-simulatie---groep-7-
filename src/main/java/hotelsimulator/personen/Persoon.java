@@ -20,8 +20,8 @@ public abstract class Persoon {
 
     // Dezelfde positie als doubles — nodig voor vloeiende beweging bij lagere snelheden
     // BELANGRIJK: deze moeten altijd synchroon lopen met pixelX en pixelY
-    private double pixelXD;
-    private double pixelYD;
+    protected double pixelXD;
+    protected double pixelYD;
 
     // Verwijzingen naar de kernonderdelen van de simulatie
     protected Hotel hotel;
@@ -36,6 +36,8 @@ public abstract class Persoon {
     // Bewegingssnelheid in pixels per stap (basis)
     protected static final int SNELHEID = 2;
     protected static final Random random = new Random();
+    protected double pixelYDouble;
+    protected double factor;
 
     // Voorkomt dat een liftverzoek meerdere keren wordt ingediend
     private boolean heeftVerzoekIngediend = false;
@@ -139,6 +141,11 @@ public abstract class Persoon {
                 }
             }
         }
+    }
+
+    public double getFactor() {
+        factor = simulatieConfig.getSnelheid().getFactor();
+        return factor;
     }
 
     // Geeft de huidige ruimte terug; standaard null (persoon zit nergens in)
