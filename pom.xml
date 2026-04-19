@@ -87,6 +87,9 @@
 				</executions>
 				<configuration>
 					<mainClass>hotelsimulator.core.Main</mainClass>
+					<additionalClasspathElements>
+						<additionalClasspathElement>${project.basedir}/src/main/resources/HotelEventsObs.jar</additionalClasspathElement>
+					</additionalClasspathElements>
 				</configuration>
 			</plugin>
 		</plugins>
