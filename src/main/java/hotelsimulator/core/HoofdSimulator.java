@@ -4,7 +4,7 @@ import javax.swing.*;
 
 import hotelsimulator.config.HTE;
 import hotelsimulator.config.SimulatieConfig;
-import hotelsimulator.events.Evenement;
+import hotelsimulator.events.Core.Evenement;
 import hotelsimulator.gui.HotelGui;
 import hotelsimulator.gui.StarterGui;
 
@@ -26,6 +26,7 @@ public class HoofdSimulator {
         this.hotel = new Hotel(config,eventManager,config);
         this.swingGui = new StarterGui(this);
 		this.eventManager = new hotelevents.HotelEventManager();
+        this.event = new Evenement(eventManager);
 
 		config.addListener(() -> {
 			eventManager.setHte(config.getSnelheid().getDelay());
