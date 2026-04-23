@@ -1,91 +1,153 @@
 package hotelsimulator.pathfinding;
 
-import hotelsimulator.ruimtes.*;
-import java.awt.Point;
-import java.util.*;
+import hotelsimulator.ruimtes.HotelRuimte;
+import hotelsimulator.ruimtes.HotelKamer;
+import hotelsimulator.ruimtes.Bioscoop;
+import hotelsimulator.ruimtes.FitnessRuimtes;
+import hotelsimulator.ruimtes.Restaurant;
 
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.PriorityQueue;
+
+/*
+  Zoekt de kortste looproute van A naar B met het A*-algoritme.
+  Het hotel wordt gezien als een 10x10 grid van vakjes (elk 50x50 pixels).
+ */
 public class Pathfinder {
 
-    // Het hotel is 10x10 vakjes, elk vakje = 50 pixels op het scherm
-    public static final int GRID_GROOTTE = 10;
-    public static final int CEL_GROOTTE  = 50;
+    // Het hotel is 10x10 vakjes, elk vakje is 50 pixels breed/hoog
+    public static final int AANTAL_VAKJES    = 10;
+    public static final int PIXELS_PER_VAKJE = 50;
+
+    // Aliassen zodat andere klassen de oude namen nog kennen
+    public static final int GRID_GROOTTE = AANTAL_VAKJES;
+    public static final int CEL_GROOTTE  = PIXELS_PER_VAKJE;
 
 
-    // Vind een looproute van startpunt naar eindpunt (in pixels)
-    // Geeft een lijst van tussenpunten terug die de gast één voor één afloopt
+    // vindPad: zoekt de kortste route en geeft die terug als pixelpunten
+
     public static List<Point> vindPad(int startPixelX, int startPixelY,
                                       int eindPixelX,  int eindPixelY,
-                                      List<HotelRuimte> ruimtes) {
+                                      List<HotelRuimte> alleRuimtes) {
 
-        // Pixels → rastervakjes (pixel 200 / 50 = vakje 4)
-        int vanGx  = klem(startPixelX / CEL_GROOTTE, 0, GRID_GROOTTE);
-        int vanGy  = klem(startPixelY / CEL_GROOTTE, 0, GRID_GROOTTE);
-        int naarGx = klem(eindPixelX  / CEL_GROOTTE, 0, GRID_GROOTTE);
-        int naarGy = klem(eindPixelY  / CEL_GROOTTE, 0, GRID_GROOTTE);
+        // Pixels omzetten naar grid-vakjes (pixel 200 / 50 = vakje 4)
+        int startKolom = pixelNaarGrid(startPixelX);
+        int startRij   = pixelNaarGrid(startPixelY);
+        int eindKolom  = pixelNaarGrid(eindPixelX);
+        int eindRij    = pixelNaarGrid(eindPixelY);
 
-        // Kaart van het hotel: welke vakjes mag de gast betreden?
-        boolean[][] loopbaar = berekenLoopbaar(ruimtes);
+        boolean[][] loopbareVakjes = berekenLoopbareKaart(alleRuimtes);
 
-        // Als start of einde in een kamer zit, is er geen route mogelijk
-        if (!loopbaar[vanGx][vanGy] || !loopbaar[naarGx][naarGy]) {
-            System.out.println("Start of einde zit in een kamer!");
+        boolean startIsGeblokkeerd = !loopbareVakjes[startKolom][startRij];
+        boolean eindIsGeblokkeerd  = !loopbareVakjes[eindKolom][eindRij];
+
+        if (startIsGeblokkeerd || eindIsGeblokkeerd) {
+            System.out.println("Start of einde zit in een geblokkeerd vakje!");
             return new ArrayList<>();
         }
 
-        int n = GRID_GROOTTE + 1;
+        // Arrays zijn één groter dan AANTAL_VAKJES omdat we 0 t/m 10 gebruiken
+        int arrayGrootte = AANTAL_VAKJES + 1;
 
-        // gScore = hoeveel stappen vanaf de start om dit vakje te bereiken
-        // fScore = gScore + schatting naar het doel (bepaalt welk vakje we als eerste bekijken)
-        // ouder  = welk vakje leidde hierheen (nodig om achteraf het pad te reconstrueren)
-        int[][] gScore      = new int[n][n];
-        int[][] fScore      = new int[n][n];
-        Point[][] ouder     = new Point[n][n];
-        boolean[][] bezocht = new boolean[n][n];
+        // aantalStappenNaarVakje = hoeveel stappen kostte het om hier te komen (gScore)
+        // geschatTotaal = stappen + schatting naar doel (fScore), A* pakt laagste eerst
+        int[][] aantalStappenNaarVakje = new int[arrayGrootte][arrayGrootte];
+        int[][] geschatTotaal          = new int[arrayGrootte][arrayGrootte];
 
-        for (int[] rij : gScore) Arrays.fill(rij, Integer.MAX_VALUE);
-        for (int[] rij : fScore) Arrays.fill(rij, Integer.MAX_VALUE);
+        for (int[] rij : aantalStappenNaarVakje) {
+            Arrays.fill(rij, Integer.MAX_VALUE);
+        }
+        for (int[] rij : geschatTotaal) {
+            Arrays.fill(rij, Integer.MAX_VALUE);
+        }
 
-        gScore[vanGx][vanGy] = 0;
-        fScore[vanGx][vanGy] = heuristiek(vanGx, vanGy, naarGx, naarGy);
+        // ouderVakje onthoudt via welk vakje we ergens kwamen (voor padreconstructie)
+        Point[][] ouderVakje  = new Point[arrayGrootte][arrayGrootte];
+        boolean[][] alVerwerkt = new boolean[arrayGrootte][arrayGrootte];
 
-        // Wachtrij die altijd het meest veelbelovende vakje (laagste fScore) als eerste geeft
-        PriorityQueue<Point> openLijst = new PriorityQueue<>(
-                Comparator.comparingInt(p -> fScore[p.x][p.y])
+        int afstandStartNaarDoel = berekenManhattanAfstand(startKolom, startRij, eindKolom, eindRij);
+
+        aantalStappenNaarVakje[startKolom][startRij] = 0;
+        geschatTotaal[startKolom][startRij]          = afstandStartNaarDoel;
+
+        // PriorityQueue sorteert automatisch: het meest veelbelovende vakje staat vooraan
+        PriorityQueue<Point> teVerkennen = new PriorityQueue<>(
+                (vakjeA, vakjeB) -> {
+                    int kostenA = geschatTotaal[vakjeA.x][vakjeA.y];
+                    int kostenB = geschatTotaal[vakjeB.x][vakjeB.y];
+                    return kostenA - kostenB;
+                }
         );
-        openLijst.add(new Point(vanGx, vanGy));
+        teVerkennen.add(new Point(startKolom, startRij));
 
-        // Geen diagonaal — alleen omlaag, omhoog, rechts, links
-        int[][] richtingen = {{0,1},{0,-1},{1,0},{-1,0}};
+        // Vier looprichtingen: geen diagonaal
+        int[][] richtingen = {
+                {0,  1},
+                {0, -1},
+                {1,  0},
+                {-1, 0}
+        };
 
-        while (!openLijst.isEmpty()) {
-            Point huidig = openLijst.poll();
+        while (!teVerkennen.isEmpty()) {
+            Point huidig  = teVerkennen.poll();
+            int huidigX   = huidig.x;
+            int huidigY   = huidig.y;
 
-            // Doel bereikt → zoek het pad terug via de ouder-verwijzingen
-            if (huidig.x == naarGx && huidig.y == naarGy) {
-                return reconstrueerPad(ouder, huidig);
+            boolean doelBereikt = huidigX == eindKolom && huidigY == eindRij;
+            if (doelBereikt) {
+                return bouwPadTerug(ouderVakje, huidig);
             }
 
-            if (bezocht[huidig.x][huidig.y]) continue;
-            bezocht[huidig.x][huidig.y] = true;
+            if (alVerwerkt[huidigX][huidigY]) {
+                continue;
+            }
+            alVerwerkt[huidigX][huidigY] = true;
 
-            // Bekijk alle vier buren
-            for (int[] dir : richtingen) {
-                int nx = huidig.x + dir[0];
-                int ny = huidig.y + dir[1];
+            for (int[] richting : richtingen) {
+                int buurKolom = huidigX + richting[0];
+                int buurRij   = huidigY + richting[1];
 
-                if (nx < 0 || nx > GRID_GROOTTE || ny < 0 || ny > GRID_GROOTTE) continue;
-                if (!loopbaar[nx][ny]) continue;
-                if (bezocht[nx][ny]) continue;
+                boolean buurValtBuitenGrid = buurKolom < 0 || buurKolom > AANTAL_VAKJES
+                        || buurRij   < 0 || buurRij   > AANTAL_VAKJES;
+                if (buurValtBuitenGrid) {
+                    continue;
+                }
 
-                // Extra check voor dunne kamers (1 vakje breed): stap mag niet dwars door een kamer gaan
-                if (!isStapToegestaan(huidig.x, huidig.y, nx, ny, ruimtes)) continue;
+                boolean buurIsGeblokkeerd = !loopbareVakjes[buurKolom][buurRij];
+                if (buurIsGeblokkeerd) {
+                    continue;
+                }
 
-                int nieuweG = gScore[huidig.x][huidig.y] + 1;
-                if (nieuweG < gScore[nx][ny]) {
-                    ouder[nx][ny]  = huidig;
-                    gScore[nx][ny] = nieuweG;
-                    fScore[nx][ny] = nieuweG + heuristiek(nx, ny, naarGx, naarGy);
-                    openLijst.add(new Point(nx, ny));
+                boolean buurAlVerwerkt = alVerwerkt[buurKolom][buurRij];
+                if (buurAlVerwerkt) {
+                    continue;
+                }
+
+                boolean stapIsOngeldig = !isStapGeldig(huidigX, huidigY, buurKolom, buurRij, alleRuimtes);
+                if (stapIsOngeldig) {
+                    continue;
+                }
+
+                int huidigAantalStappen = aantalStappenNaarVakje[huidigX][huidigY];
+                int nieuwAantalStappen  = huidigAantalStappen + 1;
+
+                int oudeAantalStappenNaarBuur = aantalStappenNaarVakje[buurKolom][buurRij];
+                boolean betereRouteGevonden   = nieuwAantalStappen < oudeAantalStappenNaarBuur;
+
+                // Betere route gevonden naar deze buur? Dan opslaan en toevoegen
+                if (betereRouteGevonden) {
+                    int afstandBuurNaarDoel = berekenManhattanAfstand(buurKolom, buurRij, eindKolom, eindRij);
+                    int nieuwGeschatTotaal  = nieuwAantalStappen + afstandBuurNaarDoel;
+
+                    ouderVakje[buurKolom][buurRij]             = huidig;
+                    aantalStappenNaarVakje[buurKolom][buurRij]  = nieuwAantalStappen;
+                    geschatTotaal[buurKolom][buurRij]           = nieuwGeschatTotaal;
+
+                    teVerkennen.add(new Point(buurKolom, buurRij));
                 }
             }
         }
@@ -95,125 +157,180 @@ public class Pathfinder {
     }
 
 
-    // Controleert of een stap van A naar B niet dwars door een dunne kamer gaat
-    // Dunne kamers (1 vakje breed) hebben geen interieur dat geblokkeerd wordt,
-    // maar je mag er toch niet doorheen stappen
-    private static boolean isStapToegestaan(int gx, int gy, int nx, int ny,
-                                            List<HotelRuimte> ruimtes) {
-        for (HotelRuimte r : ruimtes) {
-            // Trap: blokkeer x=7 BEHALVE bij ingangen (y=1, 4, 7)
-            if (r instanceof Trap) {
-                int trapGx = r.getX() + 1; // dynamisch berekend = 8, niet hardcoded 7
-                if (nx == trapGx && gx != trapGx) {
-                    boolean isIngang = (ny == 2 || ny == 5 || ny == 8);
-                    if (!isIngang) return false;
+
+    // berekenLoopbareKaart: true = mag lopen, false = geblokkeerd (kamerinterieur)
+        public static boolean[][] berekenLoopbareKaart(List<HotelRuimte> alleRuimtes) {
+        int arrayGrootte = AANTAL_VAKJES + 1;
+
+        boolean[][] loopbareKaart = new boolean[arrayGrootte][arrayGrootte];
+        for (boolean[] rij : loopbareKaart) {
+            Arrays.fill(rij, true);
+        }
+
+        for (HotelRuimte ruimte : alleRuimtes) {
+
+            boolean isHotelKamer    = ruimte instanceof HotelKamer;
+            boolean isBioscoop      = ruimte instanceof Bioscoop;
+            boolean isFitnessRuimte = ruimte instanceof FitnessRuimtes;
+            boolean isRestaurant    = ruimte instanceof Restaurant;
+            boolean isEenKamer      = isHotelKamer || isBioscoop || isFitnessRuimte || isRestaurant;
+
+            if (isEenKamer) {
+                // Blokkeer het interieur van de kamer (+1 zodat de rand vrij blijft)
+                int interiorLinks  = ruimte.getX() + 2;
+                int interiorRechts = ruimte.getX() + 1 + ruimte.getBreedte();
+                int interiorBoven  = ruimte.getY();
+                int interiorOnder  = ruimte.getY() - 1 + ruimte.getHoogte();
+
+                for (int kolom = interiorLinks; kolom < interiorRechts; kolom++) {
+                    for (int rij = interiorBoven; rij < interiorOnder; rij++) {
+                        boolean kolomBinnenGrid = kolom >= 0 && kolom < arrayGrootte;
+                        boolean rijBinnenGrid   = rij   >= 0 && rij   < arrayGrootte;
+
+                        if (kolomBinnenGrid && rijBinnenGrid) {
+                            loopbareKaart[kolom][rij] = false;
+                        }
+                    }
+                }
+            }
+
+            // Ruimtes met ingangen (zoals Trap): blokkeer kolom, open alleen de ingangen
+            int[] ingangen         = ruimte.getIngangen();
+            boolean heeftIngangen  = ingangen.length > 0;
+
+            if (heeftIngangen) {
+                int ruimteKolom = ruimte.getX() + 1;
+
+                for (int rij = 0; rij <= AANTAL_VAKJES; rij++) {
+                    loopbareKaart[ruimteKolom][rij] = false;
+                }
+                for (int ingang : ingangen) {
+                    loopbareKaart[ruimteKolom][ingang] = true;
+                }
+            }
+        }
+
+        return loopbareKaart;
+    }
+
+
+
+    // isStapGeldig: extra check zodat personen niet door dunne kamers lopen
+        private static boolean isStapGeldig(int vanKolom, int vanRij,
+                                        int naarKolom, int naarRij,
+                                        List<HotelRuimte> alleRuimtes) {
+        for (HotelRuimte ruimte : alleRuimtes) {
+
+            // Trap: alleen betreden via officiële ingang
+            int[] ingangen        = ruimte.getIngangen();
+            boolean heeftIngangen = ingangen.length > 0;
+
+            if (heeftIngangen) {
+                int     ruimteKolom        = ruimte.getX() + 1;
+                boolean stapNaarDezeKolom  = naarKolom == ruimteKolom;
+                boolean komtVanBuiten      = vanKolom  != ruimteKolom;
+                boolean probeertInTeStappen = stapNaarDezeKolom && komtVanBuiten;
+
+                boolean isGeenGeldigeIngang = !ruimte.isBeloopbaar(naarKolom, naarRij);
+
+                if (probeertInTeStappen && isGeenGeldigeIngang) {
+                    return false;
                 }
                 continue;
             }
 
-            if (!(r instanceof HotelKamer)    &&
-                    !(r instanceof Bioscoop)       &&
-                    !(r instanceof FitnessRuimtes) &&
-                    !(r instanceof Restaurant)) continue;
+            boolean isHotelKamer    = ruimte instanceof HotelKamer;
+            boolean isBioscoop      = ruimte instanceof Bioscoop;
+            boolean isFitnessRuimte = ruimte instanceof FitnessRuimtes;
+            boolean isRestaurant    = ruimte instanceof Restaurant;
+            boolean isEenKamer      = isHotelKamer || isBioscoop || isFitnessRuimte || isRestaurant;
 
-            int links  = r.getX() + 1;
-            int rechts = r.getX() + 1 + r.getBreedte();
-            int boven  = r.getY() - 1;
-            int onder  = r.getY() - 1 + r.getHoogte();
+            if (!isEenKamer) {
+                continue;
+            }
 
-            if (gy == ny) {
-                // Horizontale stap: geblokkeerd als de stap door het kamer-oppervlak gaat
-                int minGx = Math.min(gx, nx);
-                if (gy > boven && gy < onder && minGx >= links && minGx < rechts)
+            int kamerLinks  = ruimte.getX() + 1;
+            int kamerRechts = ruimte.getX() + 1 + ruimte.getBreedte();
+            int kamerBoven  = ruimte.getY() - 1;
+            int kamerOnder  = ruimte.getY() - 1 + ruimte.getHoogte();
+
+            boolean isHorizontaleStap = vanRij == naarRij;
+
+            if (isHorizontaleStap) {
+                // Horizontale stap: gaat hij dwars door het kameroppervlak?
+                int     linkerVakje       = Math.min(vanKolom, naarKolom);
+                boolean rijBinnenKamer    = vanRij      > kamerBoven  && vanRij      < kamerOnder;
+                boolean kolomBinnenKamer  = linkerVakje >= kamerLinks && linkerVakje < kamerRechts;
+
+                if (rijBinnenKamer && kolomBinnenKamer) {
                     return false;
+                }
             } else {
-                // Verticale stap: zelfde idee maar dan voor kolommen
-                int minGy = Math.min(gy, ny);
-                if (gx > links && gx < rechts && minGy >= boven && minGy < onder)
+                // Verticale stap: gaat hij dwars door het kameroppervlak?
+                int     bovensteVakje     = Math.min(vanRij, naarRij);
+                boolean kolomBinnenKamer2 = vanKolom      > kamerLinks && vanKolom      < kamerRechts;
+                boolean rijBinnenKamer2   = bovensteVakje >= kamerBoven && bovensteVakje < kamerOnder;
+
+                if (kolomBinnenKamer2 && rijBinnenKamer2) {
                     return false;
+                }
             }
         }
+
         return true;
     }
 
 
-    // Maakt een kaart van het hotel: true = mag lopen, false = kamer-interieur (geblokkeerd)
-    // Alleen het INTERIEUR wordt geblokkeerd — de randen blijven vrij zodat gasten er langs kunnen
-    public static boolean[][] berekenLoopbaar(List<HotelRuimte> ruimtes) {
-        int n = GRID_GROOTTE + 1;
-        boolean[][] loopbaar = new boolean[n][n];
-        for (boolean[] rij : loopbaar) Arrays.fill(rij, true);
 
-        for (HotelRuimte r : ruimtes) {
-            if (!(r instanceof HotelKamer)    &&
-                    !(r instanceof Bioscoop)       &&
-                    !(r instanceof FitnessRuimtes) &&
-                    !(r instanceof Restaurant)) continue;
-
-            int links  = r.getX() + 1;
-            int rechts = r.getX() + 1 + r.getBreedte();
-            int boven  = r.getY() - 1;
-            int onder  = r.getY() - 1 + r.getHoogte();
-
-            // links+1 en boven+1 slaan de rand over — alleen het interieur wordt geblokkeerd
-            for (int x = links + 1; x < rechts; x++)
-                for (int y = boven + 1; y < onder; y++)
-                    if (x >= 0 && x < n && y >= 0 && y < n)
-                        loopbaar[x][y] = false;
-
-        }
-        for (HotelRuimte r : ruimtes) {
-            if (r instanceof Trap) {
-                int trapGx = r.getX() + 1; // = 8
-                for (int y = 0; y <= GRID_GROOTTE; y++) {
-                    loopbaar[trapGx][y] = false;
-                }
-                // Alleen de 3 ingangen zijn beloopbaar
-                loopbaar[trapGx][2] = true;
-                loopbaar[trapGx][5] = true;
-                loopbaar[trapGx][8] = true;
-            }
-        }
-        return loopbaar;
-    }
-
-
-
-
-    // Geeft de ingang van een kamer terug: midden van de onderkant
-    // Gasten komen altijd van onderen de kamer in
-    public static Point getKamerIngang(HotelRuimte kamer) {
-        int pixelLinks = (kamer.getX() + 1) * CEL_GROOTTE;
-        int pixelBreed = kamer.getBreedte() * CEL_GROOTTE;
-        int onderY     = (kamer.getY() - 1 + kamer.getHoogte()) * CEL_GROOTTE;
-        int ingangX    = (pixelLinks + pixelBreed / 2) / CEL_GROOTTE * CEL_GROOTTE;
-        return new Point(ingangX, onderY);
-    }
-
-
-    // Schat hoeveel stappen er nog nodig zijn naar het doel (Manhattan Distance)
-    // Telt horizontale + verticale afstand — geen diagonaal
-    private static int heuristiek(int x1, int y1, int x2, int y2) {
-        return Math.abs(x1 - x2) + Math.abs(y1 - y2);
-    }
-
-
-    // Zoek het pad terug van doel naar start via de opgeslagen ouder-verwijzingen
-    // addFirst() zorgt dat het resultaat van start naar doel loopt
-    private static List<Point> reconstrueerPad(Point[][] ouder, Point doel) {
+    // bouwPadTerug: volgt de ouder-ketting terug van doel naar start
+        private static List<Point> bouwPadTerug(Point[][] ouderVakje, Point doelVakje) {
         LinkedList<Point> pad = new LinkedList<>();
-        Point huidig = doel;
+        Point huidig = doelVakje;
+
+        // Elke stap terug in de ketting, vooraan toevoegen geeft start→doel volgorde
         while (huidig != null) {
-            pad.addFirst(new Point(huidig.x * CEL_GROOTTE, huidig.y * CEL_GROOTTE));
-            huidig = ouder[huidig.x][huidig.y];
+            int pixelX = huidig.x * PIXELS_PER_VAKJE;
+            int pixelY = huidig.y * PIXELS_PER_VAKJE;
+
+            pad.addFirst(new Point(pixelX, pixelY));
+            huidig = ouderVakje[huidig.x][huidig.y];
         }
+
         return pad;
     }
 
 
-    // Houdt een getal binnen een min en max grens
-    // Voorbeeld: klem(12, 0, 10) → 10 | klem(-3, 0, 10) → 0 | klem(5, 0, 10) → 5
-    private static int klem(int waarde, int min, int max) {
-        return Math.max(min, Math.min(max, waarde));
+
+    // berekenManhattanAfstand: horizontale + verticale afstand (geen diagonaal)
+        private static int berekenManhattanAfstand(int kolom1, int rij1, int kolom2, int rij2) {
+        int horizontaleAfstand = Math.abs(kolom1 - kolom2);
+        int verticaleAfstand   = Math.abs(rij1   - rij2);
+        return horizontaleAfstand + verticaleAfstand;
+    }
+
+
+
+    // getKamerIngang: personen betreden een kamer altijd via het midden onderaan
+        public static Point getKamerIngang(HotelRuimte kamer) {
+        int kamerLinksInPixels   = (kamer.getX() + 1) * PIXELS_PER_VAKJE;
+        int kamerBreedteInPixels = kamer.getBreedte() * PIXELS_PER_VAKJE;
+        int kamerMiddenInPixels  = kamerLinksInPixels + kamerBreedteInPixels / 2;
+
+        int ingangX = kamerMiddenInPixels / PIXELS_PER_VAKJE * PIXELS_PER_VAKJE;
+        int ingangY = (kamer.getY() - 1 + kamer.getHoogte()) * PIXELS_PER_VAKJE;
+
+        return new Point(ingangX, ingangY);
+    }
+
+
+
+    // pixelNaarGrid: pixel → grid-index, vastgezet tussen 0 en AANTAL_VAKJES
+        private static int pixelNaarGrid(int pixels) {
+        int index = pixels / PIXELS_PER_VAKJE;
+
+        if (index < 0)             index = 0;
+        if (index > AANTAL_VAKJES) index = AANTAL_VAKJES;
+
+        return index;
     }
 }

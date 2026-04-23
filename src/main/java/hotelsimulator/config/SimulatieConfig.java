@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SimulatieConfig {
-	private HTE snelheid;
+    private Snelheid snelheid;
 	private int aantalGasten;
 	private int brightness;
 	private int volume;
@@ -28,7 +28,7 @@ public class SimulatieConfig {
         }
     }
 	// GETTERS
-	public HTE getSnelheid() {
+	public Snelheid getSnelheid() {
 		return snelheid;
 	}
 
@@ -55,7 +55,7 @@ public class SimulatieConfig {
         notifyListeners();
     }
 
-    public void setSnelheid(HTE snelheid) {
+    public void setSnelheid(Snelheid snelheid) {
         this.snelheid = snelheid;
         notifyListeners();
     }

@@ -8,7 +8,8 @@ import hotelsimulator.personen.Gast;
 import hotelsimulator.personen.Persoon;
 import hotelsimulator.personen.Schoonmaker;
 import hotelsimulator.ruimtes.*;
-
+import hotelsimulator.ruimtes.HotelRuimteFactory;
+import hotelsimulator.ruimtes.IRuimteFactory;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -23,13 +24,20 @@ public class Hotel {
     private ArrayList<Persoon> personen;
 	private Lift lift;
     private Schacht schacht;
+    private IRuimteFactory ruimteFactory;
 
-	public Hotel(SimulatieConfig config, HotelEventManager eventManager, SimulatieConfig simulatieConfig) {
+
+    public Hotel(SimulatieConfig config, HotelEventManager eventManager, SimulatieConfig simulatieConfig) {
+        this(config, eventManager, simulatieConfig, new HotelRuimteFactory());
+    }
+    public Hotel(SimulatieConfig config, HotelEventManager eventManager,
+                 SimulatieConfig simulatieConfig, IRuimteFactory factory) {
         this.hotelEventManager = eventManager;
         this.simulatieConfig = simulatieConfig;
-		this.ruimtes = new ArrayList<>();
-		this.personen = new ArrayList<>();
-	}
+        this.ruimteFactory = factory;
+        this.ruimtes = new ArrayList<>();
+        this.personen = new ArrayList<>();
+    }
 
     public LinkedList<Integer> getLiftOproepen(){
         return liftOproepen;
@@ -59,21 +67,17 @@ public class Hotel {
             String sterrenAantal = (item.Classification != null) ? item.Classification : "";
 
             //elke item maakt een nieuwe object aan met die specificaties
-            HotelRuimte r = switch (item.AreaType) {
-                case "Cinema" -> new Bioscoop(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
-                case "Fitness" -> new FitnessRuimtes(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
-                case "Restaurant" -> new Restaurant(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
-                case "Room" -> new HotelKamer(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
-                default -> null;
-            };
-            if (r != null)
-                //onthoudt waar de genoemde kamer is in de arraylijst ruimtes
+            try {
+                HotelRuimte r = ruimteFactory.maak(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
                 ruimtes.add(r);
+            } catch (IllegalArgumentException e) {
+                System.out.println("Onbekend ruimtetype overgeslagen: " + areaType);
+            }
         }
          schacht = new Schacht("Schacht", "", 0, 0, 1, 9, 0);
         Lobby lobby = new Lobby("Lobby", "", 0, 1, 6, 1, 0);
         Trap trap = new Trap("trap", "", 0, 7, 1, 9, 999);
-        lift = new Lift("Lift", "", 0, 0, 1, 1, 5,this);
+        lift = new Lift("Lift", "", 0, 0, 1, 1, 5);
 
         ruimtes.add(schacht);
         ruimtes.add(lobby);

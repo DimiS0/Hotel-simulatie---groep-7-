@@ -48,6 +48,12 @@ public abstract class HotelRuimte {
     public int getAantalAanwezig() {
         return aantalGasten + aantalSchoonmakers;
     }
+    public boolean isBeloopbaar(int gridX, int gridY) {
+        return true;
+    }
+    public int[] getIngangen() {
+        return new int[0];
+    }
 
     public String getAreaType() {
         return areaType;

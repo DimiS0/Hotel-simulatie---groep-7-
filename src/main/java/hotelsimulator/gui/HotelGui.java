@@ -1,18 +1,17 @@
 package hotelsimulator.gui;
 
 import hotelevents.HotelEventManager;
-import hotelevents.HotelEventType;
-import hotelsimulator.config.HTE;
 import hotelsimulator.core.Hotel;
 import hotelsimulator.config.SimulatieConfig;
-import hotelsimulator.personen.Gast;
 import hotelsimulator.personen.Schoonmaker;
 import hotelsimulator.ruimtes.HotelRuimte;
 import hotelsimulator.personen.Persoon;
+import hotelsimulator.config.Snelheid;
+import hotelsimulator.core.SimulatieLus;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
+
 
 import static hotelsimulator.config.HTE.*;
 
@@ -26,11 +25,8 @@ public class HotelGui extends JPanel {
     private JFrame frame;
     private JLabel speed;
     boolean setDefaultSpeed;
-    private int liftTeller = 0;
-    private final int[] LIFT_STOPS = {8, 5, 2}; // Grid-Y posities van de lifthaltes
-    private int liftStopIndex = 0;
     private HotelOverzicht overzicht;
-    private Timer bewegingsTimer;
+    private SimulatieLus simulatieLus;
 
     public HotelGui(Hotel hotel, SimulatieConfig config, HotelEventManager eventManager) {
         this.frame = new JFrame("Hotel Layout");
@@ -103,52 +99,8 @@ public class HotelGui extends JPanel {
         }
 
         // Spawn gasten één voor één via de timer (elke 2 seconden één gast)
-        List<Persoon> personen = hotel.getPersonen();
-        final int[] spawnIndex = {0};
-
-        Timer spawnTimer = new Timer(1000, ev -> {
-            while (spawnIndex[0] < personen.size()) {
-                Persoon p = personen.get(spawnIndex[0]);
-                if (p instanceof Gast gast && !gast.isGespawnd()) {
-                    // Alleen gasten worden via de timer gespawnd
-                    gast.activeer();
-                    spawnIndex[0]++;
-                    break;
-                }
-                // Schoonmakers overslaan — die zijn al geactiveerd
-                spawnIndex[0]++;
-            }
-        });
-        spawnTimer.start();
-
-        // Bewegingstimer: ~60 FPS — beweegt alle personen en hertekent het scherm
-         bewegingsTimer = new Timer(16, ev -> {
-            // Elke ~5 seconden de lift naar de volgende verdieping sturen
-            liftTeller++;
-            if (liftTeller >= 300) {
-                liftTeller = 0;
-                int volgendeStop = LIFT_STOPS[liftStopIndex % LIFT_STOPS.length];
-
-                // Eerst aan wachtrij toevoegen, dan lift starten
-                hotel.getLiftOproepen().add(volgendeStop);
-                if (hotel.getLift().getBeschikbaar()) {
-                    hotel.getLift().roepLiftNaar(volgendeStop);
-                }
-                liftStopIndex++;
-            }
-
-            // Update elke persoon op basis van zijn huidige toestand
-            for (Persoon p : hotel.getPersonen()) {
-                if (p instanceof Gast gast) {
-                    gast.update();
-                } else if (p instanceof Schoonmaker schoonmaker) {
-                    schoonmaker.update();
-                } else {
-                    p.beweeg();
-                }
-            }
-            repaint();
-        });
+        simulatieLus = new SimulatieLus(hotel, this);
+        simulatieLus.start();
 
         // Klik op de lobby om het overzichtvenster te openen of te sluiten
         this.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -165,12 +117,12 @@ public class HotelGui extends JPanel {
                                 gridY >= lobbyY && gridY < lobbyY + r.getHoogte()) {
                             if (overzicht == null || !overzicht.isVisible()){
                                 hotelEventManager.pauze();
-                                bewegingsTimer.stop();
+                                simulatieLus.stop();
                                 overzicht = new HotelOverzicht(hotel,hotelEventManager);
                             }
                             else{
                                 hotelEventManager.pauze();
-                                bewegingsTimer.start();
+                                simulatieLus.start();
                                 overzicht.dispose();
                                 overzicht = null;
                             }
@@ -182,7 +134,7 @@ public class HotelGui extends JPanel {
             }
         });
 
-        bewegingsTimer.start();
+
     }
 
     public void updateSpeedLabel(int value) {
@@ -200,14 +152,12 @@ public class HotelGui extends JPanel {
     }
 
     // Vertaalt HTE-waarde naar een getal voor het snelheidslabel
-    private int mapHTEToSlider(HTE hte) {
-        return switch (hte) {
-            case LANGZAMER -> 1;
-            case LANGZAAM  -> 2;
-            case NORMAAL   -> 3;
-            case SNEL      -> 4;
-            case VIER_X    -> 5;
-            default        -> 3;
-        };
+    private int mapHTEToSlider(Snelheid hte) {
+        double factor = hte.getFactor();
+        if (factor <= 0.25) return 1;
+        if (factor <= 0.5)  return 2;
+        if (factor <= 1.0)  return 3;
+        if (factor <= 2.0)  return 4;
+        return 5;
     }
 }

@@ -20,4 +20,14 @@ public class Trap extends HotelRuimte {
         //tekst kleur, kleur neerzetten
         g.setColor(Color.WHITE);
         g.drawString("Trap", (x+1)*cellSize + 5, (y-1)*cellSize + 15);}
-}
+
+    @Override
+    public boolean isBeloopbaar(int gridX, int gridY) {
+        return gridY == 2 || gridY == 5 || gridY == 8;}
+
+        @Override
+        public int[] getIngangen () {
+            return new int[]{2, 5, 8};
+        }
+    }
+

@@ -3,6 +3,7 @@ package hotelsimulator.gui;
 import javax.swing.*;
 import hotelsimulator.config.HTE;
 import hotelsimulator.config.SimulatieConfig;
+import hotelsimulator.config.Snelheid;
 
 
 import java.awt.*;
@@ -12,7 +13,7 @@ import java.util.Hashtable;
 import java.util.function.Consumer;
 
 public class ConfigGui {
-    private HTE valueHTE;
+    private Snelheid valueHTE;
     private final SimulatieConfig config;
     private final Consumer<Integer> onSpeedChange;
 
@@ -56,7 +57,7 @@ public class ConfigGui {
 
         snelheidSlider.addChangeListener(e -> {
             int value = snelheidSlider.getValue();
-            HTE snelheid = mapSliderToHTE(value);
+            Snelheid snelheid = mapSliderToHTE(value);
             config.setSnelheid(snelheid);
             onSpeedChange.accept(value);
         });
@@ -100,7 +101,7 @@ public class ConfigGui {
         frame.setVisible(true);
     }
 
-    private HTE mapSliderToHTE(int value) {
+    private Snelheid mapSliderToHTE(int value) {
         return switch (value) {
             case 1 -> HTE.LANGZAMER;
             case 2 -> HTE.LANGZAAM;
@@ -111,15 +112,14 @@ public class ConfigGui {
         };
     }
 
-    private int mapHTEToSlider(HTE hte) {
+    private int mapHTEToSlider(Snelheid hte) {
         this.valueHTE = hte;
-        return switch (hte) {
-            case LANGZAMER -> 1;
-            case LANGZAAM  -> 2;
-            case NORMAAL   -> 3;
-            case SNEL      -> 4;
-            case VIER_X    -> 5;
-        };
+        double factor = hte.getFactor();
+        if (factor <= 0.25) return 1;
+        if (factor <= 0.5)  return 2;
+        if (factor <= 1.0)  return 3;
+        if (factor <= 2.0)  return 4;
+        return 5;
     }
 
     //geeft instelling venster, zodat we die kunnen sluiten

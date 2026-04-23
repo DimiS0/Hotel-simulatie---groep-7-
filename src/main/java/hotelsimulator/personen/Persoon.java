@@ -3,6 +3,7 @@ package hotelsimulator.personen;
 import hotelevents.HotelEventManager;
 import hotelsimulator.config.SimulatieConfig;
 import hotelsimulator.core.Hotel;
+import hotelsimulator.pathfinding.Pathfinder;
 import hotelsimulator.ruimtes.HotelRuimte;
 import hotelsimulator.ruimtes.Lift;
 import hotelsimulator.ruimtes.Schacht;
@@ -14,128 +15,176 @@ import java.util.Random;
 
 public abstract class Persoon {
 
-    // Huidige positie van de persoon in pixels (int, voor tekenen)
+    // Positie
     protected int pixelX;
     protected int pixelY;
-
-    // Dezelfde positie als doubles — nodig voor vloeiende beweging bij lagere snelheden
-    // BELANGRIJK: deze moeten altijd synchroon lopen met pixelX en pixelY
     protected double pixelXD;
     protected double pixelYD;
+    protected double pixelYDouble;
 
-    // Verwijzingen naar de kernonderdelen van de simulatie
+    // Simulatie-referenties
     protected Hotel hotel;
-    SimulatieConfig simulatieConfig;
+    protected SimulatieConfig simulatieConfig;
     protected Schacht schacht;
     protected Lift lift;
     protected HotelEventManager hotelEventManager;
 
-    // De reeks waypoints die de persoon moet doorlopen
+    //  Beweging
     protected LinkedList<Point> pad = new LinkedList<>();
+    protected static final int    SNELHEID         = 2;
+    protected static final int    SCHACHT_PIXEL_X  = 100;
+    protected static final int    TRAP_PIXEL_X     = 425;
+    protected static final int    LIFT_CENTER_X    = 75;
+    protected static final Random random           = new Random();
 
-    // Bewegingssnelheid in pixels per stap (basis)
-    protected static final int SNELHEID = 2;
-    protected static final Random random = new Random();
-    protected double pixelYDouble;
-    protected double factor;
-
-    // Voorkomt dat een liftverzoek meerdere keren wordt ingediend
     private boolean heeftVerzoekIngediend = false;
 
-    public Persoon(int startX, int startY, Lift lift, Schacht schacht, Hotel hotel, HotelEventManager hotelEventManager, SimulatieConfig simulatieConfig) {
-        this.hotel            = hotel;
-        this.simulatieConfig  = simulatieConfig;
-        this.schacht          = schacht;
-        this.lift             = lift;
+
+    // Constructor
+    public Persoon(int startX, int startY, Lift lift, Schacht schacht,
+                   Hotel hotel, HotelEventManager hotelEventManager,
+                   SimulatieConfig simulatieConfig) {
+        this.hotel             = hotel;
+        this.simulatieConfig   = simulatieConfig;
+        this.schacht           = schacht;
+        this.lift              = lift;
         this.hotelEventManager = hotelEventManager;
-        // Initialiseer alle vier posities tegelijk zodat ze vanaf het begin synchroon zijn
-        this.pixelX  = startX;
-        this.pixelY  = startY;
-        this.pixelXD = startX;
-        this.pixelYD = startY;
+        setPositie(startX, startY);
     }
 
-    /**
-     * Zet de positie van de persoon en houdt int én double velden synchroon.
-     * Gebruik deze methode altijd als je de persoon naar een nieuwe positie teleporteert
-     * (bijv. na uitstappen uit de lift), anders loopt pixelXD/YD uit de pas en
-     * beweegt de persoon via de verkeerde beginpositie.
-     */
-    protected void setPositie(int x, int y) {
-        this.pixelX  = x;
-        this.pixelY  = y;
-        this.pixelXD = x;
-        this.pixelYD = y;
+
+    // Abstracte methodes — elke subklasse implementeert deze
+
+    // Wordt elke frame aangeroepen vanuit SimulatieLus.
+    public abstract void update();
+
+    // Zet de persoon klaar op zijn startpositie en kiest een doelkamer.
+    public abstract void activeer();
+
+    // Geeft terug of de persoon al gespawnd is.
+    public abstract boolean isGespawnd();
+
+    // Aangeroepen door de Lift wanneer hij aankomt.
+    public abstract void stapIn();
+
+    // Aangeroepen door de Lift wanneer de doelverdieping bereikt is.
+    public abstract void stapUit(int pixelYPos);
+
+    // Geeft de doelverdieping terug (nodig voor de lift).
+    public abstract int getDoelVerdieping();
+
+
+    // Gedeelde methodes (waren duplicaat in Gast + Schoonmaker)
+
+
+
+    protected Point getTrueMidden(HotelRuimte kamer) {
+        int middenX = (kamer.getX() + 1) * 50 + kamer.getBreedte() * 50 / 2;
+        int middenY = (kamer.getY() - 1) * 50 + kamer.getHoogte()  * 50 / 2;
+        return new Point(middenX, middenY);
     }
 
-    /**
-     * Beweegt één stap richting het volgende waypoint.
-     * Gebruikt doubles voor vloeiende beweging bij lagere HTE-snelheden.
-     * Beweegt ALLEEN horizontaal OF verticaal — nooit diagonaal.
-     */
+
+    protected int getNabijeStop(int gridY) {
+        int[] stops = hotel.getLift().getVerdiepingenY();
+        int dichtstbij = stops[0];
+        for (int stop : stops) {
+            if (Math.abs(gridY - stop) < Math.abs(gridY - dichtstbij))
+                dichtstbij = stop;
+        }
+        return dichtstbij;
+    }
+
+
+    protected void loopNaarSchachtOfTrapGemeen(int huidigeVerdieping,
+                                               Runnable zetStatusSchacht,
+                                               Runnable zetStatusTrap) {
+        int kies = random.nextInt(1, 3);
+        if (kies == 1) {
+            int wachtY = (huidigeVerdieping - 1) * 50;
+            List<Point> schachtPad = Pathfinder.vindPad(
+                    pixelX, pixelY, SCHACHT_PIXEL_X, wachtY, hotel.getRuimtes());
+            if (!schachtPad.isEmpty()) {
+                setPad(schachtPad);
+                zetStatusSchacht.run();
+            }
+        } else {
+            int wachtY = getNabijeStop(huidigeVerdieping) * 50;
+            List<Point> trapPad = Pathfinder.vindPad(
+                    pixelX, pixelY, TRAP_PIXEL_X, wachtY, hotel.getRuimtes());
+            if (!trapPad.isEmpty()) {
+                setPad(trapPad);
+                zetStatusTrap.run();
+            }
+        }
+    }
+
+
+    protected void updateInLift() {
+        if (pixelX != LIFT_CENTER_X) {
+            if (pixelX > LIFT_CENTER_X) pixelX = Math.max(pixelX - SNELHEID, LIFT_CENTER_X);
+            else                         pixelX = Math.min(pixelX + SNELHEID, LIFT_CENTER_X);
+        } else {
+            pixelY = (hotel.getLift().getCurrentLiftY() - 1) * 50 + 25;
+        }
+    }
+
+
+    protected boolean updateInTrap(int doelVerdieping) {
+        int doelY = doelVerdieping * 50;
+        if (Math.abs(pixelY - doelY) <= SNELHEID) {
+            setPositie(TRAP_PIXEL_X, doelY);
+            pixelX  = (TRAP_PIXEL_X / 50) * 50;
+            pixelXD = pixelX;
+            return true; // aangekomen
+        }
+        if (doelY > pixelYDouble) {
+            pixelYDouble += (2.0 * getFactor()) / 3;
+        } else {
+            pixelYDouble -= (2.0 * getFactor()) / 3;
+        }
+        pixelY = (int) pixelYDouble;
+        return false; // nog onderweg
+    }
+
+    // Bestaande methodes (ongewijzigd)
+
     public void beweeg() {
         if (pad.isEmpty()) return;
 
-        // Stapgrootte schalen op basis van de HTE-snelheid (bijv. 0.25x → 0.5 pixels/frame)
         double stap = SNELHEID * simulatieConfig.getSnelheid().getFactor();
+        Point doel  = pad.peek();
 
-        Point doelPunt = pad.peek();
-
-        if (pixelXD != doelPunt.x) {
-            // Horizontaal bewegen
-            if (pixelXD < doelPunt.x) pixelXD = Math.min(pixelXD + stap, doelPunt.x);
-            else                       pixelXD = Math.max(pixelXD - stap, doelPunt.x);
-        } else if (pixelYD != doelPunt.y) {
-            // Verticaal bewegen
-            if (pixelYD < doelPunt.y) pixelYD = Math.min(pixelYD + stap, doelPunt.y);
-            else                       pixelYD = Math.max(pixelYD - stap, doelPunt.y);
+        if (pixelXD != doel.x) {
+            if (pixelXD < doel.x) pixelXD = Math.min(pixelXD + stap, doel.x);
+            else                   pixelXD = Math.max(pixelXD - stap, doel.x);
+        } else if (pixelYD != doel.y) {
+            if (pixelYD < doel.y) pixelYD = Math.min(pixelYD + stap, doel.y);
+            else                   pixelYD = Math.max(pixelYD - stap, doel.y);
         } else {
-            // Waypoint bereikt: verwijder het en ga naar het volgende
             pad.poll();
         }
 
-        // Zet de int-velden bij vanuit de doubles (voor tekenen en positiecontroles)
         pixelX = (int) pixelXD;
         pixelY = (int) pixelYD;
 
-        // Controleer of de persoon bij de liftschacht staat op een geldige verdieping
         int gridX = pixelX / 50;
         int gridY = pixelY / 50;
 
         if (gridX == schacht.getX()) {
             for (int verdieping : lift.getVerdiepingenY()) {
-                if (gridY == verdieping) {
-                    liftVerzoek(gridY);
-                }
+                if (gridY == verdieping) liftVerzoek(gridY);
             }
         } else {
-            // Persoon staat niet meer bij de schacht: reset de verzoekstatus
             heeftVerzoekIngediend = false;
         }
     }
 
-    // Geeft aan of alle waypoints bereikt zijn
-    public boolean isOpDoel() {
-        return pad.isEmpty();
-    }
-
-    // Stelt een nieuw pad in (lijst van pixel-waypoints)
-    public void setPad(List<Point> nieuwPad) {
-        this.pad = new LinkedList<>(nieuwPad);
-    }
-
-    /**
-     * Dient éénmalig een liftverzoek in voor de opgegeven verdieping.
-     * Wordt genegeerd als de lift al op die verdieping staat of als
-     * er al eerder een verzoek is ingediend.
-     */
     public void liftVerzoek(int stopVerdieping) {
         if (!heeftVerzoekIngediend) {
             heeftVerzoekIngediend = true;
-
             if (lift.getY() != stopVerdieping) {
                 hotel.getLiftOproepen().addLast(stopVerdieping);
-
                 if (lift.getBeschikbaar()) {
                     lift.roepLiftNaar(hotel.getLiftOproepen().getFirst());
                 }
@@ -143,17 +192,29 @@ public abstract class Persoon {
         }
     }
 
-    public double getFactor() {
-        factor = simulatieConfig.getSnelheid().getFactor();
-        return factor;
+    protected void setPositie(int x, int y) {
+        this.pixelX  = x;
+        this.pixelY  = y;
+        this.pixelXD = x;
+        this.pixelYD = y;
     }
 
-    // Geeft de huidige ruimte terug; standaard null (persoon zit nergens in)
+    public void setPad(List<Point> nieuwPad) {
+        this.pad = new LinkedList<>(nieuwPad);
+    }
+
+    public boolean isOpDoel() {
+        return pad.isEmpty();
+    }
+
+    public double getFactor() {
+        return simulatieConfig.getSnelheid().getFactor();
+    }
+
     public HotelRuimte getHuidigeRuimte() {
         return null;
     }
 
-    // Tekent de persoon op het scherm
     public abstract void print(Graphics g);
 
     public int getPixelX() { return pixelX; }

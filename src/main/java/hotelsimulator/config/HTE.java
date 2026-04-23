@@ -1,6 +1,6 @@
 package hotelsimulator.config;
 
-public enum HTE {
+public enum HTE implements Snelheid  {
 	LANGZAMER("0.25x", 0.25),
 	LANGZAAM("0.5x", 0.5),
 	NORMAAL("1.0x", 1.0),
@@ -14,11 +14,16 @@ public enum HTE {
 		this.label = label;
 		this.factor = factor;
 	}
+    @Override
 	public double getFactor() {
 		return factor;
 	}
-
+    @Override
 	public int getDelay() {
 		return (int) (1000 / getFactor());
 	}
+    @Override
+    public String getLabel() {
+        return label;
+    }
 }
