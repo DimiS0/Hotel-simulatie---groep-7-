@@ -1,16 +1,22 @@
 package hotelsimulator.events.Core;
 
+import hotelevents.HotelEvent;
 import hotelevents.HotelEventType;
+import hotelsimulator.core.Hotel;
 import hotelsimulator.events.Emergency.CleaningEmergency;
 import hotelsimulator.events.Emergency.Evacuate;
 import hotelsimulator.events.Emergency.Godzilla;
 import hotelsimulator.events.Guest.*;
 import hotelsimulator.events.Ruimte.StartCinema;
+import hotelsimulator.personen.Gast;
 
 public class evenementFactory {
-    public static EventStrategie verwerken(HotelEventType type){
+    public static EventStrategie verwerken(HotelEvent evt, Hotel hotel){
+        HotelEventType type = evt.getEventType();
+        int guestId = evt.getGuestId();
+
         switch(type){
-            case CHECK_IN -> {return new CheckIn();}
+            case CHECK_IN -> {Gast gast = hotel.zoekGastOpId(guestId); if (gast == null) {System.out.println("Gast niet gevonden met id: " + guestId); return () -> {};} return new CheckIn(gast);}
             case CHECK_OUT -> {return new CheckOut();}
             case CLEANING_EMERGENCY -> {return new CleaningEmergency();}
             case EVACUATE -> {return new Evacuate();}
@@ -26,3 +32,4 @@ public class evenementFactory {
         }
     }
 }
+

@@ -26,7 +26,7 @@ public class HoofdSimulator {
         this.hotel = new Hotel(config,eventManager,config);
         this.swingGui = new StarterGui(this);
 		this.eventManager = new hotelevents.HotelEventManager();
-        this.event = new Evenement(eventManager);
+        this.event = new Evenement(eventManager,hotel);
 
 		config.addListener(() -> {
 			eventManager.setHte(config.getSnelheid().getDelay());
@@ -54,12 +54,10 @@ public class HoofdSimulator {
         gui.showGui();
 
         eventManager.register(evt -> {
-            if (evt.getEventType() == hotelevents.HotelEventType.NONE) {
                 javax.swing.SwingUtilities.invokeLater(() -> {
                     hotel.getLift().liftBwegen();
                     gui.repaint();
                 });
-            }
         });
         eventManager.start(1);
     }

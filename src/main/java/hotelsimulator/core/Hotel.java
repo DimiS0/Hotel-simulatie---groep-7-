@@ -102,7 +102,7 @@ public class Hotel {
         personen = new ArrayList<>();
 
         // Bereken hoeveel schoonmakers er nodig zijn: 2 per 5 gasten (naar boven afgerond)
-        int aantalSchoonmakers = (int) Math.ceil(aantalGasten * 2.0 / 5.0);
+        int aantalSchoonmakers = 2;
 
         int gastIndex = 0;
         int schoonmakerIndex = 0;
@@ -113,7 +113,7 @@ public class Hotel {
 
             // Voeg een groep van maximaal 5 gasten toe
             for (int i = 0; i < 5 && gastIndex < aantalGasten; i++, gastIndex++) {
-                personen.add(new Gast(lift, schacht, this,hotelEventManager,simulatieConfig));
+                personen.add(new Gast(lift, schacht, this,hotelEventManager,simulatieConfig,gastIndex+1));
             }
 
             // Voeg daarna maximaal 2 schoonmakers toe
@@ -136,5 +136,16 @@ public class Hotel {
 
     public ArrayList<Persoon> getPersonen() {
         return personen;
+    }
+
+    public Gast zoekGastOpId(int guestId) {
+        for (Persoon persoon : personen) {
+            if (persoon instanceof Gast gast && gast.getGuestID() == guestId) {
+                System.out.println(" GAST GEVONDEN " + guestId);
+                return gast;
+            }
+        }
+        System.out.println("GEEN GAST GEVONDEN voor id " + guestId);
+        return null;
     }
 }

@@ -13,10 +13,13 @@ import java.util.List;
 public class Gast extends Persoon {
 
     public enum Status {
-        WACHT_OP_SPAWN, LOOPT_NAAR_INGANG, LOOPT_NAAR_SCHACHT,
+        WACHT_OP_SPAWN, WACHT_IN_LOBBY, LOOPT_NAAR_INGANG, LOOPT_NAAR_SCHACHT,
         WACHT_OP_LIFT, IN_LIFT, LOOP_DOOR_TRAP, LOOP_NAAR_TRAP,
         BETREEDT_KAMER, IN_KAMER, VERLAAT_KAMER
     }
+
+    private int guestID;
+    private boolean wachtOpCheckIn = false;
 
     private Status status = Status.WACHT_OP_SPAWN;
     private HotelRuimte doelKamer;
@@ -29,8 +32,13 @@ public class Gast extends Persoon {
     private int huidigeVerdieping = 8;
 
     public Gast(Lift lift, Schacht schacht, Hotel hotel,
-                HotelEventManager hotelEventManager, SimulatieConfig simulatieConfig) {
+                HotelEventManager hotelEventManager, SimulatieConfig simulatieConfig, int guestID) {
         super(SPAWN_X, SPAWN_Y, lift, schacht, hotel, hotelEventManager, simulatieConfig);
+        this.guestID = guestID;
+    }
+
+    public int getGuestID() {
+        return guestID;
     }
 
     @Override
@@ -38,6 +46,13 @@ public class Gast extends Persoon {
         switch (status) {
 
             case WACHT_OP_SPAWN -> {}
+
+            case WACHT_IN_LOBBY -> {
+                if (wachtOpCheckIn) {
+                    wachtOpCheckIn = false;
+                    kiesEnLoopNaarKamer();
+                }
+            }
 
             case LOOPT_NAAR_INGANG -> {
                 if (!pad.isEmpty()) {
@@ -207,8 +222,16 @@ public class Gast extends Persoon {
         pad.clear();
         doelKamer = null;
         huidigeVerdieping = 8;
-        status = Status.WACHT_OP_SPAWN;
-        kiesEnLoopNaarKamer();
+        status = Status.WACHT_IN_LOBBY;
+    }
+
+    public void handleCheckIn() {
+        wachtOpCheckIn = true;
+
+        if (status == Status.WACHT_IN_LOBBY) {
+            wachtOpCheckIn = false;
+            kiesEnLoopNaarKamer();
+        }
     }
 
     @Override
