@@ -12,11 +12,14 @@ import hotelsimulator.personen.Gast;
 
 public class evenementFactory {
     public static EventStrategie verwerken(HotelEvent evt, Hotel hotel){
+
+        //de type en guestID opslaan voor als hij nodig is voor events
         HotelEventType type = evt.getEventType();
         int guestId = evt.getGuestId();
 
+        //juiste gedrag willen voor type event
         switch(type){
-            case CHECK_IN -> {Gast gast = hotel.zoekGastOpId(guestId); if (gast == null) {System.out.println("Gast niet gevonden met id: " + guestId); return () -> {};} return new CheckIn(gast);}
+            case CHECK_IN -> {Gast gast = hotel.zoekGastOpId(guestId); if (gast == null) {System.out.println("Gast niet gevonden met id: " + guestId); return () -> {};} return new CheckIn(gast, evt.getData() );}
             case CHECK_OUT -> {return new CheckOut();}
             case CLEANING_EMERGENCY -> {return new CleaningEmergency();}
             case EVACUATE -> {return new Evacuate();}

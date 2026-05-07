@@ -19,10 +19,10 @@ import java.util.List;
 public class Hotel {
     private HotelEventManager hotelEventManager;
     private SimulatieConfig simulatieConfig;
-	private ArrayList<HotelRuimte> ruimtes;
+    private ArrayList<HotelRuimte> ruimtes;
     private LinkedList<Integer> liftOproepen = new LinkedList<Integer>();
     private ArrayList<Persoon> personen;
-	private Lift lift;
+    private Lift lift;
     private Schacht schacht;
     private IRuimteFactory ruimteFactory;
 
@@ -30,6 +30,7 @@ public class Hotel {
     public Hotel(SimulatieConfig config, HotelEventManager eventManager, SimulatieConfig simulatieConfig) {
         this(config, eventManager, simulatieConfig, new HotelRuimteFactory());
     }
+
     public Hotel(SimulatieConfig config, HotelEventManager eventManager,
                  SimulatieConfig simulatieConfig, IRuimteFactory factory) {
         this.hotelEventManager = eventManager;
@@ -39,13 +40,14 @@ public class Hotel {
         this.personen = new ArrayList<>();
     }
 
-    public LinkedList<Integer> getLiftOproepen(){
+    public LinkedList<Integer> getLiftOproepen() {
         return liftOproepen;
     }
 
     public void maakHotelLayout(String layoutJson) {
         Gson gson = new Gson();
-        Type listType = new TypeToken<List<JsonItem>>() {}.getType();
+        Type listType = new TypeToken<List<JsonItem>>() {
+        }.getType();
         List<JsonItem> items = gson.fromJson(layoutJson, listType);
 
         //Lijst leegmaken zodat oude data niet overblijft bij hergebruik
@@ -64,7 +66,7 @@ public class Hotel {
             int dimY = Integer.parseInt(dim[1].trim());
 
             int maxPersonen = (item.Capacity != null) ? Integer.parseInt(item.Capacity.trim()) : 0;
-            String sterrenAantal = (item.Classification != null) ? item.Classification : "";
+            int sterrenAantal = (item.Classification != null && !item.Classification.isBlank()) ? Integer.parseInt(item.Classification.trim().split("\\s+")[0]) : 0;
 
             //elke item maakt een nieuwe object aan met die specificaties
             try {
@@ -74,10 +76,10 @@ public class Hotel {
                 System.out.println("Onbekend ruimtetype overgeslagen: " + areaType);
             }
         }
-         schacht = new Schacht("Schacht", "", 0, 0, 1, 9, 0);
-        Lobby lobby = new Lobby("Lobby", "", 0, 1, 6, 1, 0);
-        Trap trap = new Trap("trap", "", 0, 7, 1, 9, 999);
-        lift = new Lift("Lift", "", 0, 0, 1, 1, 5);
+        schacht = new Schacht("Schacht", 0, 0, 0, 1, 9, 0);
+        Lobby lobby = new Lobby("Lobby", 0, 0, 1, 6, 1, 0);
+        Trap trap = new Trap("trap", 0, 0, 7, 1, 9, 999);
+        lift = new Lift("Lift", 0, 0, 0, 1, 1, 5);
 
         ruimtes.add(schacht);
         ruimtes.add(lobby);
@@ -113,12 +115,12 @@ public class Hotel {
 
             // Voeg een groep van maximaal 5 gasten toe
             for (int i = 0; i < 5 && gastIndex < aantalGasten; i++, gastIndex++) {
-                personen.add(new Gast(lift, schacht, this,hotelEventManager,simulatieConfig,gastIndex+1));
+                personen.add(new Gast(lift, schacht, this, hotelEventManager, simulatieConfig, gastIndex + 1));
             }
 
             // Voeg daarna maximaal 2 schoonmakers toe
             for (int i = 0; i < 2 && schoonmakerIndex < aantalSchoonmakers; i++, schoonmakerIndex++) {
-                personen.add(new Schoonmaker(50, 450, lift, schacht, this,hotelEventManager,simulatieConfig));
+                personen.add(new Schoonmaker(50, 450, lift, schacht, this, hotelEventManager, simulatieConfig));
             }
         }
     }
@@ -127,7 +129,7 @@ public class Hotel {
         List<HotelRuimte> result = new ArrayList<>();
         for (HotelRuimte r : ruimtes) {
             if (r instanceof HotelKamer || r instanceof Restaurant ||
-                    r instanceof Bioscoop  || r instanceof FitnessRuimtes) {
+                    r instanceof Bioscoop || r instanceof FitnessRuimtes) {
                 result.add(r);
             }
         }
@@ -146,6 +148,26 @@ public class Hotel {
             }
         }
         System.out.println("GEEN GAST GEVONDEN voor id " + guestId);
+        return null;
+    }
+
+    // Zoekt naar een vrije kamer voor de gast
+    public HotelKamer zoekVrijeHotelKamer(int minimalesterren) {
+        //zoeken naar een vrije kamer met de minimale aantal sterren
+        for(int sterren = minimalesterren; sterren <= 5; sterren++) {
+            for (HotelRuimte ruimte : getRuimtes()) {
+                if (ruimte instanceof HotelKamer kamer
+                        && !kamer.isVol()
+                        && kamer.getSterrenAantal() == sterren
+                        && !kamer.isGereserveerd()) {
+
+                    //als er een kamer gevonden is dan reserveren we hem, want we willen niet dat andere gasten erin kunnen
+                    kamer.reserveer();
+                    return kamer;
+                }
+            }
+        }
+        //if overgeslagen dan geen kamer beschikbaar of bestaat niet?
         return null;
     }
 }

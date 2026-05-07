@@ -3,7 +3,7 @@ package hotelsimulator.ruimtes;
 import java.awt.*;
 
 public class Schacht extends HotelRuimte {
-	public Schacht(String areaType, String sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen) {
+	public Schacht(String areaType, int sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen) {
 		super(areaType, sterrenAantal, y, x, breedte, hoogte, maxPersonen);
 	}
     @Override

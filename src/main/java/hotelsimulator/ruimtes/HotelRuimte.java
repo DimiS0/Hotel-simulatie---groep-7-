@@ -4,7 +4,7 @@ import java.awt.*;
 
 public abstract class HotelRuimte {
 	protected String areaType;
-	protected String sterrenAantal;
+	protected int sterrenAantal;
 	protected int y;
 	protected int x;
 	protected int breedte;
@@ -12,7 +12,7 @@ public abstract class HotelRuimte {
 	protected int maxPersonen;
     private int aantalGasten = 0;
     private int aantalSchoonmakers = 0;
-	public HotelRuimte(String areaType, String sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen) {
+	public HotelRuimte(String areaType, int sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen) {
 		this.areaType = areaType;
 		this.sterrenAantal = sterrenAantal;
 		this.y = 10 - y - hoogte + 1;
@@ -59,7 +59,7 @@ public abstract class HotelRuimte {
         return areaType;
     }
 
-    public String getSterrenAantal() {
+    public int getSterrenAantal() {
         return sterrenAantal;
     }
 
