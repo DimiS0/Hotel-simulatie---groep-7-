@@ -30,7 +30,7 @@ public class Lift extends HotelRuimte {
     // Dit vervangt hotel.getLiftOproepen() als bron van waarheid.
     private final LinkedList<Integer> verzoeken = new LinkedList<>();
 
-    public Lift(String areaType, String sterrenAantal, int y, int x,
+    public Lift(String areaType, int sterrenAantal, int y, int x,
                 int breedte, int hoogte, int maxPersonen) {
         super(areaType, sterrenAantal, y, x, breedte, hoogte, maxPersonen);
         for (int stop : verdiepingenY) {

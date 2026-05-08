@@ -20,6 +20,8 @@ public class Gast extends Persoon {
 
     private int guestID;
     private boolean wachtOpCheckIn = false;
+    private HotelKamer toegewezenKamer;
+    private int gewildeSterren = 0;
 
     private Status status = Status.WACHT_OP_SPAWN;
     private HotelRuimte doelKamer;
@@ -45,15 +47,26 @@ public class Gast extends Persoon {
     public void update() {
         switch (status) {
 
-            case WACHT_OP_SPAWN -> {}
-
-            case WACHT_IN_LOBBY -> {
-                if (wachtOpCheckIn) {
-                    wachtOpCheckIn = false;
-                    kiesEnLoopNaarKamer();
-                }
+            case WACHT_OP_SPAWN -> {
             }
 
+            case WACHT_IN_LOBBY -> {
+                //
+                if (wachtOpCheckIn) {
+                    wachtOpCheckIn = false;
+
+                    //vrije kamer vinden met de aantal sterren
+                    HotelKamer kamer = hotel.zoekVrijeHotelKamer(gewildeSterren);
+
+                    //kamer is niet gevonden, verwijderen van gast
+                    if (kamer == null) {
+                        //TODO verwijderen van de gast methode/code moet hier komen!!!!!
+                        return;
+                    }
+                    //kamer gevonden, gast naar zijn kamer bewegen
+                    startCheckInNaarKamer(kamer);
+                }
+            }
             case LOOPT_NAAR_INGANG -> {
                 if (!pad.isEmpty()) {
                     beweeg();
@@ -63,7 +76,6 @@ public class Gast extends Persoon {
                     if (midden.y >= ingang.y) {
                         doelKamer.verlaat();
                         doelKamer = null;
-                        kiesEnLoopNaarKamer();
                         return;
                     }
                     List<Point> instap = new ArrayList<>();
@@ -91,6 +103,7 @@ public class Gast extends Persoon {
                 if (!pad.isEmpty()) {
                     beweeg();
                 } else {
+                    doelKamer.betreedAlsGast();
                     status = Status.IN_KAMER;
                     verblijfEinde = System.currentTimeMillis()
                             + (long)(doelKamer.getVerblijfMs() / simulatieConfig.getSnelheid().getFactor());
@@ -98,7 +111,10 @@ public class Gast extends Persoon {
             }
 
             case IN_KAMER -> {
-                if (System.currentTimeMillis() >= verblijfEinde) {
+                if (doelKamer instanceof  HotelKamer){
+                    return;
+                }
+                if  (System.currentTimeMillis() >= verblijfEinde) {
                     Point ingang = Pathfinder.getKamerIngang(doelKamer);
                     Point midden = getTrueMidden(doelKamer);       // ← uit Persoon
                     List<Point> naarIngang = new ArrayList<>();
@@ -117,8 +133,14 @@ public class Gast extends Persoon {
                     pixelX = ingang.x;
                     pixelY = ingang.y;
                     doelKamer.verlaat();
+
+                    HotelRuimte verlatenRuimte = doelKamer;
                     doelKamer = null;
-                    kiesEnLoopNaarKamer();
+
+                    // later terug naar eigen kamer:
+                    if (!(verlatenRuimte instanceof HotelKamer) && toegewezenKamer != null) {
+                        startCheckInNaarKamer(toegewezenKamer);
+                    }
                 }
             }
 
@@ -144,51 +166,51 @@ public class Gast extends Persoon {
                         doelKamer.verlaat();
                         doelKamer = null;
                     }
-                    kiesEnLoopNaarKamer();
+
                 }
             }
         }
     }
 
-    private void kiesEnLoopNaarKamer() {
-        List<HotelRuimte> kamers = hotel.getKamers();
-        if (kamers.isEmpty()) return;
+    private void gaNaarRuimte(HotelRuimte ruimte) {
+        //algemene methode om een gast naar een ruimte te sturen
+        //wordt door alle toekomstige events gebruikt die te maken hebben met lopen bijvoorbeeld
 
-        for (int poging = 0; poging < 15; poging++) {
-            HotelRuimte kandidaat = kamers.get(random.nextInt(kamers.size()));
-            if (kandidaat.isVol()) continue;
+        //geen ruimte niet lopen
+            if (ruimte == null) return;
 
-            Point ingang = Pathfinder.getKamerIngang(kandidaat);
-            Point midden = getTrueMidden(kandidaat);               // ← uit Persoon
-            if (midden.y >= ingang.y) continue;
+            doelKamer = ruimte;
 
-            int kamerVerdieping = getNabijeStop(kandidaat.getY()); // ← uit Persoon
+            Point ingang = Pathfinder.getKamerIngang(ruimte);
+            Point midden = getTrueMidden(ruimte);
 
-            if (kamerVerdieping == huidigeVerdieping) {
+            //zonder ingang of doelpositie kan er geen pad worden berekend
+            if (ingang == null || midden == null) return;
+
+            //voorkomt dat een gast op een andere manier de kamer binnen komt
+            if (midden.y >= ingang.y) return;
+
+            int verdieping = getNabijeStop(ruimte.getY());
+
+            //besteming op de verdieping, direct een pad berekenen
+            if (verdieping == huidigeVerdieping) {
                 List<Point> nieuwPad = Pathfinder.vindPad(
                         pixelX, pixelY, ingang.x, ingang.y, hotel.getRuimtes());
+
                 if (!nieuwPad.isEmpty()) {
-                    kandidaat.betreedAlsGast();
-                    doelKamer = kandidaat;
                     setPad(nieuwPad);
                     status = Status.LOOPT_NAAR_INGANG;
-                    return;
                 }
             } else {
-                kandidaat.betreedAlsGast();
-                doelKamer = kandidaat;
-                doelVerdieping = kamerVerdieping;
+                //als bestemming op andere verdieping dan kiezen we tussen lift of trap
+                doelVerdieping = verdieping;
                 loopNaarSchachtOfTrap();
-                if (status == Status.LOOPT_NAAR_SCHACHT || status == Status.LOOP_NAAR_TRAP) return;
-                doelKamer.verlaat();
-                doelKamer = null;
             }
         }
-    }
 
     // Roept de gedeelde methode in Persoon aan met Gast-specifieke status-setters
     private void loopNaarSchachtOfTrap() {
-        loopNaarSchachtOfTrapGemeen(                               // ← uit Persoon
+        loopNaarSchachtOfTrapGemeen(
                 huidigeVerdieping,
                 () -> status = Status.LOOPT_NAAR_SCHACHT,
                 () -> status = Status.LOOP_NAAR_TRAP
@@ -210,7 +232,6 @@ public class Gast extends Persoon {
             doelKamer.verlaat();
             doelKamer = null;
         }
-        kiesEnLoopNaarKamer();
     }
 
     @Override
@@ -225,13 +246,26 @@ public class Gast extends Persoon {
         status = Status.WACHT_IN_LOBBY;
     }
 
-    public void handleCheckIn() {
-        wachtOpCheckIn = true;
+    public void handleCheckIn(int gewildeSterren) {
+        //sterren opslaan bij de gast om te gebruiken om kamer te vinden
+        this.gewildeSterren = gewildeSterren;
 
-        if (status == Status.WACHT_IN_LOBBY) {
-            wachtOpCheckIn = false;
-            kiesEnLoopNaarKamer();
-        }
+        //boolean zodat lobby weet dat gast mag inchecken
+        wachtOpCheckIn = true;
+    }
+
+    private void startCheckInNaarKamer(HotelRuimte kamer) {
+        //geen kamer? doen we niks dan
+        if (kamer == null) return;
+
+        //zorgen dat we alleen HotelKamers hebben
+        if (!(kamer instanceof HotelKamer)) return;
+
+        //Kamer bewaren  zodat de gast zijn eigen kamer weet
+        toegewezenKamer = (HotelKamer) kamer;
+
+        //start de route naar de kamer
+        gaNaarRuimte(toegewezenKamer);
     }
 
     @Override

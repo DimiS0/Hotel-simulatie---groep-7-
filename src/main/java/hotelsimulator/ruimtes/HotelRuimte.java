@@ -3,27 +3,25 @@ package hotelsimulator.ruimtes;
 import java.awt.*;
 
 public abstract class HotelRuimte {
-    protected String areaType;
-    protected String sterrenAantal;
-    protected int y;
-    protected int x;
-    protected int breedte;
-    protected int hoogte;
-    protected int maxPersonen;
+	protected String areaType;
+	protected int sterrenAantal;
+	protected int y;
+	protected int x;
+	protected int breedte;
+	protected int hoogte;
+	protected int maxPersonen;
     private int aantalGasten = 0;
     private int aantalSchoonmakers = 0;
     private boolean cleaningEmergency = false;
-
-    public HotelRuimte(String areaType, String sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen) {
-        this.areaType = areaType;
-        this.sterrenAantal = sterrenAantal;
-        this.y = 10 - y - hoogte + 1;
-        this.x = x;
-        this.breedte = breedte;
-        this.hoogte = hoogte;
-        this.maxPersonen = maxPersonen;
-    }
-
+	public HotelRuimte(String areaType, int sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen) {
+		this.areaType = areaType;
+		this.sterrenAantal = sterrenAantal;
+		this.y = 10 - y - hoogte + 1;
+		this.x = x;
+		this.breedte = breedte;
+		this.hoogte = hoogte;
+		this.maxPersonen = maxPersonen;
+	}
     public boolean isVol() {
         return maxPersonen > 0 && (aantalGasten + aantalSchoonmakers) >= maxPersonen;
     }
@@ -70,7 +68,7 @@ public abstract class HotelRuimte {
         return areaType;
     }
 
-    public String getSterrenAantal() {
+    public int getSterrenAantal() {
         return sterrenAantal;
     }
 

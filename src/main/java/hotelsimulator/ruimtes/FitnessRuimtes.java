@@ -7,7 +7,7 @@ import java.awt.Graphics2D;
 
 public class FitnessRuimtes extends HotelRuimte {
 
-	public FitnessRuimtes(String areaType, String sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen) {
+	public FitnessRuimtes(String areaType, int sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen) {
 		super(areaType, sterrenAantal, y, x, breedte, hoogte, maxPersonen);
 	}
     @Override

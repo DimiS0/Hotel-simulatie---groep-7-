@@ -3,7 +3,7 @@ package hotelsimulator.ruimtes;
 import java.awt.*;
 
 public class Trap extends HotelRuimte {
-	public Trap(String areaType, String sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen) {
+	public Trap(String areaType, int sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen) {
 		super(areaType, sterrenAantal, y, x, breedte, hoogte, maxPersonen);
 	}
     @Override

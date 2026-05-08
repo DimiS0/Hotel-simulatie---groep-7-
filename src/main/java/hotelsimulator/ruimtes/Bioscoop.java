@@ -7,7 +7,7 @@ import java.awt.Graphics2D;
 
 public class Bioscoop extends HotelRuimte {
 
-	public Bioscoop(String areaType, String sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen) {
+	public Bioscoop(String areaType, int sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen) {
 		super(areaType, sterrenAantal, y, x, breedte, hoogte, maxPersonen);
 	}
     @Override

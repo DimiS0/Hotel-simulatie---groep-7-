@@ -5,7 +5,9 @@ import java.awt.Graphics2D;
 import java.awt.*;
 
 public class HotelKamer extends HotelRuimte {
-	public HotelKamer(String areaType, String sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen) {
+    private boolean gereserveerd = false;
+
+	public HotelKamer(String areaType, int sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen) {
 		super(areaType, sterrenAantal, y, x, breedte, hoogte, maxPersonen);
 	}
 
@@ -34,5 +36,17 @@ public class HotelKamer extends HotelRuimte {
     @Override
     public long getVerblijfMs() {
         return 15000;
+    }
+
+    public boolean isGereserveerd() {
+        return gereserveerd;
+    }
+
+    public void reserveer() {
+        gereserveerd = true;
+    }
+
+    public void maakReserveringVrij() {
+        gereserveerd = false;
     }
 }
