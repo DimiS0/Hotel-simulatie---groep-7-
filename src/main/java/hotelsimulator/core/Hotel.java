@@ -170,4 +170,8 @@ public class Hotel {
         //if overgeslagen dan geen kamer beschikbaar of bestaat niet?
         return null;
     }
+    public void verwijderPersoon(Persoon persoon) {
+        personen.remove(persoon);
+    }
+
 }

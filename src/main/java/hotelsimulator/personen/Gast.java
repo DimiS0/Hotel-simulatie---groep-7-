@@ -60,7 +60,9 @@ public class Gast extends Persoon {
 
                     //kamer is niet gevonden, verwijderen van gast
                     if (kamer == null) {
-                        //TODO verwijderen van de gast methode/code moet hier komen!!!!!
+                        System.out.println("Geen kamer beschikbaar voor gast "
+                                + guestID + " — gast verwijderd");
+                        hotel.verwijderPersoon(this);
                         return;
                     }
                     //kamer gevonden, gast naar zijn kamer bewegen
