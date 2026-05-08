@@ -1,5 +1,7 @@
 package hotelsimulator.ruimtes;
-
+import java.awt.BasicStroke;
+import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.*;
 
 public class HotelKamer extends HotelRuimte {
@@ -18,9 +20,16 @@ public class HotelKamer extends HotelRuimte {
         g.setColor(Color.BLACK); // outline
         g.drawRect((x+1)*cellSize, (y-1)*cellSize, breedte*cellSize, hoogte*cellSize);
 
-        //tekst kleur, tekst neeretten
-        g.setColor(Color.WHITE);
-        g.drawString("Kamer", (x+1)*cellSize + 5, (y-1)*cellSize + 15);
+
+            //tekst kleur, tekst neeretten
+            g.setColor(Color.WHITE);
+            g.drawString("Kamer", (x + 1) * cellSize + 5, (y - 1) * cellSize + 15);
+
+        if (isCleaningEmergency()) {
+            // Rood uitroepteken rechtsboven in de kamer
+            g.setColor(Color.RED);
+            g.drawString("!", (x + 1) * cellSize + breedte * cellSize - 25, (y - 1) * cellSize + 25);
+        }
     }
     @Override
     public long getVerblijfMs() {

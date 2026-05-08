@@ -7,6 +7,7 @@ import hotelsimulator.config.SimulatieConfig;
 import hotelsimulator.events.Core.Evenement;
 import hotelsimulator.gui.HotelGui;
 import hotelsimulator.gui.StarterGui;
+import hotelsimulator.events.Emergency.CleaningEmergency;
 
 
 import java.io.IOException;
@@ -27,6 +28,8 @@ public class HoofdSimulator {
         this.swingGui = new StarterGui(this);
 		this.eventManager = new hotelevents.HotelEventManager();
         this.event = new Evenement(eventManager,hotel);
+
+        CleaningEmergency.setHotel(hotel);
 
 		config.addListener(() -> {
 			eventManager.setHte(config.getSnelheid().getDelay());

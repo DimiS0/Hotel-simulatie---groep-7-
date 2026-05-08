@@ -46,7 +46,7 @@ public class Schoonmaker extends Persoon {
                     beweeg();
                 } else {
                     Point ingang = Pathfinder.getKamerIngang(doelKamer);
-                    Point midden = getTrueMidden(doelKamer);       // ← uit Persoon
+                    Point midden = getTrueMidden(doelKamer);
                     if (midden.y >= ingang.y) {
                         doelKamer.verlaatAlsSchoonmaker();
                         doelKamer = null;
@@ -73,7 +73,7 @@ public class Schoonmaker extends Persoon {
 
             case WACHT_OP_LIFT -> {}
 
-            case IN_LIFT -> updateInLift();    // ← uit Persoon
+            case IN_LIFT -> updateInLift();
 
             case BETREEDT_KAMER -> {
                 if (!pad.isEmpty()) {
@@ -87,7 +87,7 @@ public class Schoonmaker extends Persoon {
             case IN_KAMER -> {
                 if (System.currentTimeMillis() >= verblijfEinde) {
                     Point ingang = Pathfinder.getKamerIngang(doelKamer);
-                    Point midden = getTrueMidden(doelKamer);       // ← uit Persoon
+                    Point midden = getTrueMidden(doelKamer);
                     List<Point> naarIngang = new ArrayList<>();
                     naarIngang.add(new Point(midden.x, ingang.y));
                     naarIngang.add(ingang);
@@ -96,6 +96,7 @@ public class Schoonmaker extends Persoon {
                 }
             }
 
+            // ── VERLAAT_KAMER: emergency-vlag resetten na schoonmaken ────
             case VERLAAT_KAMER -> {
                 if (!pad.isEmpty()) {
                     beweeg();
@@ -103,6 +104,7 @@ public class Schoonmaker extends Persoon {
                     Point ingang = Pathfinder.getKamerIngang(doelKamer);
                     pixelX = ingang.x;
                     pixelY = ingang.y;
+                    doelKamer.setCleaningEmergency(false); // kamer is nu schoon
                     doelKamer.verlaatAlsSchoonmaker();
                     doelKamer = null;
                     kiesEnLoopNaarKamer();
@@ -120,7 +122,7 @@ public class Schoonmaker extends Persoon {
             }
 
             case LOOP_DOOR_TRAP -> {
-                boolean aangekomen = updateInTrap(doelVerdieping);  // ← uit Persoon
+                boolean aangekomen = updateInTrap(doelVerdieping);
                 if (aangekomen) {
                     huidigeVerdieping = doelVerdieping;
                     if (doelKamer != null) {
@@ -137,21 +139,26 @@ public class Schoonmaker extends Persoon {
         }
     }
 
+    // ── kiesEnLoopNaarKamer: eerst emergency-kamers, dan willekeurig ─────
     private void kiesEnLoopNaarKamer() {
-        List<HotelRuimte> kamers = hotel.getKamers();
-        if (kamers.isEmpty()) return;
+        List<HotelRuimte> alleKamers = hotel.getKamers();
+        if (alleKamers.isEmpty()) return;
 
-        for (int poging = 0; poging < 15; poging++) {
-            HotelRuimte kandidaat = kamers.get(random.nextInt(kamers.size()));
-            if (kandidaat.isVol()) continue;
+        // Stap 1: zoek een kamer met cleaning emergency
+        for (HotelRuimte kandidaat : alleKamers) {
+            boolean heeftEmergency   = kandidaat.isCleaningEmergency();
+            boolean isNietVol        = !kandidaat.isVol();
+            if (!heeftEmergency || !isNietVol) continue;
 
-            Point ingang = Pathfinder.getKamerIngang(kandidaat);
-            Point midden = getTrueMidden(kandidaat);               // ← uit Persoon
-            if (midden.y >= ingang.y) continue;
+            Point ingang             = Pathfinder.getKamerIngang(kandidaat);
+            Point midden             = getTrueMidden(kandidaat);
+            boolean ongeldigeKamer   = midden.y >= ingang.y;
+            if (ongeldigeKamer) continue;
 
-            int kamerVerdieping = getNabijeStop(kandidaat.getY()); // ← uit Persoon
+            int kamerVerdieping      = getNabijeStop(kandidaat.getY());
+            boolean zelfdeVerdieping = kamerVerdieping == huidigeVerdieping;
 
-            if (kamerVerdieping == huidigeVerdieping) {
+            if (zelfdeVerdieping) {
                 List<Point> nieuwPad = Pathfinder.vindPad(
                         pixelX, pixelY, ingang.x, ingang.y, hotel.getRuimtes());
                 if (!nieuwPad.isEmpty()) {
@@ -163,23 +170,100 @@ public class Schoonmaker extends Persoon {
                 }
             } else {
                 kandidaat.betreedAlsSchoonmaker();
-                doelKamer = kandidaat;
+                doelKamer      = kandidaat;
                 doelVerdieping = kamerVerdieping;
                 loopNaarSchachtOfTrap();
-                if (status == Status.LOOPT_NAAR_SCHACHT || status == Status.LOOP_NAAR_TRAP) return;
+                boolean onderweg = status == Status.LOOPT_NAAR_SCHACHT
+                        || status == Status.LOOP_NAAR_TRAP;
+                if (onderweg) return;
+                doelKamer.verlaatAlsSchoonmaker();
+                doelKamer = null;
+            }
+        }
+
+        // Stap 2: geen emergency, kies willekeurige kamer
+        for (int poging = 0; poging < 15; poging++) {
+            HotelRuimte kandidaat    = alleKamers.get(random.nextInt(alleKamers.size()));
+            if (kandidaat.isVol()) continue;
+
+            Point ingang             = Pathfinder.getKamerIngang(kandidaat);
+            Point midden             = getTrueMidden(kandidaat);
+            boolean ongeldigeKamer   = midden.y >= ingang.y;
+            if (ongeldigeKamer) continue;
+
+            int kamerVerdieping      = getNabijeStop(kandidaat.getY());
+            boolean zelfdeVerdieping = kamerVerdieping == huidigeVerdieping;
+
+            if (zelfdeVerdieping) {
+                List<Point> nieuwPad = Pathfinder.vindPad(
+                        pixelX, pixelY, ingang.x, ingang.y, hotel.getRuimtes());
+                if (!nieuwPad.isEmpty()) {
+                    kandidaat.betreedAlsSchoonmaker();
+                    doelKamer = kandidaat;
+                    setPad(nieuwPad);
+                    status = Status.LOOPT_NAAR_INGANG;
+                    return;
+                }
+            } else {
+                kandidaat.betreedAlsSchoonmaker();
+                doelKamer      = kandidaat;
+                doelVerdieping = kamerVerdieping;
+                loopNaarSchachtOfTrap();
+                boolean onderweg = status == Status.LOOPT_NAAR_SCHACHT
+                        || status == Status.LOOP_NAAR_TRAP;
+                if (onderweg) return;
                 doelKamer.verlaatAlsSchoonmaker();
                 doelKamer = null;
             }
         }
     }
 
-    // Roept de gedeelde methode in Persoon aan met Schoonmaker-specifieke status-setters
     private void loopNaarSchachtOfTrap() {
-        loopNaarSchachtOfTrapGemeen(                               // ← uit Persoon
+        loopNaarSchachtOfTrapGemeen(
                 huidigeVerdieping,
                 () -> status = Status.LOOPT_NAAR_SCHACHT,
                 () -> status = Status.LOOP_NAAR_TRAP
         );
+    }
+
+    // ── isInGang: true als schoonmaker vrij is voor een emergency ────────
+    public boolean isInGang() {
+        boolean looptNaarKamer = status == Status.LOOPT_NAAR_INGANG;
+        boolean looptNaarLift  = status == Status.LOOPT_NAAR_SCHACHT;
+        boolean looptNaarTrap  = status == Status.LOOP_NAAR_TRAP;
+        boolean looptDoorTrap  = status == Status.LOOP_DOOR_TRAP;
+        boolean wachtOpLift    = status == Status.WACHT_OP_LIFT;
+        boolean zitInLift      = status == Status.IN_LIFT;
+        return looptNaarKamer || looptNaarLift || looptNaarTrap
+                || looptDoorTrap  || wachtOpLift   || zitInLift;
+    }
+
+    // ── reageerOpEmergency: onderbreek huidige taak, ga naar noodkamer ───
+    public void reageerOpEmergency(HotelRuimte noodkamer) {
+        if (doelKamer != null) {
+            doelKamer.verlaatAlsSchoonmaker();
+        }
+
+        noodkamer.betreedAlsSchoonmaker();
+        doelKamer = noodkamer;
+
+        int kamerVerdieping      = getNabijeStop(noodkamer.getY());
+        boolean zelfdeVerdieping = kamerVerdieping == huidigeVerdieping;
+
+        if (zelfdeVerdieping) {
+            Point ingang         = Pathfinder.getKamerIngang(noodkamer);
+            List<Point> padNaarKamer = Pathfinder.vindPad(
+                    pixelX, pixelY, ingang.x, ingang.y, hotel.getRuimtes());
+
+            boolean padGevonden  = !padNaarKamer.isEmpty();
+            if (padGevonden) {
+                setPad(padNaarKamer);
+                status = Status.LOOPT_NAAR_INGANG;
+            }
+        } else {
+            doelVerdieping = kamerVerdieping;
+            loopNaarSchachtOfTrap();
+        }
     }
 
     @Override

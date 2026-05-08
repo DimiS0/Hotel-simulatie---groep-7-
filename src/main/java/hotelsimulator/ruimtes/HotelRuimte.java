@@ -3,24 +3,27 @@ package hotelsimulator.ruimtes;
 import java.awt.*;
 
 public abstract class HotelRuimte {
-	protected String areaType;
-	protected String sterrenAantal;
-	protected int y;
-	protected int x;
-	protected int breedte;
-	protected int hoogte;
-	protected int maxPersonen;
+    protected String areaType;
+    protected String sterrenAantal;
+    protected int y;
+    protected int x;
+    protected int breedte;
+    protected int hoogte;
+    protected int maxPersonen;
     private int aantalGasten = 0;
     private int aantalSchoonmakers = 0;
-	public HotelRuimte(String areaType, String sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen) {
-		this.areaType = areaType;
-		this.sterrenAantal = sterrenAantal;
-		this.y = 10 - y - hoogte + 1;
-		this.x = x;
-		this.breedte = breedte;
-		this.hoogte = hoogte;
-		this.maxPersonen = maxPersonen;
-	}
+    private boolean cleaningEmergency = false;
+
+    public HotelRuimte(String areaType, String sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen) {
+        this.areaType = areaType;
+        this.sterrenAantal = sterrenAantal;
+        this.y = 10 - y - hoogte + 1;
+        this.x = x;
+        this.breedte = breedte;
+        this.hoogte = hoogte;
+        this.maxPersonen = maxPersonen;
+    }
+
     public boolean isVol() {
         return maxPersonen > 0 && (aantalGasten + aantalSchoonmakers) >= maxPersonen;
     }
@@ -28,9 +31,11 @@ public abstract class HotelRuimte {
     public synchronized void betreedAlsGast() {
         aantalGasten++;
     }
+
     public synchronized void verlaat() {
-        if (aantalGasten > 0) aantalGasten--;
-    }
+        if (aantalGasten > 0) {
+            aantalGasten--;
+        }}
 
     public synchronized void betreedAlsSchoonmaker() {
         aantalSchoonmakers++;
@@ -53,6 +58,12 @@ public abstract class HotelRuimte {
     }
     public int[] getIngangen() {
         return new int[0];
+    }
+    public boolean isCleaningEmergency() {
+        return cleaningEmergency;
+    }
+    public void setCleaningEmergency(boolean waarde) {
+        cleaningEmergency = waarde;
     }
 
     public String getAreaType() {
