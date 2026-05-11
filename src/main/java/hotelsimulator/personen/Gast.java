@@ -174,13 +174,18 @@ public class Gast extends Persoon {
         }
     }
 
-    private void gaNaarRuimte(HotelRuimte ruimte) {
+    public void gaNaarRuimte(HotelRuimte ruimte) {
         //algemene methode om een gast naar een ruimte te sturen
         //wordt door alle toekomstige events gebruikt die te maken hebben met lopen bijvoorbeeld
 
         //geen ruimte niet lopen
             if (ruimte == null) return;
-
+        // Als gast in zijn hotelkamer zit, eerst de kamer verlaten
+        if (status == Status.IN_KAMER && doelKamer instanceof HotelKamer) {
+            doelKamer.verlaat();
+            doelKamer = null;
+            status = Status.WACHT_IN_LOBBY;
+        }
             doelKamer = ruimte;
 
             Point ingang = Pathfinder.getKamerIngang(ruimte);
@@ -270,6 +275,36 @@ public class Gast extends Persoon {
         gaNaarRuimte(toegewezenKamer);
     }
 
+    public void startGoToBioscoop() {
+        for (HotelRuimte ruimte : hotel.getRuimtes()) {
+            if (ruimte instanceof Bioscoop && !ruimte.isVol()) {
+                gaNaarRuimte(ruimte);
+                return;
+            }
+        }
+        System.out.println("Geen beschikbare bioscoop gevonden!");
+    }
+
+    public void startGoToRestaurant() {
+        for (HotelRuimte ruimte : hotel.getRuimtes()) {
+            if (ruimte instanceof Restaurant && !ruimte.isVol()) {
+                gaNaarRuimte(ruimte);
+                return;
+            }
+        }
+        System.out.println("Geen beschikbare restaurant gevonden!");
+    }
+
+    public void startGoToFitness() {
+        for (HotelRuimte ruimte : hotel.getRuimtes()) {
+            if (ruimte instanceof FitnessRuimtes && !ruimte.isVol()) {
+                gaNaarRuimte(ruimte);
+                return;
+            }
+        }
+        System.out.println("Geen beschikbare fitness gevonden!");
+    }
+
     @Override
     public boolean isGespawnd() { return status != Status.WACHT_OP_SPAWN; }
 
@@ -280,7 +315,9 @@ public class Gast extends Persoon {
                 status == Status.VERLAAT_KAMER) return doelKamer;
         return null;
     }
-
+    public HotelKamer getToegwezenKamer() {
+        return toegewezenKamer;
+    }
     @Override
     public void print(Graphics g) {
         if (status == Status.WACHT_OP_SPAWN) return;

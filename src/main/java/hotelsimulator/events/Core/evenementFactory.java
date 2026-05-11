@@ -24,10 +24,10 @@ public class evenementFactory {
             case CLEANING_EMERGENCY -> {return new CleaningEmergency();}
             case EVACUATE -> {return new Evacuate();}
             case GODZILLA -> {return new Godzilla();}
-            case NEED_FOOD -> {return new NeedFood();}
-            case GOTO_CINEMA -> {return new GoToCinema();}
-            case GOTO_FITNESS -> {return new GoToFitness();}
-            case START_CINEMA -> {return new StartCinema();}
+            case NEED_FOOD -> {Gast gast = hotel.zoekGastOpId(guestId); if (gast == null) {; return () -> {};}return new NeedFood(gast);}
+            case GOTO_CINEMA -> { Gast gast = hotel.zoekGastOpId(guestId); if (gast == null) {; return () -> {};}return new GoToCinema(gast);}
+            case GOTO_FITNESS -> {Gast gast = hotel.zoekGastOpId(guestId); if (gast == null) {; return () -> {};}return new GoToFitness(gast);}
+            case START_CINEMA -> {return new StartCinema(hotel);}
             default -> {throw new IllegalArgumentException(type+" is Geen event type");
         }
 
