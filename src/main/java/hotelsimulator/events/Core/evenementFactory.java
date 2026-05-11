@@ -20,7 +20,7 @@ public class evenementFactory {
         //juiste gedrag willen voor type event
         switch(type){
             case CHECK_IN -> {Gast gast = hotel.zoekGastOpId(guestId); if (gast == null) {System.out.println("Gast niet gevonden met id: " + guestId); return () -> {};} return new CheckIn(gast, evt.getData() );}
-            case CHECK_OUT -> {return new CheckOut();}
+            case CHECK_OUT -> {Gast gast = hotel.zoekGastOpId(guestId); if (gast == null) {System.out.println("Gast niet gevonden met id: " + guestId); return () -> {};} return new CheckOut(gast);}
             case CLEANING_EMERGENCY -> {return new CleaningEmergency();}
             case EVACUATE -> {return new Evacuate();}
             case GODZILLA -> {return new Godzilla();}

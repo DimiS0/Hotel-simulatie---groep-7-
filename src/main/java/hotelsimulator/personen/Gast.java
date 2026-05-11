@@ -15,13 +15,14 @@ public class Gast extends Persoon {
     public enum Status {
         WACHT_OP_SPAWN, WACHT_IN_LOBBY, LOOPT_NAAR_INGANG, LOOPT_NAAR_SCHACHT,
         WACHT_OP_LIFT, IN_LIFT, LOOP_DOOR_TRAP, LOOP_NAAR_TRAP,
-        BETREEDT_KAMER, IN_KAMER, VERLAAT_KAMER
+        BETREEDT_KAMER, IN_KAMER, VERLAAT_KAMER,LOOP_NAAR_LOBBY
     }
 
     private int guestID;
     private boolean wachtOpCheckIn = false;
     private HotelKamer toegewezenKamer;
     private int gewildeSterren = 0;
+    private boolean isWachtOpCheckOut;
 
     private Status status = Status.WACHT_OP_SPAWN;
     private HotelRuimte doelKamer;
@@ -111,11 +112,44 @@ public class Gast extends Persoon {
                             + (long)(doelKamer.getVerblijfMs() / simulatieConfig.getSnelheid().getFactor());
                 }
             }
+            case LOOP_NAAR_LOBBY ->{
+
+                if (!pad.isEmpty()) {
+                    beweeg();
+                } else {
+                    // aangekomen in lobby
+                    if (doelKamer != null) {
+                        doelKamer.verlaat();
+                        doelKamer = null;
+                    }
+
+                    if (toegewezenKamer != null) {
+                        toegewezenKamer.verlaat();
+                        toegewezenKamer = null;
+                    }
+
+                }
+            }
 
             case IN_KAMER -> {
+                if (isWachtOpCheckOut) {
+                    isWachtOpCheckOut = false;
+
+                    Point lobbyPunt = new Point(SPAWN_X, SPAWN_Y); // bvb spawn is lobby
+                    List<Point> naarLobby = Pathfinder.vindPad(
+                            pixelX, pixelY, lobbyPunt.x, lobbyPunt.y, hotel.getRuimtes());
+
+                    if (!naarLobby.isEmpty()) {
+                        setPad(naarLobby);
+                        status = status.LOOP_NAAR_LOBBY;
+                    }
+                    return;
+                }
+
                 if (doelKamer instanceof  HotelKamer){
                     return;
                 }
+
                 if  (System.currentTimeMillis() >= verblijfEinde) {
                     Point ingang = Pathfinder.getKamerIngang(doelKamer);
                     Point midden = getTrueMidden(doelKamer);       // ← uit Persoon
@@ -254,6 +288,10 @@ public class Gast extends Persoon {
 
         //boolean zodat lobby weet dat gast mag inchecken
         wachtOpCheckIn = true;
+    }
+    public void checkOutHandleIn(){
+        //checkout op true zetten
+        isWachtOpCheckOut = true;
     }
 
     private void startCheckInNaarKamer(HotelRuimte kamer) {
