@@ -63,7 +63,7 @@ public class Gast extends Persoon {
                     if (kamer == null) {
                         System.out.println("Geen kamer beschikbaar voor gast "
                                 + guestID + " — gast verwijderd");
-                        hotel.verwijderPersoon(this);
+                        markeerVoorVerwijdering();
                         return;
                     }
                     //kamer gevonden, gast naar zijn kamer bewegen
@@ -127,7 +127,7 @@ public class Gast extends Persoon {
                         toegewezenKamer.verlaat();
                         toegewezenKamer = null;
                     }
-
+                    markeerVoorVerwijdering();
                 }
             }
 
@@ -135,24 +135,33 @@ public class Gast extends Persoon {
                 if (isWachtOpCheckOut) {
                     isWachtOpCheckOut = false;
 
-                    Point lobbyPunt = new Point(SPAWN_X, SPAWN_Y); // bvb spawn is lobby
-                    List<Point> naarLobby = Pathfinder.vindPad(
-                            pixelX, pixelY, lobbyPunt.x, lobbyPunt.y, hotel.getRuimtes());
+                    Point ingang = Pathfinder.getKamerIngang(toegewezenKamer);
+                    Point lobbyPunt = new Point(SPAWN_X, SPAWN_Y);
 
-                    if (!naarLobby.isEmpty()) {
-                        setPad(naarLobby);
-                        status = status.LOOP_NAAR_LOBBY;
+                    List<Point> naarIngang = Pathfinder.vindPad(
+                            pixelX, pixelY, ingang.x, ingang.y, hotel.getRuimtes());
+
+                    List<Point> naarLobby = Pathfinder.vindPad(
+                            ingang.x, ingang.y, lobbyPunt.x, lobbyPunt.y, hotel.getRuimtes());
+
+                    List<Point> volledigPad = new ArrayList<>();
+                    volledigPad.addAll(naarIngang);
+                    volledigPad.addAll(naarLobby);
+
+                    if (!volledigPad.isEmpty()) {
+                        setPad(volledigPad);
+                        status = Status.LOOP_NAAR_LOBBY;
                     }
                     return;
                 }
 
-                if (doelKamer instanceof  HotelKamer){
+                if (doelKamer instanceof HotelKamer) {
                     return;
                 }
 
-                if  (System.currentTimeMillis() >= verblijfEinde) {
+                if (System.currentTimeMillis() >= verblijfEinde) {
                     Point ingang = Pathfinder.getKamerIngang(doelKamer);
-                    Point midden = getTrueMidden(doelKamer);       // ← uit Persoon
+                    Point midden = getTrueMidden(doelKamer);
                     List<Point> naarIngang = new ArrayList<>();
                     naarIngang.add(new Point(midden.x, ingang.y));
                     naarIngang.add(ingang);
@@ -191,7 +200,7 @@ public class Gast extends Persoon {
             }
 
             case LOOP_DOOR_TRAP -> {
-                boolean aangekomen = updateInTrap(doelVerdieping);  // ← uit Persoon
+                boolean aangekomen = updateInTrap(doelVerdieping);
                 if (aangekomen) {
                     huidigeVerdieping = doelVerdieping;
                     if (doelKamer != null) {
@@ -213,41 +222,39 @@ public class Gast extends Persoon {
         //wordt door alle toekomstige events gebruikt die te maken hebben met lopen bijvoorbeeld
 
         //geen ruimte niet lopen
-            if (ruimte == null) return;
-        // Als gast in zijn hotelkamer zit, eerst de kamer verlaten
-        if (status == Status.IN_KAMER && doelKamer instanceof HotelKamer) {
-            doelKamer.verlaat();
-            doelKamer = null;
-            status = Status.WACHT_IN_LOBBY;
-        }
-            doelKamer = ruimte;
+        if (ruimte == null) return;
 
-            Point ingang = Pathfinder.getKamerIngang(ruimte);
-            Point midden = getTrueMidden(ruimte);
+        doelKamer = ruimte;
 
-            //zonder ingang of doelpositie kan er geen pad worden berekend
-            if (ingang == null || midden == null) return;
+        Point ingang = Pathfinder.getKamerIngang(ruimte);
+        Point midden = getTrueMidden(ruimte);
 
-            //voorkomt dat een gast op een andere manier de kamer binnen komt
-            if (midden.y >= ingang.y) return;
+        //zonder ingang of doelpositie kan er geen pad worden berekend
+        if (ingang == null || midden == null) return;
 
-            int verdieping = getNabijeStop(ruimte.getY());
+        //voorkomt dat een gast op een andere manier de kamer binnen komt
+        if (midden.y >= ingang.y) {
+            System.out.println("GEBLOKKEERD: midden.y >= ingang.y");  // ← dit zie je waarschijnlijk
+            return;}
 
-            //besteming op de verdieping, direct een pad berekenen
-            if (verdieping == huidigeVerdieping) {
-                List<Point> nieuwPad = Pathfinder.vindPad(
-                        pixelX, pixelY, ingang.x, ingang.y, hotel.getRuimtes());
+        int verdieping = getNabijeStop(ruimte.getY());
 
-                if (!nieuwPad.isEmpty()) {
-                    setPad(nieuwPad);
-                    status = Status.LOOPT_NAAR_INGANG;
-                }
-            } else {
-                //als bestemming op andere verdieping dan kiezen we tussen lift of trap
-                doelVerdieping = verdieping;
-                loopNaarSchachtOfTrap();
+        //besteming op de verdieping, direct een pad berekenen
+        if (verdieping == huidigeVerdieping) {
+            List<Point> nieuwPad = Pathfinder.vindPad(
+                    pixelX, pixelY, ingang.x, ingang.y, hotel.getRuimtes());
+
+            if (!nieuwPad.isEmpty()) {
+                setPad(nieuwPad);
+                status = Status.LOOPT_NAAR_INGANG;
             }
+        } else {
+            //als bestemming op andere verdieping dan kiezen we tussen lift of trap
+            doelVerdieping = verdieping;
+            loopNaarSchachtOfTrap();
         }
+    }
+
 
     // Roept de gedeelde methode in Persoon aan met Gast-specifieke status-setters
     private void loopNaarSchachtOfTrap() {

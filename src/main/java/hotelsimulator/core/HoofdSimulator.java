@@ -62,7 +62,7 @@ public class HoofdSimulator {
                     gui.repaint();
                 });
         });
-        eventManager.start(1);
+        eventManager.start(2);
     }
 
 

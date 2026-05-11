@@ -36,8 +36,9 @@ public abstract class Persoon {
     protected static final int    TRAP_PIXEL_X     = 425;
     protected static final int    LIFT_CENTER_X    = 75;
     protected static final Random random           = new Random();
-
     private boolean heeftVerzoekIngediend = false;
+
+    private boolean moetVerwijderdWorden = false;
 
 
     // Constructor
@@ -73,6 +74,13 @@ public abstract class Persoon {
     // Geeft de doelverdieping terug (nodig voor de lift).
     public abstract int getDoelVerdieping();
 
+    public void markeerVoorVerwijdering() {
+        moetVerwijderdWorden = true;
+    }
+
+    public boolean moetVerwijderdWorden() {
+        return moetVerwijderdWorden;
+    }
 
     // Gedeelde methodes (waren duplicaat in Gast + Schoonmaker)
 

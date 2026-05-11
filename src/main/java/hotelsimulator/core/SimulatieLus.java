@@ -32,6 +32,7 @@ public class SimulatieLus {
                     p.beweeg();
                 }
             }
+            hotel.getPersonen().removeIf(Persoon::moetVerwijderdWorden);
             gui.repaint();
         });
 
