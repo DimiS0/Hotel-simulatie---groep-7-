@@ -25,6 +25,7 @@ public class Hotel {
     private Lift lift;
     private Schacht schacht;
     private IRuimteFactory ruimteFactory;
+    private final LinkedList<HotelKamer> schoonmaakWachtrij = new LinkedList<>();
 
     //waarom? test
     public Hotel(SimulatieConfig config, HotelEventManager eventManager, SimulatieConfig simulatieConfig) {
@@ -38,6 +39,18 @@ public class Hotel {
         this.ruimteFactory = factory;
         this.ruimtes = new ArrayList<>();
         this.personen = new ArrayList<>();
+    }
+    public synchronized void voegToeAanSchoonmaakWachtrij(HotelKamer kamer) {
+        if (!schoonmaakWachtrij.contains(kamer)) {
+            schoonmaakWachtrij.addLast(kamer);
+        }
+    }
+    public synchronized HotelKamer pakVolgendeSchoonmaakKamer() {
+        return schoonmaakWachtrij.isEmpty() ? null : schoonmaakWachtrij.removeFirst();
+    }
+
+    public boolean heeftSchoonmaakWerk() {
+        return !schoonmaakWachtrij.isEmpty();
     }
 
     public LinkedList<Integer> getLiftOproepen() {
@@ -124,7 +137,7 @@ public class Hotel {
 
             // Voeg daarna maximaal 2 schoonmakers toe
             for (int i = 0; i < 2 && schoonmakerIndex < aantalSchoonmakers; i++, schoonmakerIndex++) {
-                personen.add(new Schoonmaker(50, 450, lift, schacht, this, hotelEventManager, simulatieConfig));
+                personen.add(new Schoonmaker(lift, schacht, this, hotelEventManager, simulatieConfig));
             }
         }
     }
