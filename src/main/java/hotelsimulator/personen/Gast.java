@@ -135,21 +135,16 @@ public class Gast extends Persoon {
                 if (isWachtOpCheckOut) {
                     isWachtOpCheckOut = false;
 
-                    Point ingang = Pathfinder.getKamerIngang(toegewezenKamer);
+                    // Kamer toevoegen aan schoonmaakwachtrij vóór de gast vertrekt
+                    if (toegewezenKamer != null) {
+                        hotel.voegToeAanSchoonmaakWachtrij(toegewezenKamer);
+                    }
+
                     Point lobbyPunt = new Point(SPAWN_X, SPAWN_Y);
-
-                    List<Point> naarIngang = Pathfinder.vindPad(
-                            pixelX, pixelY, ingang.x, ingang.y, hotel.getRuimtes());
-
                     List<Point> naarLobby = Pathfinder.vindPad(
-                            ingang.x, ingang.y, lobbyPunt.x, lobbyPunt.y, hotel.getRuimtes());
-
-                    List<Point> volledigPad = new ArrayList<>();
-                    volledigPad.addAll(naarIngang);
-                    volledigPad.addAll(naarLobby);
-
-                    if (!volledigPad.isEmpty()) {
-                        setPad(volledigPad);
+                            pixelX, pixelY, lobbyPunt.x, lobbyPunt.y, hotel.getRuimtes());
+                    if (!naarLobby.isEmpty()) {
+                        setPad(naarLobby);
                         status = Status.LOOP_NAAR_LOBBY;
                     }
                     return;
@@ -169,11 +164,15 @@ public class Gast extends Persoon {
                     status = Status.VERLAAT_KAMER;
                 }
             }
-
             case VERLAAT_KAMER -> {
                 if (!pad.isEmpty()) {
                     beweeg();
                 } else {
+                    if (doelKamer == null) {
+                        status = Status.WACHT_IN_LOBBY;  // ← status resetten anders blijft gast hangen
+                        return;
+                    }
+
                     Point ingang = Pathfinder.getKamerIngang(doelKamer);
                     pixelX = ingang.x;
                     pixelY = ingang.y;
@@ -182,7 +181,6 @@ public class Gast extends Persoon {
                     HotelRuimte verlatenRuimte = doelKamer;
                     doelKamer = null;
 
-                    // later terug naar eigen kamer:
                     if (!(verlatenRuimte instanceof HotelKamer) && toegewezenKamer != null) {
                         startCheckInNaarKamer(toegewezenKamer);
                     }
