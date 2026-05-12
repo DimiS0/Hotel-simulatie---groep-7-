@@ -155,6 +155,16 @@ public class Gast extends Persoon {
                     return;
                 }
 
+                if (doelKamer == null) {
+                    // Gast heeft geen doelkamer, stuur terug naar toegewezenKamer
+                    if (toegewezenKamer != null) {
+                        startCheckInNaarKamer(toegewezenKamer);
+                    } else {
+                        markeerVoorVerwijdering();
+                    }
+                    return;
+
+                }
                 if (doelKamer instanceof HotelKamer) {
                     return;
                 }
@@ -174,6 +184,12 @@ public class Gast extends Persoon {
                 if (!pad.isEmpty()) {
                     beweeg();
                 } else {
+
+                    if (doelKamer == null) {
+                        markeerVoorVerwijdering();
+                        return;
+                    }
+
                     Point ingang = Pathfinder.getKamerIngang(doelKamer);
                     pixelX = ingang.x;
                     pixelY = ingang.y;

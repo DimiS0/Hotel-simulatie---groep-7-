@@ -155,14 +155,14 @@ public abstract class Persoon {
         return false; // nog onderweg
     }
 
-    // Bestaande methodes (ongewijzigd)
-
     public void beweeg() {
         if (pad.isEmpty()) return;
 
+        //point doel eerstvolgende punt waar je gaat zonder het te verwijderen
         double stap = SNELHEID * simulatieConfig.getSnelheid().getFactor();
         Point doel  = pad.peek();
 
+        //bewegen eerst met x en dan Y geen diagonaal, poll verwijdert de pad
         if (pixelXD != doel.x) {
             if (pixelXD < doel.x) pixelXD = Math.min(pixelXD + stap, doel.x);
             else                   pixelXD = Math.max(pixelXD - stap, doel.x);
@@ -176,9 +176,11 @@ public abstract class Persoon {
         pixelX = (int) pixelXD;
         pixelY = (int) pixelYD;
 
+        //pixels omrekenen naar grid
         int gridX = pixelX / 50;
         int gridY = pixelY / 50;
 
+        //persoon op dezelfde X en Y als schacht lift verzoek indienen
         if (gridX == schacht.getX()) {
             for (int verdieping : lift.getVerdiepingenY()) {
                 if (gridY == verdieping) liftVerzoek(gridY);
@@ -188,6 +190,7 @@ public abstract class Persoon {
         }
     }
 
+    //zet de verdieping in een linkedlist dit heet liftoproepen, als lift beschikbaar is gaat de lift daar naartoe
     public void liftVerzoek(int stopVerdieping) {
         if (!heeftVerzoekIngediend) {
             heeftVerzoekIngediend = true;

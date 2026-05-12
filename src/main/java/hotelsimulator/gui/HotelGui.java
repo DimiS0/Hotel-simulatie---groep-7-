@@ -24,7 +24,6 @@ public class HotelGui extends JPanel {
     private ConfigGui configGui;
     private JFrame frame;
     private JLabel speed;
-    boolean setDefaultSpeed;
     private HotelOverzicht overzicht;
     private SimulatieLus simulatieLus;
 
@@ -33,7 +32,6 @@ public class HotelGui extends JPanel {
         this.hotel = hotel;
         this.hotelEventManager = eventManager;
         this.config = config;
-        this.setDefaultSpeed = false;
         this.speed = new JLabel("1x");
         setPreferredSize(new Dimension(10 * cellSize, 10 * cellSize));
     }
@@ -54,6 +52,8 @@ public class HotelGui extends JPanel {
         for (HotelRuimte r : hotel.getRuimtes()) {
             r.print(g, cellSize);
         }
+
+        //personen printen zichzelf
         if (hotel.getPersonen() != null) {
             for (Persoon p : hotel.getPersonen()) {
                 p.print(g);
@@ -72,10 +72,10 @@ public class HotelGui extends JPanel {
         JButton instellingenBtn = new JButton("Instellingen");
 
         topPanel.add(instellingenBtn);
-        topPanel.add(speed);
         frame.add(topPanel, BorderLayout.NORTH);
         frame.add(speed, BorderLayout.SOUTH);
 
+        //instellingen opent met een callback
         instellingenBtn.addActionListener(e -> new ConfigGui(config, value -> updateSpeedLabel(value)));
 
         // Pas het venster aan zodat alle elementen precies passen

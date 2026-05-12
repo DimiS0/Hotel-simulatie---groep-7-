@@ -113,7 +113,6 @@ public class ConfigGui {
     }
 
     private int mapHTEToSlider(Snelheid hte) {
-        this.valueHTE = hte;
         double factor = hte.getFactor();
         if (factor <= 0.25) return 1;
         if (factor <= 0.5)  return 2;

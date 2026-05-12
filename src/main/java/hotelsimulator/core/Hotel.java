@@ -26,7 +26,7 @@ public class Hotel {
     private Schacht schacht;
     private IRuimteFactory ruimteFactory;
 
-
+    //waarom? test
     public Hotel(SimulatieConfig config, HotelEventManager eventManager, SimulatieConfig simulatieConfig) {
         this(config, eventManager, simulatieConfig, new HotelRuimteFactory());
     }
@@ -65,6 +65,7 @@ public class Hotel {
             int dimX = Integer.parseInt(dim[0].trim());
             int dimY = Integer.parseInt(dim[1].trim());
 
+            // waarom tenary if? Omdat het een kortere if - else is
             int maxPersonen = (item.Capacity != null) ? Integer.parseInt(item.Capacity.trim()) : 0;
             int sterrenAantal = (item.Classification != null && !item.Classification.isBlank()) ? Integer.parseInt(item.Classification.trim().split("\\s+")[0]) : 0;
 
@@ -76,11 +77,13 @@ public class Hotel {
                 System.out.println("Onbekend ruimtetype overgeslagen: " + areaType);
             }
         }
+        //deze zelf aanmaken, want zitten niet in json
         schacht = new Schacht("Schacht", 0, 0, 0, 1, 9, 0);
         Lobby lobby = new Lobby("Lobby", 0, 0, 1, 6, 1, 0);
         Trap trap = new Trap("trap", 0, 0, 7, 1, 9, 999);
         lift = new Lift("Lift", 0, 0, 0, 1, 1, 5);
 
+        //toevoegen aan arraylist
         ruimtes.add(schacht);
         ruimtes.add(lobby);
         ruimtes.add(trap);
@@ -101,16 +104,17 @@ public class Hotel {
     }
 
     public void maakPersonen(int aantalGasten) {
+        //mensen opslaan
         personen = new ArrayList<>();
 
-        // Bereken hoeveel schoonmakers er nodig zijn: 2 per 5 gasten (naar boven afgerond)
+        //schoonmakers
         int aantalSchoonmakers = 2;
+
 
         int gastIndex = 0;
         int schoonmakerIndex = 0;
 
-        // Voeg gasten en schoonmakers afwisselend toe in groepen van 5 gasten + 2 schoonmakers
-        // Zo worden ze in de spawn-timer door elkaar gespawnd, niet eerst alle gasten en dan pas schoonmakers
+        //de gasten en schoonmakers spawnen doorelkaar gemixed
         while (gastIndex < aantalGasten || schoonmakerIndex < aantalSchoonmakers) {
 
             // Voeg een groep van maximaal 5 gasten toe
@@ -124,7 +128,7 @@ public class Hotel {
             }
         }
     }
-
+    //waar gasten op mogen lopen in dit geval dus niet in lobby
     public List<HotelRuimte> getKamers() {
         List<HotelRuimte> result = new ArrayList<>();
         for (HotelRuimte r : ruimtes) {
@@ -140,6 +144,7 @@ public class Hotel {
         return personen;
     }
 
+    //gasten opzoeken als er een event wordt afgevuurd, anders niet
     public Gast zoekGastOpId(int guestId) {
         for (Persoon persoon : personen) {
             if (persoon instanceof Gast gast && gast.getGuestID() == guestId) {
@@ -147,7 +152,6 @@ public class Hotel {
                 return gast;
             }
         }
-        System.out.println("GEEN GAST GEVONDEN voor id " + guestId);
         return null;
     }
 
@@ -170,6 +174,7 @@ public class Hotel {
         //if overgeslagen dan geen kamer beschikbaar of bestaat niet?
         return null;
     }
+    //verwijderd persoon van de lijst
     public void verwijderPersoon(Persoon persoon) {
         personen.remove(persoon);
     }

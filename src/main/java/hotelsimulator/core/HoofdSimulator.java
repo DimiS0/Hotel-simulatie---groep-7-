@@ -29,8 +29,10 @@ public class HoofdSimulator {
 		this.eventManager = new hotelevents.HotelEventManager();
         this.event = new Evenement(eventManager,hotel);
 
+        //iemand statish toegevoegt ipv via constructor
         CleaningEmergency.setHotel(hotel);
 
+        //verandert de klok van events om de slider te matchen
 		config.addListener(() -> {
 			eventManager.setHte(config.getSnelheid().getDelay());
 		});
@@ -53,15 +55,19 @@ public class HoofdSimulator {
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
+
         HotelGui gui = new HotelGui(hotel, config, eventManager);
         gui.showGui();
 
+        //lift vragen, bewegen en retekenen
         eventManager.register(evt -> {
                 javax.swing.SwingUtilities.invokeLater(() -> {
                     hotel.getLift().liftBwegen();
                     gui.repaint();
                 });
         });
+
+        //start de scenario
         eventManager.start(2);
     }
 
@@ -72,6 +78,8 @@ public class HoofdSimulator {
                 "Layout Bestanden (*.json, *.layout)", "json", "layout"));
 
         int result = fileChooser.showOpenDialog(null);
+
+        //anuleren / niks kiezen
         if (result != JFileChooser.APPROVE_OPTION) {
             System.out.println("Geen bestand gekozen");
             return;
@@ -92,13 +100,12 @@ public class HoofdSimulator {
         HotelGui gui = new HotelGui(hotel, config, eventManager);
         gui.showGui();
 
+        //lift vragen, bewegen en retekenen
         eventManager.register(evt -> {
-            if (evt.getEventType() == hotelevents.HotelEventType.NONE) {
                 javax.swing.SwingUtilities.invokeLater(() -> {
                     hotel.getLift().liftBwegen();
                     gui.repaint();
                 });
-            }
         });
         eventManager.start(1);
     }
