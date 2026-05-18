@@ -22,8 +22,6 @@ public class evenementFactory {
             case CHECK_IN -> {Gast gast = hotel.zoekGastOpId(guestId); if (gast == null) {System.out.println("Gast niet gevonden met id: " + guestId); return () -> {};} return new CheckIn(gast, evt.getData() );}
             case CHECK_OUT -> {Gast gast = hotel.zoekGastOpId(guestId); if (gast == null) {System.out.println("Gast niet gevonden met id: " + guestId); return () -> {};} return new CheckOut(gast);}
             case CLEANING_EMERGENCY -> {return new CleaningEmergency();}
-            case EVACUATE -> {return new Evacuate();}
-            case GODZILLA -> {return new Godzilla();}
             case NEED_FOOD -> {Gast gast = hotel.zoekGastOpId(guestId); if (gast == null) {; return () -> {};}return new NeedFood(gast);}
             case GOTO_CINEMA -> { Gast gast = hotel.zoekGastOpId(guestId); if (gast == null) {; return () -> {};}return new GoToCinema(gast);}
             case GOTO_FITNESS -> {Gast gast = hotel.zoekGastOpId(guestId); if (gast == null) {; return () -> {};}return new GoToFitness(gast);}
