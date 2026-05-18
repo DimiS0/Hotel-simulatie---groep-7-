@@ -65,9 +65,7 @@ public class HotelOverzicht extends JFrame {
 
         // Ververst het overzicht elke keer dat de eventManager een NONE-event stuurt
         eventManager.register(evt -> {
-            if (evt.getEventType() == HotelEventType.NONE) {
                 SwingUtilities.invokeLater(this::verversen);
-            }
         });
     }
 
@@ -126,6 +124,7 @@ public class HotelOverzicht extends JFrame {
     }
 
     private JButton maakRuimteKnop(HotelRuimte ruimte) {
+        //Long omdat count een long terug geeft
         long aantalG = hotel.getPersonen().stream()
                 .filter(p -> p instanceof Gast && p.getHuidigeRuimte() == ruimte)
                 .count();
@@ -143,22 +142,32 @@ public class HotelOverzicht extends JFrame {
             default           -> "";
         };
 
+        //html mode, omdat dit het misnte werk is dan component g of meerderelabels in een panel stoppen
         StringBuilder html = new StringBuilder("<html><center>");
+
+        //als er een emoji is die toevoegen, daarna naam van ruimte
         if (!emoji.isEmpty()) html.append(emoji).append(" ");
         html.append("<b>").append(ruimte.getAreaType()).append("</b><br>");
 
+        //blauwe G
         for (int i = 0; i < aantalG; i++) {
             html.append("<font color='#0064FF'><b>G</b></font> ");
         }
+        //paarse S
         for (int i = 0; i < aantalS; i++) {
             html.append("<font color='#9400D3'><b>S</b></font> ");
         }
+        //html afsluiten
         html.append("</center></html>");
 
+        //knop krijgt het als tekst
         JButton btn = new JButton(html.toString());
+
+        //zet de tekst in het midden
         btn.setVerticalTextPosition(SwingConstants.CENTER);
         btn.setHorizontalTextPosition(SwingConstants.CENTER);
 
+        //iemeand is in de ruimte
         if (inGebruik) {
             btn.setBackground(new Color(144, 238, 144));
             btn.setOpaque(true);
@@ -210,7 +219,7 @@ public class HotelOverzicht extends JFrame {
 
         // Ververst de info in het dialoogvenster elke keer via de eventManager
         eventManager.register(evt -> {
-            if (evt.getEventType() == HotelEventType.NONE && dialog.isShowing()) {
+            if (dialog.isShowing()) {
                 SwingUtilities.invokeLater(updateInfo);
             }
         });

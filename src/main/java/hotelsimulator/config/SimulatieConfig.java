@@ -8,6 +8,7 @@ public class SimulatieConfig {
 	private int aantalGasten;
 	private int brightness;
 	private int volume;
+    private int scenario = 1;
 	// Constructor
 	public SimulatieConfig() {
 		this.snelheid = HTE.NORMAAL;
@@ -44,6 +45,10 @@ public class SimulatieConfig {
 		return volume;
 	}
 
+    public int getScenario(){
+        return this.scenario;
+    }
+
 	// SETTERS
     public void setBrightness(int brightness) {
         this.brightness = brightness;
@@ -63,5 +68,8 @@ public class SimulatieConfig {
     public void setAantalGasten(int aantalGasten) {
         this.aantalGasten = aantalGasten;
         notifyListeners();
+    }
+    public void setScenario(int value){
+        this.scenario = value;
     }
 }

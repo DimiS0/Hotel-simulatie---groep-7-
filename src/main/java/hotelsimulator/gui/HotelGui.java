@@ -76,7 +76,13 @@ public class HotelGui extends JPanel {
         frame.add(topPanel, BorderLayout.NORTH);
         frame.add(speed, BorderLayout.SOUTH);
 
-        instellingenBtn.addActionListener(e -> new ConfigGui(config, value -> updateSpeedLabel(value)));
+        instellingenBtn.addActionListener(e -> {
+            if (configGui == null || !configGui.getFrame().isDisplayable()) {
+                configGui = new ConfigGui(config, value -> updateSpeedLabel(value));
+            } else {
+                configGui.getFrame().toFront();
+            }
+        });
 
         // Pas het venster aan zodat alle elementen precies passen
         frame.pack();

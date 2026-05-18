@@ -21,13 +21,13 @@ public class StarterGui {
 
 	public StarterGui(HoofdSimulator hoofdSimulator) {
 		this.hoofdSimulator = hoofdSimulator;
-
 		// titel, niet grotermaken, sluiten, border toevoegen
 		scherm1.setTitle("Hotel Simulator");
 		scherm1.setResizable(false);
 		scherm1.setSize(800, 1000);
 		scherm1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		scherm1.setLayout(new BorderLayout());
+        scherm1.setLocationRelativeTo(null);
 
 		// gridbaglayout zodat de knoppen in het midden komen
 		bestandinvoegen.setLayout(new GridBagLayout());
@@ -78,7 +78,11 @@ public class StarterGui {
 		instellingenBtn.addActionListener(e -> {
 
 			// sla het instellingen venster op in config, later als gebruiker layout kiest sluiten
-            configFrame = new ConfigGui(hoofdSimulator.getConfig(), value -> {}).getFrame();
+            if(configFrame == null || !configFrame.isDisplayable()) {
+                configFrame = new ConfigGui(hoofdSimulator.getConfig(), value -> {
+                }).getFrame();
+            } else
+                configFrame.toFront();
 
         });
 	}

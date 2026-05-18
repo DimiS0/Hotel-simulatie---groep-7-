@@ -32,6 +32,8 @@ public class ConfigGui {
         frame.setSize(500, 350);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setLayout(new BorderLayout());
+        frame.setResizable(false);
+        frame.setLocationRelativeTo(null);
 
         JPanel panel = new JPanel(new GridLayout(5, 2, 10, 10));
 
@@ -39,6 +41,40 @@ public class ConfigGui {
         testLabel.setOpaque(true);
         testLabel.setBackground(Color.GRAY);
         frame.add(testLabel, BorderLayout.SOUTH);
+
+        panel.add(new JLabel("Scenario"));
+        JSlider scenarioSlider = new JSlider(1, 4, config.getScenario());
+
+        Hashtable<Integer, JLabel> scenarios = new Hashtable<>();
+        scenarios.put(1, new JLabel("1"));
+        scenarios.put(2, new JLabel("2"));
+        scenarios.put(3, new JLabel("3"));
+        scenarios.put(4, new JLabel("4"));
+
+        scenarioSlider.setLabelTable(scenarios);
+        scenarioSlider.setPaintLabels(true);
+        scenarioSlider.setPaintTicks(true);
+        scenarioSlider.setMajorTickSpacing(1);
+
+        scenarioSlider.addChangeListener(e ->{
+            int scenarioValue = scenarioSlider.getValue();
+            config.setScenario(scenarioValue);
+        });
+        panel.add(scenarioSlider);
+
+        panel.add(new JLabel("Aantal gasten:"));
+        JTextField gastenField = new JTextField(String.valueOf(config.getAantalGasten()));
+        gastenField.addFocusListener(new FocusAdapter() {
+
+            public void focusLost(FocusEvent e) {
+                try {
+                    int g = Integer.parseInt(gastenField.getText());
+                    config.setAantalGasten(g);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(frame, "Ongeldige waarde");
+                }}});
+
+        panel.add(gastenField);
 
         panel.add(new JLabel("Snelheid"));
         JSlider snelheidSlider = new JSlider(1, 5, mapHTEToSlider(config.getSnelheid()));
@@ -55,6 +91,7 @@ public class ConfigGui {
         snelheidSlider.setPaintTicks(true);
         snelheidSlider.setMajorTickSpacing(1);
 
+
         snelheidSlider.addChangeListener(e -> {
             int value = snelheidSlider.getValue();
             Snelheid snelheid = mapSliderToHTE(value);
@@ -63,20 +100,6 @@ public class ConfigGui {
         });
 
         panel.add(snelheidSlider);
-
-        panel.add(new JLabel("Aantal gasten:"));
-        JTextField gastenField = new JTextField(String.valueOf(config.getAantalGasten()));
-        gastenField.addFocusListener(new FocusAdapter() {
-
-            public void focusLost(FocusEvent e) {
-                try {
-                    int g = Integer.parseInt(gastenField.getText());
-                    config.setAantalGasten(g);
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(frame, "Ongeldige waarde");
-                }}});
-
-        panel.add(gastenField);
 
         panel.add(new JLabel("Brightness:"));
         JSlider brightnessSlider = new JSlider(0, 100, config.getBrightness());
@@ -113,7 +136,6 @@ public class ConfigGui {
     }
 
     private int mapHTEToSlider(Snelheid hte) {
-        this.valueHTE = hte;
         double factor = hte.getFactor();
         if (factor <= 0.25) return 1;
         if (factor <= 0.5)  return 2;
