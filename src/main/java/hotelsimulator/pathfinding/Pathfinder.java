@@ -268,10 +268,13 @@ public class Pathfinder {
             } else {
                 // Verticale stap: gaat hij dwars door het kameroppervlak?
                 int     bovensteVakje     = Math.min(vanRij, naarRij);
+                int ondersteVakje    = Math.max(vanRij, naarRij);
                 boolean kolomBinnenKamer2 = vanKolom      > kamerLinks && vanKolom      < kamerRechts;
                 boolean rijBinnenKamer2   = bovensteVakje >= kamerBoven && bovensteVakje < kamerOnder;
+                boolean eindtBinnenKamer  = ondersteVakje > kamerBoven && ondersteVakje <= kamerOnder;
 
-                if (kolomBinnenKamer2 && rijBinnenKamer2) {
+
+                if (kolomBinnenKamer2 && (rijBinnenKamer2 || eindtBinnenKamer)) {
                     return false;
                 }
             }
