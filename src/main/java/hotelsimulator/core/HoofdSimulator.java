@@ -62,7 +62,8 @@ public class HoofdSimulator {
                     gui.repaint();
                 });
         });
-        eventManager.start(2);
+        eventManager.start(config.getScenario());
+        System.out.println(config.getScenario());
     }
 
 
@@ -100,7 +101,7 @@ public class HoofdSimulator {
                 });
             }
         });
-        eventManager.start(1);
+        eventManager.start(config.getScenario());
     }
 
 	public SimulatieConfig getConfig() {
