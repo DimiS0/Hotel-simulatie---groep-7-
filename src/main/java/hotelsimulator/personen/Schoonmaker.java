@@ -173,31 +173,6 @@ public class Schoonmaker extends Persoon {
         }
     }
 
-    // Reageer direct op een emergency (aangeroepen vanuit CleaningEmergency)
-    public void reageerOpEmergency(HotelKamer noodkamer) {
-        if (status != Status.WACHT_OP_WERK) return; // alleen als hij vrij staat te wachten
-
-        noodkamer.betreedAlsSchoonmaker();
-        doelKamer = noodkamer;
-
-        int kamerVerdieping = getNabijeStop(noodkamer.getY());
-        if (kamerVerdieping == huidigeVerdieping) {
-            Point ingang = Pathfinder.getKamerIngang(noodkamer);
-            List<Point> padNaarKamer = Pathfinder.vindPad(
-                    pixelX, pixelY, ingang.x, ingang.y, hotel.getRuimtes());
-            if (!padNaarKamer.isEmpty()) {
-                setPad(padNaarKamer);
-                status = Status.LOOPT_NAAR_INGANG;
-            }
-        } else {
-            doelVerdieping = kamerVerdieping;
-            loopNaarSchachtOfTrap();
-        }
-    }
-
-    public boolean isVrij() {
-        return status == Status.WACHT_OP_WERK;
-    }
 
     private void startSchoonmaakRonde(HotelKamer kamer) {
         doelKamer = kamer;

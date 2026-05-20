@@ -49,9 +49,6 @@ public class Hotel {
         return schoonmaakWachtrij.isEmpty() ? null : schoonmaakWachtrij.removeFirst();
     }
 
-    public boolean heeftSchoonmaakWerk() {
-        return !schoonmaakWachtrij.isEmpty();
-    }
 
     public LinkedList<Integer> getLiftOproepen() {
         return liftOproepen;
@@ -187,9 +184,6 @@ public class Hotel {
         //if overgeslagen dan geen kamer beschikbaar of bestaat niet?
         return null;
     }
-    //verwijderd persoon van de lijst
-    public void verwijderPersoon(Persoon persoon) {
-        personen.remove(persoon);
-    }
+
 
 }

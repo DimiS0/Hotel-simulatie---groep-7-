@@ -77,14 +77,25 @@ public class Gast extends Persoon {
             case LOOPT_NAAR_INGANG -> {
                 if (!pad.isEmpty()) {
                     beweeg();
-                } else {
-                    if (!eventWachtrij.isEmpty() && doelKamer != null) {
-                        HotelRuimte volgend = eventWachtrij.peek();
+                } else {  System.out.println("Gast " + guestID + " aangekomen bij ingang van: "
+                        + (doelKamer != null ? doelKamer.getAreaType() : "null")
+                        + " | wachtrij: " + eventWachtrij.size());
+                    if (doelKamer == null) {
+                        status = Status.WACHT_IN_LOBBY;  // ← eerst status resetten
+                        if (!eventWachtrij.isEmpty()) {
+                            HotelRuimte volgend = eventWachtrij.poll();
+                            gaNaarRuimte(volgend);
+                        } else if (toegewezenKamer != null) {
+                            gaNaarRuimte(toegewezenKamer);
+                        }
+                        return;
+                    }
 
+                    if (!eventWachtrij.isEmpty()) {
+                        HotelRuimte volgend = eventWachtrij.peek();
                         Point volgendIngang = Pathfinder.getKamerIngang(volgend);
                         List<Point> testPad = Pathfinder.vindPad(
                                 pixelX, pixelY, volgendIngang.x, volgendIngang.y, hotel.getRuimtes());
-
                         if (!testPad.isEmpty()) {
                             eventWachtrij.poll();
                             doelKamer.verlaat();
@@ -92,11 +103,9 @@ public class Gast extends Persoon {
                             gaNaarRuimte(volgend);
                             return;
                         } else {
-                            eventWachtrij.clear(); // pad niet gevonden, huidige kamer afmaken
+                            eventWachtrij.clear();
                         }
                     }
-
-                    if (doelKamer == null) { status = Status.WACHT_IN_LOBBY; return; }
 
                     Point ingang = Pathfinder.getKamerIngang(doelKamer);
                     Point midden = getTrueMidden(doelKamer);
@@ -175,6 +184,7 @@ public class Gast extends Persoon {
                     return;
                 }
 
+
                 if (doelKamer instanceof HotelKamer) {
                     return;
                 }
@@ -188,11 +198,15 @@ public class Gast extends Persoon {
                     setPad(naarIngang);
                     status = Status.VERLAAT_KAMER;
                 }
+
             }
             case VERLAAT_KAMER -> {
                 if (!pad.isEmpty()) {
                     beweeg();
-                } else {
+                } else { System.out.println("Gast " + guestID + " verlaat: "
+                        + (doelKamer != null ? doelKamer.getAreaType() : "null")
+                        + " | toegewezenKamer: " + (toegewezenKamer != null ? toegewezenKamer.getAreaType() : "null")
+                        + " | wachtrij: " + eventWachtrij.size());
                     if (doelKamer == null) { status = Status.WACHT_IN_LOBBY; return; }
                     Point ingang = Pathfinder.getKamerIngang(doelKamer);
                     pixelX = ingang.x;
@@ -250,6 +264,11 @@ public class Gast extends Persoon {
         //geen ruimte niet lopen
         if (ruimte == null) return;
 
+        System.out.println("Gast " + guestID + " gaNaarRuimte: " + ruimte.getAreaType()
+                + " | status: " + status
+                + " | doelKamer: " + (doelKamer != null ? doelKamer.getAreaType() : "null")
+                + " | wachtrij: " + eventWachtrij.size());
+
         // Als gast bezig is met lopen of in kamer zit, event bewaren voor later
         boolean isBezig = status == Status.LOOPT_NAAR_INGANG
                 || status == Status.LOOPT_NAAR_SCHACHT
@@ -260,22 +279,27 @@ public class Gast extends Persoon {
                 || status == Status.BETREEDT_KAMER;
 
         if (isBezig) {
-            eventWachtrij.clear(); // alleen laatste event bewaren
-            eventWachtrij.add(ruimte);
+            // Alleen bewaren als het een speciale kamer is, geen hotelkamer
+            if (!(ruimte instanceof HotelKamer)) {
+                eventWachtrij.clear();
+                eventWachtrij.add(ruimte);
+            }
             return;
         }
 
         // Als gast in kamer zit, eerst verlaten
         if (status == Status.IN_KAMER && doelKamer != null) {
-            eventWachtrij.clear();
-            eventWachtrij.add(ruimte);
-            Point ingang = Pathfinder.getKamerIngang(doelKamer);
-            Point midden = getTrueMidden(doelKamer);
-            List<Point> naarIngang = new ArrayList<>();
-            naarIngang.add(new Point(midden.x, ingang.y));
-            naarIngang.add(ingang);
-            setPad(naarIngang);
-            status = Status.VERLAAT_KAMER;
+            if (!(ruimte instanceof HotelKamer)) {
+                eventWachtrij.clear();
+                eventWachtrij.add(ruimte);
+                Point ingang = Pathfinder.getKamerIngang(doelKamer);
+                Point midden = getTrueMidden(doelKamer);
+                List<Point> naarIngang = new ArrayList<>();
+                naarIngang.add(new Point(midden.x, ingang.y));
+                naarIngang.add(ingang);
+                setPad(naarIngang);
+                status = Status.VERLAAT_KAMER;
+            }
             return;
         }
         doelKamer = ruimte;
