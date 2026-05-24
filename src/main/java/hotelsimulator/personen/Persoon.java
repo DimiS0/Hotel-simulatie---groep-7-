@@ -31,15 +31,14 @@ public abstract class Persoon {
 
     //  Beweging
     protected LinkedList<Point> pad = new LinkedList<>();
+    private double doubleTRAP_PIXEL_X;
     protected static final int    SNELHEID         = 2;
     protected static final int    SCHACHT_PIXEL_X  = 100;
-    protected static final int    TRAP_PIXEL_X     = 425;
+    protected int TRAP_PIXEL_X;
     protected static final int    LIFT_CENTER_X    = 75;
     protected static final Random random           = new Random();
     private boolean heeftVerzoekIngediend = false;
-
     private boolean moetVerwijderdWorden = false;
-
 
     // Constructor
     public Persoon(int startX, int startY, Lift lift, Schacht schacht,
@@ -50,6 +49,8 @@ public abstract class Persoon {
         this.schacht           = schacht;
         this.lift              = lift;
         this.hotelEventManager = hotelEventManager;
+        this.doubleTRAP_PIXEL_X = (hotel.getMaxBreedte() + 2.5) * 50;
+        this.TRAP_PIXEL_X = (int) doubleTRAP_PIXEL_X;
         setPositie(startX, startY);
     }
 

@@ -26,6 +26,10 @@ public class Hotel {
     private Schacht schacht;
     private IRuimteFactory ruimteFactory;
     private final LinkedList<HotelKamer> schoonmaakWachtrij = new LinkedList<>();
+    private int maxHoogte = 0;
+    private int maxBreedte = 0;
+    private int verdiepingen = 0;
+    private int lobbyBreedte = 0;
 
     //waarom? test
     public Hotel(SimulatieConfig config, HotelEventManager eventManager, SimulatieConfig simulatieConfig) {
@@ -87,18 +91,54 @@ public class Hotel {
                 System.out.println("Onbekend ruimtetype overgeslagen: " + areaType);
             }
         }
+
+        //forloops om de maximale hoogte en breedte te achterhalen
+        for(int i= 0; i < ruimtes.size(); i++){
+            if((ruimtes.get(i).getOrgineleY()+ruimtes.get(i).getHoogte()) > maxHoogte){maxHoogte = ruimtes.get(i).getOrgineleY() + ruimtes.get(i).getHoogte();}
+        }
+
+        for(int i= 0; i < ruimtes.size(); i++){
+            if(ruimtes.get(i).getX() > maxBreedte){maxBreedte = ruimtes.get(i).getX();}
+        }
+        kiesVerdiepingen();
+
         //deze zelf aanmaken, want zitten niet in json
-        schacht = new Schacht("Schacht", 0, 0, 0, 1, 9, 0);
-        Lobby lobby = new Lobby("Lobby", 0, 0, 1, 6, 1, 0);
-        Trap trap = new Trap("trap", 0, 0, 7, 1, 9, 999);
-        lift = new Lift("Lift", 0, 0, 0, 1, 1, 5);
+        schacht = new Schacht("Schacht", 0, 0, 0, 1, maxHoogte, 0);
+        Lobby lobby = new Lobby("Lobby", 0, 0, 1, maxBreedte, 1, 0);
+        Trap trap = new Trap("trap", 0, 0, maxBreedte+ 1, 1, maxHoogte, 999, getverdiepingen());
+        lift = new Lift("Lift", 0, 0, 0, 1, 1, 5, getverdiepingen());
 
         //toevoegen aan arraylist
         ruimtes.add(schacht);
         ruimtes.add(lobby);
         ruimtes.add(trap);
         ruimtes.add(lift);
+    }
 
+    public void kiesVerdiepingen(){
+        switch(maxHoogte){
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+                verdiepingen = 1;
+                break;
+            case 5:
+            case 6:
+            case 7:
+                verdiepingen = 2;
+                break;
+            default:
+                verdiepingen = 3;
+        }
+
+    }
+    public int getMaxBreedte(){
+        return maxBreedte;
+    }
+
+    public int getverdiepingen(){
+        return verdiepingen;
     }
 
     public ArrayList<HotelRuimte> getRuimtes() {
@@ -129,12 +169,12 @@ public class Hotel {
 
             // Voeg een groep van maximaal 5 gasten toe
             for (int i = 0; i < 5 && gastIndex < aantalGasten; i++, gastIndex++) {
-                personen.add(new Gast(lift, schacht, this, hotelEventManager, simulatieConfig, gastIndex + 1));
+                personen.add(new Gast(lift, schacht, this, hotelEventManager, simulatieConfig, gastIndex + 1, getMaxBreedte()));
             }
 
             // Voeg daarna maximaal 2 schoonmakers toe
             for (int i = 0; i < 2 && schoonmakerIndex < aantalSchoonmakers; i++, schoonmakerIndex++) {
-                personen.add(new Schoonmaker(lift, schacht, this, hotelEventManager, simulatieConfig));
+                personen.add(new Schoonmaker(lift, schacht, this, hotelEventManager, simulatieConfig, getMaxBreedte()));
             }
         }
     }

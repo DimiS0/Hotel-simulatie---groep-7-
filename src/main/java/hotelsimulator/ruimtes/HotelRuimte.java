@@ -13,9 +13,11 @@ public abstract class HotelRuimte {
     private int aantalGasten = 0;
     private int aantalSchoonmakers = 0;
     private boolean cleaningEmergency = false;
+    private int orgineleY;
 	public HotelRuimte(String areaType, int sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen) {
 		this.areaType = areaType;
 		this.sterrenAantal = sterrenAantal;
+        this.orgineleY = y;
 		this.y = 10 - y - hoogte + 1;
 		this.x = x;
 		this.breedte = breedte;
@@ -40,6 +42,11 @@ public abstract class HotelRuimte {
     }
     public synchronized void verlaatAlsSchoonmaker() {
         if (aantalSchoonmakers > 0) aantalSchoonmakers--;
+    }
+
+    //nodig voor dynamisch maken van layout
+    public int getOrgineleY() {
+        return orgineleY;
     }
 
     public int getAantalGasten() {

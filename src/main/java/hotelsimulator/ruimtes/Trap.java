@@ -3,8 +3,10 @@ package hotelsimulator.ruimtes;
 import java.awt.*;
 
 public class Trap extends HotelRuimte {
-	public Trap(String areaType, int sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen) {
+    private int verdiepingen;
+	public Trap(String areaType, int sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen, int verdiepingen) {
 		super(areaType, sterrenAantal, y, x, breedte, hoogte, maxPersonen);
+        this.verdiepingen = verdiepingen;
 	}
     @Override
     public void print(Graphics g, int cellSize) {
@@ -23,7 +25,15 @@ public class Trap extends HotelRuimte {
 
     @Override
     public boolean isBeloopbaar(int gridX, int gridY) {
-        return gridY == 2 || gridY == 5 || gridY == 8;}
+        switch(verdiepingen){
+            case 1:
+                return gridY == 8;
+            case 2:
+                return gridY == 8 || gridY == 5;
+            default:
+                return gridY == 8 || gridY == 5 || gridY == 2;
+        }
+    }
 
         @Override
         public int[] getIngangen () {

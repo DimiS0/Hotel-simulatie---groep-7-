@@ -29,19 +29,18 @@ public class Gast extends Persoon {
     private Status status = Status.WACHT_OP_SPAWN;
     private HotelRuimte doelKamer;
     private long verblijfEinde = 0;
-    private HotelRuimte volgendeDoel = null;
     private final LinkedList<HotelRuimte> eventWachtrij = new LinkedList<>();
-
-    public static final int SPAWN_X = 200;
-    public static final int SPAWN_Y = 500;
 
     private int doelVerdieping    = 8;
     private int huidigeVerdieping = 8;
+    private int SPAWN_X;
+    private static final int SPAWN_Y = 500;
 
     public Gast(Lift lift, Schacht schacht, Hotel hotel,
-                HotelEventManager hotelEventManager, SimulatieConfig simulatieConfig, int guestID) {
-        super(SPAWN_X, SPAWN_Y, lift, schacht, hotel, hotelEventManager, simulatieConfig);
+                HotelEventManager hotelEventManager, SimulatieConfig simulatieConfig, int guestID, int maxBreedte) {
+        super(berekenGastSpawnLocatie(maxBreedte), SPAWN_Y, lift, schacht, hotel, hotelEventManager, simulatieConfig);
         this.guestID = guestID;
+        this.SPAWN_X = berekenGastSpawnLocatie(maxBreedte);
     }
 
     public int getGuestID() {
@@ -329,6 +328,15 @@ public class Gast extends Persoon {
             //als bestemming op andere verdieping dan kiezen we tussen lift of trap
             doelVerdieping = verdieping;
             loopNaarSchachtOfTrap();
+        }
+    }
+
+    private static int berekenGastSpawnLocatie(int maxBreedte){
+        if (maxBreedte > 4){
+            return (maxBreedte - 2) * 50;
+        }
+        else{
+            return 150;
         }
     }
 

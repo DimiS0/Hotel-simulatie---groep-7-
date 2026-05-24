@@ -27,10 +27,6 @@ public class Schoonmaker extends Persoon {
         LOOP_TERUG_NAAR_POST  // loopt terug naar wachtpositie
     }
 
-    // Wachtpositie: naast de lobby (rechts van de lift/schacht, op de lobbyverdieping)
-    public static final int WACHT_X = 350;  // midden van de lobby
-    public static final int WACHT_Y = 450;  // lobbyverdieping (rij 9 = y=450)
-
     private Status status = Status.WACHT_OP_SPAWN;
     private HotelKamer doelKamer;
     private long verblijfEinde = 0;
@@ -39,10 +35,15 @@ public class Schoonmaker extends Persoon {
     private int doelVerdieping    = 8;
     private int huidigeVerdieping = 8;
 
+    // Wachtpositie: naast de lobby (rechts van de lift/schacht, op de lobbyverdieping)
+    protected static final int WACHT_Y = 450;  // lobbyverdieping (rij 9 = y=450)
+    protected int WACHT_X;
+
     public Schoonmaker(Lift lift, Schacht schacht, Hotel hotel,
                        HotelEventManager hotelEventManager,
-                       SimulatieConfig simulatieConfig) {
-        super(WACHT_X, WACHT_Y, lift, schacht, hotel, hotelEventManager, simulatieConfig);
+                       SimulatieConfig simulatieConfig, int maxBreedte) {
+        super (berekenSchoonmakerPauzePositie(maxBreedte), WACHT_Y, lift, schacht, hotel, hotelEventManager, simulatieConfig);
+        this.WACHT_X = berekenSchoonmakerPauzePositie(maxBreedte);
     }
 
     @Override
@@ -197,6 +198,9 @@ public class Schoonmaker extends Persoon {
             doelVerdieping = kamerVerdieping;
             loopNaarSchachtOfTrap();
         }
+    }
+    private static int berekenSchoonmakerPauzePositie(int maxBreedte){
+        return (maxBreedte +1) * 50;
     }
 
     private void loopTerugNaarPost() {

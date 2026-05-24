@@ -10,13 +10,16 @@ import java.util.List;
 public class Lift extends HotelRuimte {
 
     // ── Verdiepingen waar de lift kan stoppen ────────────────
-    private int[] verdiepingenY = {8, 5, 2};
+    private ArrayList<Integer> tijdelijkeArray = new ArrayList();
+    private int [] verdiepingenY;
+
 
     // ── Rijgedrag ────────────────────────────────────────────
     private int  doelVerdieping = 8;
     private int  stopPositie    = 8;
     private boolean beschikbaar = true;
     private boolean omhoog      = true;
+    private int verdiepingen;
 
     // ── Passagiers ───────────────────────────────────────────
     private final List<Gast>       gastenInLift        = new ArrayList<>();
@@ -31,8 +34,10 @@ public class Lift extends HotelRuimte {
     private final LinkedList<Integer> verzoeken = new LinkedList<>();
 
     public Lift(String areaType, int sterrenAantal, int y, int x,
-                int breedte, int hoogte, int maxPersonen) {
+                int breedte, int hoogte, int maxPersonen, int verdiepingen) {
         super(areaType, sterrenAantal, y, x, breedte, hoogte, maxPersonen);
+        this.verdiepingen = verdiepingen;
+        kiesVerdiepingenY();
         for (int stop : verdiepingenY) {
             gastWachtrij.put(stop, new ArrayList<>());
             schoonmakerWachtrij.put(stop, new ArrayList<>());
@@ -88,6 +93,24 @@ public class Lift extends HotelRuimte {
         } else {
             // Geen verzoeken meer — lift staat stil
             beschikbaar = true;
+        }
+    }
+    public void kiesVerdiepingenY(){
+        switch(verdiepingen){
+            case 1:
+                tijdelijkeArray.add(8);
+                verdiepingenY = tijdelijkeArray.stream().mapToInt(Integer::intValue).toArray();
+                break;
+            case 2:
+                tijdelijkeArray.add(8);
+                tijdelijkeArray.add(5);
+                verdiepingenY = tijdelijkeArray.stream().mapToInt(Integer::intValue).toArray();
+                break;
+            default:
+                tijdelijkeArray.add(8);
+                tijdelijkeArray.add(5);
+                tijdelijkeArray.add(2);
+                verdiepingenY = tijdelijkeArray.stream().mapToInt(Integer::intValue).toArray();
         }
     }
 
