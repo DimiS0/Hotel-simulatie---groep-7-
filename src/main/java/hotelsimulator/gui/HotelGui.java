@@ -3,6 +3,8 @@ package hotelsimulator.gui;
 import hotelevents.HotelEventManager;
 import hotelsimulator.core.Hotel;
 import hotelsimulator.config.SimulatieConfig;
+import hotelsimulator.core.LayoutBeheer;
+import hotelsimulator.core.OpgeslagenLayouts;
 import hotelsimulator.personen.Schoonmaker;
 import hotelsimulator.ruimtes.HotelRuimte;
 import hotelsimulator.personen.Persoon;
@@ -11,9 +13,12 @@ import hotelsimulator.core.SimulatieLus;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 
 
 import static hotelsimulator.config.HTE.*;
+import static hotelsimulator.core.OpgeslagenLayouts.laadLayoutsUitMap;
+import java.util.List;
 
 public class HotelGui extends JPanel {
 
@@ -27,6 +32,7 @@ public class HotelGui extends JPanel {
     boolean setDefaultSpeed;
     private HotelOverzicht overzicht;
     private SimulatieLus simulatieLus;
+
 
     public HotelGui(Hotel hotel, SimulatieConfig config, HotelEventManager eventManager) {
         this.frame = new JFrame("Hotel Layout");
@@ -70,11 +76,23 @@ public class HotelGui extends JPanel {
 
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JButton instellingenBtn = new JButton("Instellingen");
+        JButton layoutPlusKnop = new JButton("+");
+        JButton layoutInladenKnop = new JButton("Opgeslagen Layouts");
 
+        topPanel.add(layoutPlusKnop);
+        topPanel.add(layoutInladenKnop);
         topPanel.add(instellingenBtn);
         topPanel.add(speed);
         frame.add(topPanel, BorderLayout.NORTH);
         frame.add(speed, BorderLayout.SOUTH);
+
+        layoutPlusKnop.addActionListener(e -> {
+            LayoutBeheer.layoutOpslaanInMap();
+        });
+
+        layoutInladenKnop.addActionListener(e -> {
+
+            });
 
         instellingenBtn.addActionListener(e -> {
             if (configGui == null || !configGui.getFrame().isDisplayable()) {

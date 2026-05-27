@@ -27,5 +27,8 @@ class EvenementTest {
 
             // Assert
             assertThrows(IllegalArgumentException.class, act);
+
+            //test faalt
+            // assertThrows(NullPointerException.class, act);
         }
 }
