@@ -34,7 +34,8 @@ public class CleaningEmergency implements EventStrategie {
         noodkamer.setCleaningEmergency(true);
 
         // Gewoon toevoegen aan de schoonmaakwachtrij — schoonmakers pakken het op
-        hotel.voegToeAanSchoonmaakWachtrij(noodkamer);
+        hotel.voegToeAanSchoonmaakWachtrijVooraan(noodkamer);
         System.out.println("Cleaning emergency toegevoegd aan wachtrij: " + noodkamer.getAreaType());
     }
+
 }
