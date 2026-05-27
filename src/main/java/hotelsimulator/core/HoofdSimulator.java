@@ -65,7 +65,38 @@ public class HoofdSimulator {
         eventManager.start(config.getScenario());
         System.out.println(config.getScenario());
     }
+    public void herstart(int scenarioNummer) {
+        // Stop de huidige simulatie
+        eventManager.stop();
 
+        // Reset het hotel
+        hotel.reset();
+
+        // Laad de layout opnieuw
+        try {
+            String layoutStr = new LayoutLader().laadVanResources("/hotel_layout.json");
+            hotel.maakHotelLayout(layoutStr);
+        } catch (IOException e) {
+            System.out.println("Fout bij laden layout: " + e.getMessage());
+            return;
+        }
+
+        // Maak nieuwe personen aan
+        hotel.maakPersonen(config.getAantalGasten());
+
+        // Start nieuwe simulatie met gekozen scenario
+        eventManager = new hotelevents.HotelEventManager();
+        event = new Evenement(eventManager, hotel);
+        CleaningEmergency.setHotel(hotel);
+
+        eventManager.register(evt -> {
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                hotel.getLift().liftBwegen();
+            });
+        });
+
+        eventManager.start(scenarioNummer);
+    }
 
     public void LayoutKiezer() {
         JFileChooser fileChooser = new JFileChooser();

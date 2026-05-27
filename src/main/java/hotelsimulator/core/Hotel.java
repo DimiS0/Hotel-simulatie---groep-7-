@@ -213,7 +213,8 @@ public class Hotel {
                 if (ruimte instanceof HotelKamer kamer
                         && !kamer.isVol()
                         && kamer.getSterrenAantal() == sterren
-                        && !kamer.isGereserveerd()) {
+                        && !kamer.isGereserveerd()
+                        && !kamer.isCleaningEmergency()) {
 
                     //als er een kamer gevonden is dan reserveren we hem, want we willen niet dat andere gasten erin kunnen
                     kamer.reserveer();
@@ -225,5 +226,20 @@ public class Hotel {
         return null;
     }
 
-
+    public synchronized void voegToeAanSchoonmaakWachtrijVooraan(HotelKamer kamer) {
+        if (!schoonmaakWachtrij.contains(kamer)) {
+            schoonmaakWachtrij.addFirst(kamer);
+        }
+    }
+    public void reset(){
+        ruimtes.clear();
+        personen.clear();
+        liftOproepen.clear();
+        schoonmaakWachtrij.clear();
+        maxHoogte = 0;
+        maxBreedte = 0;
+        verdiepingen = 0;
+        lift = null;
+        schacht = null;
+    }
 }

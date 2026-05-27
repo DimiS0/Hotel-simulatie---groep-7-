@@ -160,7 +160,17 @@ public class HotelGui extends JPanel {
 
 
     }
-
+    public void sluitVenster() {
+        // Stop de bewegings- en spawntimer zodat gasten niet meer updaten
+        // op een hotel dat al gereset is
+        if (simulatieLus != null) {
+            simulatieLus.stop();
+        }
+        // Sluit het venster en geeft geheugen vrij
+        if (frame != null) {
+            frame.dispose();
+        }
+    }
     public void updateSpeedLabel(int value) {
         switch (value) {
             case 1 -> speed.setText("0.25x");

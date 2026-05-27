@@ -72,4 +72,8 @@ public class SimulatieConfig {
     public void setScenario(int value){
         this.scenario = value;
     }
+
+    public void clearListeners() {
+        listeners.clear();
+    }
 }

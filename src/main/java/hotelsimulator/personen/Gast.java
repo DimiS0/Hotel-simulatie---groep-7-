@@ -262,7 +262,10 @@ public class Gast extends Persoon {
 
         //geen ruimte niet lopen
         if (ruimte == null) return;
-
+        if (ruimte.isCleaningEmergency()) {
+            System.out.println("Gast " + guestID + " kan niet naar " + ruimte.getAreaType() + " — cleaning emergency!");
+            return;
+        }
         System.out.println("Gast " + guestID + " gaNaarRuimte: " + ruimte.getAreaType()
                 + " | status: " + status
                 + " | doelKamer: " + (doelKamer != null ? doelKamer.getAreaType() : "null")
@@ -433,9 +436,11 @@ public class Gast extends Persoon {
         gaNaarRuimte(toegewezenKamer);
     }
 
+    // In Gast.java — verander de drie methodes:
+
     public void startGoToBioscoop() {
         for (HotelRuimte ruimte : hotel.getRuimtes()) {
-            if (ruimte instanceof Bioscoop && !ruimte.isVol()) {
+            if (ruimte instanceof Bioscoop && !ruimte.isVol() && !ruimte.isCleaningEmergency()) {
                 gaNaarRuimte(ruimte);
                 return;
             }
@@ -445,7 +450,7 @@ public class Gast extends Persoon {
 
     public void startGoToRestaurant() {
         for (HotelRuimte ruimte : hotel.getRuimtes()) {
-            if (ruimte instanceof Restaurant && !ruimte.isVol()) {
+            if (ruimte instanceof Restaurant && !ruimte.isVol() && !ruimte.isCleaningEmergency()) {
                 gaNaarRuimte(ruimte);
                 return;
             }
@@ -455,7 +460,7 @@ public class Gast extends Persoon {
 
     public void startGoToFitness() {
         for (HotelRuimte ruimte : hotel.getRuimtes()) {
-            if (ruimte instanceof FitnessRuimtes && !ruimte.isVol()) {
+            if (ruimte instanceof FitnessRuimtes && !ruimte.isVol() && !ruimte.isCleaningEmergency()) {
                 gaNaarRuimte(ruimte);
                 return;
             }

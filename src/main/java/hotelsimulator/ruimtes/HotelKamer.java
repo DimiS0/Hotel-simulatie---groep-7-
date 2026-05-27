@@ -30,7 +30,7 @@ public class HotelKamer extends HotelRuimte {
         if (isCleaningEmergency()) {
             // Rood uitroepteken rechtsboven in de kamer
             g.setColor(Color.RED);
-            g.drawString("!", (x + 1) * cellSize + breedte * cellSize - 25, (y - 1) * cellSize + 25);
+            g.drawString("⚠", (x + 1) * cellSize + breedte * cellSize - 15, (y - 1) * cellSize + 45);
         }
     }
     @Override
