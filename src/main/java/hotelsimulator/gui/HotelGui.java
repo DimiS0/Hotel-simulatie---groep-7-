@@ -1,23 +1,18 @@
 package hotelsimulator.gui;
 
 import hotelevents.HotelEventManager;
-import hotelsimulator.core.Hotel;
+import hotelsimulator.core.*;
 import hotelsimulator.config.SimulatieConfig;
-import hotelsimulator.core.LayoutBeheer;
-import hotelsimulator.core.OpgeslagenLayouts;
 import hotelsimulator.personen.Schoonmaker;
 import hotelsimulator.ruimtes.HotelRuimte;
 import hotelsimulator.personen.Persoon;
 import hotelsimulator.config.Snelheid;
-import hotelsimulator.core.SimulatieLus;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 
 
-import static hotelsimulator.config.HTE.*;
-import static hotelsimulator.core.OpgeslagenLayouts.laadLayoutsUitMap;
 import java.util.List;
 
 public class HotelGui extends JPanel {
@@ -32,12 +27,14 @@ public class HotelGui extends JPanel {
     boolean setDefaultSpeed;
     private HotelOverzicht overzicht;
     private SimulatieLus simulatieLus;
+    private HoofdSimulator hoofdSimulator;
 
 
-    public HotelGui(Hotel hotel, SimulatieConfig config, HotelEventManager eventManager) {
+    public HotelGui(Hotel hotel, SimulatieConfig config, HotelEventManager eventManager, HoofdSimulator hoofdSimulator) {
         this.frame = new JFrame("Hotel Layout");
         this.hotel = hotel;
         this.hotelEventManager = eventManager;
+        this.hoofdSimulator = hoofdSimulator;
         this.config = config;
         this.setDefaultSpeed = false;
         this.speed = new JLabel("1x");
@@ -91,8 +88,57 @@ public class HotelGui extends JPanel {
         });
 
         layoutInladenKnop.addActionListener(e -> {
+            try {
+                String tekst = "";
+                List<OpgeslagenLayouts> layouts = OpgeslagenLayouts.laadLayoutsUitMap();
 
-            });
+                if (layouts.isEmpty()){
+                    JOptionPane.showMessageDialog(null, "Er zijn geen layouts opgeslagen in de map!");
+                    return;
+                }
+                //Jlist omdat  het een duidelijk selecteert, zodat de gebruiker ziet welke layout gekozen is
+                JList  <OpgeslagenLayouts> lijst = new JList<>(layouts.toArray(new OpgeslagenLayouts[0]));
+                int resultaat = JOptionPane.showConfirmDialog(null,new JScrollPane(lijst), "Kies layout", JOptionPane.OK_CANCEL_OPTION);
+
+                if (resultaat == JOptionPane.OK_OPTION) {
+                    OpgeslagenLayouts gekozenLayout = lijst.getSelectedValue();
+
+
+                    if (gekozenLayout == null) {
+                        JOptionPane.showMessageDialog(null, "Er is geeb geselecteerde layout");
+                        return;
+                    }
+                    String layoutStr = gekozenLayout.getLayoutStr();
+
+                    //ruimte vrij maken
+                    if (overzicht != null) {
+                        overzicht.dispose();
+                        overzicht = null;
+                    }
+
+                    simulatieLus.stop();
+                    hotel.reset();
+                    hotel.maakHotelLayout(layoutStr);
+                    hoofdSimulator.herstart(hoofdSimulator.getConfig().getScenario());
+
+                    hotelEventManager = hoofdSimulator.getEventManager();
+
+                    for (Persoon p : hotel.getPersonen()) {
+                        if (p instanceof Schoonmaker schoonmaker) {
+                            schoonmaker.activeer();
+                        }
+                    }
+
+                    simulatieLus = new SimulatieLus(hotel, this);
+                    simulatieLus.start();
+                    repaint();
+                }
+
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+
+        });
 
         instellingenBtn.addActionListener(e -> {
             if (configGui == null || !configGui.getFrame().isDisplayable()) {

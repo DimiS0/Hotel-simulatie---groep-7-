@@ -38,6 +38,12 @@ public class OpgeslagenLayouts {
         return layoutStr;
     }
 
+    @Override
+    //waarom? want de namen worden nin hashcode gelatenien
+    public String toString() {
+        return naam;
+    }
+
     public static List<OpgeslagenLayouts> laadLayoutsUitMap() throws IOException {
         List<OpgeslagenLayouts> layouts = new ArrayList<>();
         Path mapPad = Path.of("layouts");

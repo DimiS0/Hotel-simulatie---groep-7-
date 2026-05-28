@@ -2,6 +2,7 @@ package hotelsimulator.core;
 
 import javax.swing.*;
 
+import hotelevents.HotelEventManager;
 import hotelsimulator.config.HTE;
 import hotelsimulator.config.SimulatieConfig;
 import hotelsimulator.events.Core.Evenement;
@@ -22,6 +23,9 @@ public class HoofdSimulator {
 	private HTE hte;
 	private SimulatieConfig config;
 
+    //voorkomt dat de eventmanager stopt als hij nog niet gestart is
+    private boolean eventManagerGestart = false;
+
     public HoofdSimulator() {
 		this.config = new SimulatieConfig();
         this.hotel = new Hotel(config,eventManager,config);
@@ -41,6 +45,10 @@ public class HoofdSimulator {
 
 	}
 
+    public HotelEventManager getEventManager() {
+        return eventManager;
+    }
+
     public void laadStandaardLayout() {
         try {
             String layoutStr = new LayoutLader().laadVanResources("/hotel_layout.json");
@@ -53,7 +61,7 @@ public class HoofdSimulator {
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
-        HotelGui gui = new HotelGui(hotel, config, eventManager);
+        HotelGui gui = new HotelGui(hotel, config, eventManager,this);
         gui.showGui();
 
         eventManager.register(evt -> {
@@ -67,27 +75,20 @@ public class HoofdSimulator {
     }
     public void herstart(int scenarioNummer) {
         // Stop de huidige simulatie
-        eventManager.stop();
-
-        // Reset het hotel
-        hotel.reset();
-
-        // Laad de layout opnieuw
-        try {
-            String layoutStr = new LayoutLader().laadVanResources("/hotel_layout.json");
-            hotel.maakHotelLayout(layoutStr);
-        } catch (IOException e) {
-            System.out.println("Fout bij laden layout: " + e.getMessage());
-            return;
+        if (eventManagerGestart) {
+            eventManager.stop();
+            eventManagerGestart = false;
         }
 
         // Maak nieuwe personen aan
         hotel.maakPersonen(config.getAantalGasten());
 
+
         // Start nieuwe simulatie met gekozen scenario
         eventManager = new hotelevents.HotelEventManager();
         event = new Evenement(eventManager, hotel);
         CleaningEmergency.setHotel(hotel);
+
 
         eventManager.register(evt -> {
             javax.swing.SwingUtilities.invokeLater(() -> {
@@ -96,6 +97,7 @@ public class HoofdSimulator {
         });
 
         eventManager.start(scenarioNummer);
+        eventManagerGestart = true;
     }
 
     public void LayoutKiezer() {
@@ -121,7 +123,7 @@ public class HoofdSimulator {
             return;
         }
 
-        HotelGui gui = new HotelGui(hotel, config, eventManager);
+        HotelGui gui = new HotelGui(hotel, config, eventManager, this);
         gui.showGui();
 
         eventManager.register(evt -> {
