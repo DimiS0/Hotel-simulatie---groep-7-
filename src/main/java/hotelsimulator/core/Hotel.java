@@ -207,22 +207,25 @@ public class Hotel {
 
     // Zoekt naar een vrije kamer voor de gast
     public HotelKamer zoekVrijeHotelKamer(int minimalesterren) {
-        //zoeken naar een vrije kamer met de minimale aantal sterren
-        for(int sterren = minimalesterren; sterren <= 5; sterren++) {
+        for (int sterren = minimalesterren; sterren <= 5; sterren++) {
+            List<HotelKamer> kandidaten = new ArrayList<>();
             for (HotelRuimte ruimte : getRuimtes()) {
                 if (ruimte instanceof HotelKamer kamer
                         && !kamer.isVol()
                         && kamer.getSterrenAantal() == sterren
                         && !kamer.isGereserveerd()
                         && !kamer.isCleaningEmergency()) {
-
-                    //als er een kamer gevonden is dan reserveren we hem, want we willen niet dat andere gasten erin kunnen
-                    kamer.reserveer();
-                    return kamer;
+                    kandidaten.add(kamer);
                 }
             }
+            if (!kandidaten.isEmpty()) {
+                HotelKamer gekozen = kandidaten.get(
+                        new java.util.Random().nextInt(kandidaten.size())
+                );
+                gekozen.reserveer();
+                return gekozen;
+            }
         }
-        //if overgeslagen dan geen kamer beschikbaar of bestaat niet?
         return null;
     }
 

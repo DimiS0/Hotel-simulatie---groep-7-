@@ -439,33 +439,45 @@ public class Gast extends Persoon {
     // In Gast.java — verander de drie methodes:
 
     public void startGoToBioscoop() {
+        List<HotelRuimte> kandidaten = new ArrayList<>();
         for (HotelRuimte ruimte : hotel.getRuimtes()) {
             if (ruimte instanceof Bioscoop && !ruimte.isVol() && !ruimte.isCleaningEmergency()) {
-                gaNaarRuimte(ruimte);
-                return;
+                kandidaten.add(ruimte);
             }
         }
-        System.out.println("Geen beschikbare bioscoop gevonden!");
+        if (kandidaten.isEmpty()) {
+            System.out.println("Geen beschikbare bioscoop gevonden!");
+            return;
+        }
+        gaNaarRuimte(kandidaten.get(random.nextInt(kandidaten.size())));
     }
 
     public void startGoToRestaurant() {
+        List<HotelRuimte> kandidaten = new ArrayList<>();
         for (HotelRuimte ruimte : hotel.getRuimtes()) {
             if (ruimte instanceof Restaurant && !ruimte.isVol() && !ruimte.isCleaningEmergency()) {
-                gaNaarRuimte(ruimte);
-                return;
+                kandidaten.add(ruimte);
             }
         }
-        System.out.println("Geen beschikbare restaurant gevonden!");
+        if (kandidaten.isEmpty()) {
+            System.out.println("Geen beschikbaar restaurant gevonden!");
+            return;
+        }
+        gaNaarRuimte(kandidaten.get(random.nextInt(kandidaten.size())));
     }
 
     public void startGoToFitness() {
+        List<HotelRuimte> kandidaten = new ArrayList<>();
         for (HotelRuimte ruimte : hotel.getRuimtes()) {
             if (ruimte instanceof FitnessRuimtes && !ruimte.isVol() && !ruimte.isCleaningEmergency()) {
-                gaNaarRuimte(ruimte);
-                return;
+                kandidaten.add(ruimte);
             }
         }
-        System.out.println("Geen beschikbare fitness gevonden!");
+        if (kandidaten.isEmpty()) {
+            System.out.println("Geen beschikbare fitness gevonden!");
+            return;
+        }
+        gaNaarRuimte(kandidaten.get(random.nextInt(kandidaten.size())));
     }
 
     @Override
