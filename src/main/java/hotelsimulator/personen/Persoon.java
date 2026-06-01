@@ -112,7 +112,7 @@ public abstract class Persoon {
         if (kies == 1) {
             int wachtY = (huidigeVerdieping - 1) * 50;
             List<Point> schachtPad = Pathfinder.vindPad(
-                    pixelX, pixelY, SCHACHT_PIXEL_X, wachtY, hotel.getRuimtes());
+                    pixelX, pixelY, SCHACHT_PIXEL_X, wachtY, hotel.getRuimtes(), hotel);
             if (!schachtPad.isEmpty()) {
                 setPad(schachtPad);
                 zetStatusSchacht.run();
@@ -120,7 +120,7 @@ public abstract class Persoon {
         } else {
             int wachtY = getNabijeStop(huidigeVerdieping) * 50;
             List<Point> trapPad = Pathfinder.vindPad(
-                    pixelX, pixelY, TRAP_PIXEL_X, wachtY, hotel.getRuimtes());
+                    pixelX, pixelY, TRAP_PIXEL_X, wachtY, hotel.getRuimtes(), hotel);
             if (!trapPad.isEmpty()) {
                 setPad(trapPad);
                 zetStatusTrap.run();

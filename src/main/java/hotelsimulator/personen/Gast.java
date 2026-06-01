@@ -94,7 +94,7 @@ public class Gast extends Persoon {
                         HotelRuimte volgend = eventWachtrij.peek();
                         Point volgendIngang = Pathfinder.getKamerIngang(volgend);
                         List<Point> testPad = Pathfinder.vindPad(
-                                pixelX, pixelY, volgendIngang.x, volgendIngang.y, hotel.getRuimtes());
+                                pixelX, pixelY, volgendIngang.x, volgendIngang.y, hotel.getRuimtes(), hotel);
                         if (!testPad.isEmpty()) {
                             eventWachtrij.poll();
                             doelKamer.verlaat();
@@ -175,7 +175,7 @@ public class Gast extends Persoon {
 
                     Point lobbyPunt = new Point(SPAWN_X, SPAWN_Y);
                     List<Point> naarLobby = Pathfinder.vindPad(
-                            pixelX, pixelY, lobbyPunt.x, lobbyPunt.y, hotel.getRuimtes());
+                            pixelX, pixelY, lobbyPunt.x, lobbyPunt.y, hotel.getRuimtes(), hotel);
                     if (!naarLobby.isEmpty()) {
                         setPad(naarLobby);
                         status = Status.LOOP_NAAR_LOBBY;
@@ -245,7 +245,7 @@ public class Gast extends Persoon {
                     if (doelKamer != null) {
                         Point ingang = Pathfinder.getKamerIngang(doelKamer);
                         List<Point> p = Pathfinder.vindPad(
-                                pixelX, pixelY, ingang.x, ingang.y, hotel.getRuimtes());
+                                pixelX, pixelY, ingang.x, ingang.y, hotel.getRuimtes(), hotel);
                         if (!p.isEmpty()) { setPad(p); status = Status.LOOPT_NAAR_INGANG; break; }
                         doelKamer.verlaat();
                         doelKamer = null;
@@ -321,7 +321,7 @@ public class Gast extends Persoon {
         //besteming op de verdieping, direct een pad berekenen
         if (verdieping == huidigeVerdieping) {
             List<Point> nieuwPad = Pathfinder.vindPad(
-                    pixelX, pixelY, ingang.x, ingang.y, hotel.getRuimtes());
+                    pixelX, pixelY, ingang.x, ingang.y, hotel.getRuimtes(), hotel);
 
             if (!nieuwPad.isEmpty()) {
                 setPad(nieuwPad);
@@ -362,7 +362,7 @@ public class Gast extends Persoon {
         if (doelKamer != null) {
             Point ingang = Pathfinder.getKamerIngang(doelKamer);
             List<Point> p = Pathfinder.vindPad(
-                    pixelX, pixelY, ingang.x, ingang.y, hotel.getRuimtes());
+                    pixelX, pixelY, ingang.x, ingang.y, hotel.getRuimtes(), hotel);
             if (!p.isEmpty()) { setPad(p); status = Status.LOOPT_NAAR_INGANG; return; }
             doelKamer.verlaat();
             doelKamer = null;
@@ -411,7 +411,7 @@ public class Gast extends Persoon {
             // Pad berekenen naar lobby vanuit huidige positie
             Point lobbyPunt = new Point(SPAWN_X, SPAWN_Y);
             List<Point> naarLobby = Pathfinder.vindPad(
-                    pixelX, pixelY, lobbyPunt.x, lobbyPunt.y, hotel.getRuimtes());
+                    pixelX, pixelY, lobbyPunt.x, lobbyPunt.y, hotel.getRuimtes(), hotel);
 
             if (!naarLobby.isEmpty()) {
                 setPad(naarLobby);

@@ -137,6 +137,10 @@ public class Hotel {
         return maxBreedte;
     }
 
+    public int getMaxHoogte(){
+        return maxHoogte;
+    }
+
     public int getverdiepingen(){
         return verdiepingen;
     }

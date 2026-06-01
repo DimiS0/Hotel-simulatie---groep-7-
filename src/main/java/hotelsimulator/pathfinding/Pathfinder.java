@@ -1,5 +1,6 @@
 package hotelsimulator.pathfinding;
 
+import hotelsimulator.core.Hotel;
 import hotelsimulator.ruimtes.HotelRuimte;
 import hotelsimulator.ruimtes.HotelKamer;
 import hotelsimulator.ruimtes.Bioscoop;
@@ -32,7 +33,7 @@ public class Pathfinder {
 
     public static List<Point> vindPad(int startPixelX, int startPixelY,
                                       int eindPixelX,  int eindPixelY,
-                                      List<HotelRuimte> alleRuimtes) {
+                                      List<HotelRuimte> alleRuimtes, Hotel hotel) {
 
         // Pixels omzetten naar grid-vakjes (pixel 200 / 50 = vakje 4)
         int startKolom = pixelNaarGrid(startPixelX);
@@ -40,7 +41,7 @@ public class Pathfinder {
         int eindKolom  = pixelNaarGrid(eindPixelX);
         int eindRij    = pixelNaarGrid(eindPixelY);
 
-        boolean[][] loopbareVakjes = berekenLoopbareKaart(alleRuimtes);
+        boolean[][] loopbareVakjes = berekenLoopbareKaart(alleRuimtes, hotel);
 
         boolean startIsGeblokkeerd = !loopbareVakjes[startKolom][startRij];
         boolean eindIsGeblokkeerd  = !loopbareVakjes[eindKolom][eindRij];
@@ -159,7 +160,7 @@ public class Pathfinder {
 
 
     // berekenLoopbareKaart: true = mag lopen, false = geblokkeerd (kamerinterieur)
-        public static boolean[][] berekenLoopbareKaart(List<HotelRuimte> alleRuimtes) {
+        public static boolean[][] berekenLoopbareKaart(List<HotelRuimte> alleRuimtes, Hotel hotel) {
         int arrayGrootte = AANTAL_VAKJES + 1;
 
         boolean[][] loopbareKaart = new boolean[arrayGrootte][arrayGrootte];
@@ -201,7 +202,7 @@ public class Pathfinder {
             if (heeftIngangen) {
                 int ruimteKolom = ruimte.getX() + 1;
 
-                for (int rij = 0; rij <= AANTAL_VAKJES; rij++) {
+                for (int rij = 0; rij <= hotel.getMaxBreedte()+1; rij++) {
                     loopbareKaart[ruimteKolom][rij] = false;
                 }
                 for (int ingang : ingangen) {

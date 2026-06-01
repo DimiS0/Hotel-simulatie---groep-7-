@@ -38,25 +38,31 @@ public class HotelGui extends JPanel {
         this.config = config;
         this.setDefaultSpeed = false;
         this.speed = new JLabel("1x");
-        setPreferredSize(new Dimension(10 * cellSize, 10 * cellSize));
+        setPreferredSize(new Dimension( (hotel.getMaxBreedte()+4) *cellSize, (hotel.getMaxHoogte()+100)* cellSize));
     }
 
     @Override
     protected void paintComponent(Graphics g) {
-        // Maak het scherm eerst leeg voordat er opnieuw getekend wordt
         super.paintComponent(g);
-
-        // Teken het rooster van horizontale en verticale lijnen
         g.setColor(Color.LIGHT_GRAY);
-        for (int i = 0; i <= 10; i++) {
-            g.drawLine(0, i * cellSize, 10 * cellSize, i * cellSize);
-            g.drawLine(i * cellSize, 0, i * cellSize, 10 * cellSize);
+
+        int breedte = hotel.getMaxBreedte() + 4;  // schacht(1) + kamers + trap(1) + marge
+        int hoogte  = hotel.getMaxHoogte() + 2;   // kamers + lobby
+
+        // Horizontale lijnen
+        for (int i = 0; i <= hoogte; i++) {
+            g.drawLine(0, i * cellSize, breedte * cellSize, i * cellSize);
         }
 
-        // Laat elke ruimte zichzelf tekenen (Java kiest automatisch de juiste print-methode)
-        for (HotelRuimte r : hotel.getRuimtes()) {
-            r.print(g, cellSize);
+        // Verticale lijnen + ruimtes tekenen
+        for (int i = 0; i <= breedte; i++) {
+            g.drawLine(i * cellSize, 0, i * cellSize, hoogte * cellSize);
+
+            for (HotelRuimte r : hotel.getRuimtes()) {
+                r.print(g, cellSize);
+            }
         }
+
         if (hotel.getPersonen() != null) {
             for (Persoon p : hotel.getPersonen()) {
                 p.print(g);

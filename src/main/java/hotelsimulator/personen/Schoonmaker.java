@@ -150,7 +150,7 @@ public class Schoonmaker extends Persoon {
                     if (doelKamer != null) {
                         Point ingang = Pathfinder.getKamerIngang(doelKamer);
                         List<Point> p = Pathfinder.vindPad(
-                                pixelX, pixelY, ingang.x, ingang.y, hotel.getRuimtes());
+                                pixelX, pixelY, ingang.x, ingang.y, hotel.getRuimtes(), hotel);
                         if (!p.isEmpty()) {
                             setPad(p);
                             status = Status.LOOPT_NAAR_INGANG;
@@ -184,7 +184,7 @@ public class Schoonmaker extends Persoon {
         if (kamerVerdieping == huidigeVerdieping) {
             Point ingang = Pathfinder.getKamerIngang(kamer);
             List<Point> p = Pathfinder.vindPad(
-                    pixelX, pixelY, ingang.x, ingang.y, hotel.getRuimtes());
+                    pixelX, pixelY, ingang.x, ingang.y, hotel.getRuimtes(), hotel);
             if (!p.isEmpty()) {
                 setPad(p);
                 status = Status.LOOPT_NAAR_INGANG;
@@ -205,7 +205,7 @@ public class Schoonmaker extends Persoon {
 
     private void loopTerugNaarPost() {
         List<Point> terugPad = Pathfinder.vindPad(
-                pixelX, pixelY, WACHT_X, WACHT_Y, hotel.getRuimtes());
+                pixelX, pixelY, WACHT_X, WACHT_Y, hotel.getRuimtes(), hotel);
         if (!terugPad.isEmpty()) {
             setPad(terugPad);
             status = Status.LOOP_TERUG_NAAR_POST;
@@ -235,7 +235,7 @@ public class Schoonmaker extends Persoon {
         if (doelKamer != null) {
             Point ingang = Pathfinder.getKamerIngang(doelKamer);
             List<Point> p = Pathfinder.vindPad(
-                    pixelX, pixelY, ingang.x, ingang.y, hotel.getRuimtes());
+                    pixelX, pixelY, ingang.x, ingang.y, hotel.getRuimtes(), hotel);
             if (!p.isEmpty()) {
                 setPad(p);
                 status = Status.LOOPT_NAAR_INGANG;
