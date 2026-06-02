@@ -38,24 +38,31 @@ public class HotelGui extends JPanel {
         this.config = config;
         this.setDefaultSpeed = false;
         this.speed = new JLabel("1x");
-        setPreferredSize(new Dimension( (hotel.getMaxBreedte()+4) *cellSize, (hotel.getMaxHoogte()+100)* cellSize));
+
+
+// preferredSize in constructor:
+        setPreferredSize(new Dimension(
+                (hotel.getMaxBreedte() + 4) * cellSize,
+                (hotel.getMaxHoogte() + 2) * cellSize
+        ));
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.setColor(Color.LIGHT_GRAY);
 
-        int breedte = hotel.getMaxBreedte() + 4;  // schacht(1) + kamers + trap(1) + marge
-        int hoogte  = hotel.getMaxHoogte() + 2;   // kamers + lobby
+        int breedte = hotel.getMaxBreedte() + 4;
+        int hoogte  = hotel.getMaxHoogte() + 2;
 
         // Horizontale lijnen
         for (int i = 0; i <= hoogte; i++) {
+            g.setColor(Color.LIGHT_GRAY);
             g.drawLine(0, i * cellSize, breedte * cellSize, i * cellSize);
         }
 
         // Verticale lijnen + ruimtes tekenen
         for (int i = 0; i <= breedte; i++) {
+            g.setColor(Color.LIGHT_GRAY);
             g.drawLine(i * cellSize, 0, i * cellSize, hoogte * cellSize);
 
             for (HotelRuimte r : hotel.getRuimtes()) {
@@ -73,9 +80,13 @@ public class HotelGui extends JPanel {
     public void showGui() {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
-        frame.setResizable(false);
 
-        frame.add(this, BorderLayout.CENTER);
+        // Wrap het hotel panel in een scrollpane
+        JScrollPane scrollPane = new JScrollPane(this);
+        scrollPane.setPreferredSize(new Dimension(10 * cellSize, 10 * cellSize));
+        scrollPane.getHorizontalScrollBar().setUnitIncrement(cellSize);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(cellSize);
+        frame.add(scrollPane, BorderLayout.CENTER);
 
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JButton instellingenBtn = new JButton("Instellingen");
@@ -156,6 +167,7 @@ public class HotelGui extends JPanel {
 
         // Pas het venster aan zodat alle elementen precies passen
         frame.pack();
+        frame.setResizable(false);
 
         // Zet het venster in het midden van het beeldscherm
         frame.setLocationRelativeTo(null);
