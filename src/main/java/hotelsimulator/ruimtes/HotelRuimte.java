@@ -18,7 +18,7 @@ public abstract class HotelRuimte {
 		this.areaType = areaType;
 		this.sterrenAantal = sterrenAantal;
         this.orgineleY = y;
-		this.y = 10 - y - hoogte + 1;
+		this.y = y;
 		this.x = x;
 		this.breedte = breedte;
 		this.hoogte = hoogte;
@@ -104,4 +104,9 @@ public abstract class HotelRuimte {
     }
 
     public abstract void print(Graphics g, int cellSize);
+
+    public void herberekenY(int maxHoogte) {
+        // +1 voor de lege roosterrij bovenaan
+        this.y = maxHoogte - orgineleY - hoogte + 2;
+    }
 }

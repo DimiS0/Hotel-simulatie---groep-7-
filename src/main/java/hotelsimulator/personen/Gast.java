@@ -34,15 +34,17 @@ public class Gast extends Persoon {
     private int doelVerdieping    = 8;
     private int huidigeVerdieping = 8;
     private int SPAWN_X;
-    private static final int SPAWN_Y = 500;
+    private int SPAWN_Y;
 
     public Gast(Lift lift, Schacht schacht, Hotel hotel,
-                HotelEventManager hotelEventManager, SimulatieConfig simulatieConfig, int guestID, int maxBreedte) {
-        super(berekenGastSpawnLocatie(maxBreedte), SPAWN_Y, lift, schacht, hotel, hotelEventManager, simulatieConfig);
+                HotelEventManager hotelEventManager, SimulatieConfig simulatieConfig, int guestID, int maxBreedte, int maxHoogte) {
+        super(berekenGastSpawnLocatie(maxBreedte), (maxHoogte + 1) * 50 - 25, lift, schacht, hotel, hotelEventManager, simulatieConfig);
         this.guestID = guestID;
         this.SPAWN_X = berekenGastSpawnLocatie(maxBreedte);
+        this.SPAWN_Y = (maxHoogte + 1) * 50 - 25;
+        this.doelVerdieping = maxHoogte;
+        this.huidigeVerdieping = maxHoogte;
     }
-
     public int getGuestID() {
         return guestID;
     }
@@ -377,7 +379,7 @@ public class Gast extends Persoon {
         pixelX = SPAWN_X; pixelY = SPAWN_Y;
         pad.clear();
         doelKamer = null;
-        huidigeVerdieping = 8;
+        huidigeVerdieping = huidigeVerdieping;
         status = Status.WACHT_IN_LOBBY;
     }
 

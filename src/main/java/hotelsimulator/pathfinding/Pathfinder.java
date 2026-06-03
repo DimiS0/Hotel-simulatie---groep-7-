@@ -16,16 +16,14 @@ import java.util.PriorityQueue;
 
 /*
   Zoekt de kortste looproute van A naar B met het A*-algoritme.
-  Het hotel wordt gezien als een 10x10 grid van vakjes (elk 50x50 pixels).
+  Het hotel wordt gezien als een dynamisch grid van vakjes (elk 50x50 pixels).
  */
 public class Pathfinder {
 
-    // Het hotel is 10x10 vakjes, elk vakje is 50 pixels breed/hoog
-    public static final int AANTAL_VAKJES    = 10;
+    // Het hotel is dynamisch, elk vakje is 50 pixels breed/hoog
     public static final int PIXELS_PER_VAKJE = 50;
 
     // Aliassen zodat andere klassen de oude namen nog kennen
-    public static final int GRID_GROOTTE = AANTAL_VAKJES;
     public static final int CEL_GROOTTE  = PIXELS_PER_VAKJE;
 
 
@@ -35,11 +33,14 @@ public class Pathfinder {
                                       int eindPixelX,  int eindPixelY,
                                       List<HotelRuimte> alleRuimtes, Hotel hotel) {
 
+        int aantalVakjes = Math.max(hotel.getMaxBreedte(), hotel.getMaxHoogte()) + 3;
+        int arrayGrootte = aantalVakjes + 1;
+
         // Pixels omzetten naar grid-vakjes (pixel 200 / 50 = vakje 4)
-        int startKolom = pixelNaarGrid(startPixelX);
-        int startRij   = pixelNaarGrid(startPixelY);
-        int eindKolom  = pixelNaarGrid(eindPixelX);
-        int eindRij    = pixelNaarGrid(eindPixelY);
+        int startKolom = pixelNaarGrid(startPixelX, aantalVakjes);
+        int startRij   = pixelNaarGrid(startPixelY, aantalVakjes);
+        int eindKolom  = pixelNaarGrid(eindPixelX, aantalVakjes);
+        int eindRij    = pixelNaarGrid(eindPixelY, aantalVakjes);
 
         boolean[][] loopbareVakjes = berekenLoopbareKaart(alleRuimtes, hotel);
 
@@ -50,9 +51,6 @@ public class Pathfinder {
             System.out.println("Start of einde zit in een geblokkeerd vakje!");
             return new ArrayList<>();
         }
-
-        // Arrays zijn één groter dan AANTAL_VAKJES omdat we 0 t/m 10 gebruiken
-        int arrayGrootte = AANTAL_VAKJES + 1;
 
         // aantalStappenNaarVakje = hoeveel stappen kostte het om hier te komen (gScore)
         // geschatTotaal = stappen + schatting naar doel (fScore), A* pakt laagste eerst
@@ -112,8 +110,8 @@ public class Pathfinder {
                 int buurKolom = huidigX + richting[0];
                 int buurRij   = huidigY + richting[1];
 
-                boolean buurValtBuitenGrid = buurKolom < 0 || buurKolom > AANTAL_VAKJES
-                        || buurRij   < 0 || buurRij   > AANTAL_VAKJES;
+                boolean buurValtBuitenGrid = buurKolom < 0 || buurKolom > aantalVakjes
+                        || buurRij   < 0 || buurRij   > aantalVakjes;
                 if (buurValtBuitenGrid) {
                     continue;
                 }
@@ -160,8 +158,9 @@ public class Pathfinder {
 
 
     // berekenLoopbareKaart: true = mag lopen, false = geblokkeerd (kamerinterieur)
-        public static boolean[][] berekenLoopbareKaart(List<HotelRuimte> alleRuimtes, Hotel hotel) {
-        int arrayGrootte = AANTAL_VAKJES + 1;
+    public static boolean[][] berekenLoopbareKaart(List<HotelRuimte> alleRuimtes, Hotel hotel) {
+        int aantalVakjes = Math.max(hotel.getMaxBreedte(), hotel.getMaxHoogte()) + 3;
+        int arrayGrootte = aantalVakjes + 1;
 
         boolean[][] loopbareKaart = new boolean[arrayGrootte][arrayGrootte];
         for (boolean[] rij : loopbareKaart) {
@@ -202,7 +201,7 @@ public class Pathfinder {
             if (heeftIngangen) {
                 int ruimteKolom = ruimte.getX() + 1;
 
-                for (int rij = 0; rij <= hotel.getMaxBreedte()+1; rij++) {
+                for (int rij = 0; rij <= aantalVakjes; rij++) {
                     loopbareKaart[ruimteKolom][rij] = false;
                 }
                 for (int ingang : ingangen) {
@@ -217,7 +216,7 @@ public class Pathfinder {
 
 
     // isStapGeldig: extra check zodat personen niet door dunne kamers lopen
-        private static boolean isStapGeldig(int vanKolom, int vanRij,
+    private static boolean isStapGeldig(int vanKolom, int vanRij,
                                         int naarKolom, int naarRij,
                                         List<HotelRuimte> alleRuimtes) {
         for (HotelRuimte ruimte : alleRuimtes) {
@@ -287,7 +286,7 @@ public class Pathfinder {
 
 
     // bouwPadTerug: volgt de ouder-ketting terug van doel naar start
-        private static List<Point> bouwPadTerug(Point[][] ouderVakje, Point doelVakje) {
+    private static List<Point> bouwPadTerug(Point[][] ouderVakje, Point doelVakje) {
         LinkedList<Point> pad = new LinkedList<>();
         Point huidig = doelVakje;
 
@@ -306,7 +305,7 @@ public class Pathfinder {
 
 
     // berekenManhattanAfstand: horizontale + verticale afstand (geen diagonaal)
-        private static int berekenManhattanAfstand(int kolom1, int rij1, int kolom2, int rij2) {
+    private static int berekenManhattanAfstand(int kolom1, int rij1, int kolom2, int rij2) {
         int horizontaleAfstand = Math.abs(kolom1 - kolom2);
         int verticaleAfstand   = Math.abs(rij1   - rij2);
         return horizontaleAfstand + verticaleAfstand;
@@ -315,7 +314,7 @@ public class Pathfinder {
 
 
     // getKamerIngang: personen betreden een kamer altijd via het midden onderaan
-        public static Point getKamerIngang(HotelRuimte kamer) {
+    public static Point getKamerIngang(HotelRuimte kamer) {
         int kamerLinksInPixels   = (kamer.getX() + 1) * PIXELS_PER_VAKJE;
         int kamerBreedteInPixels = kamer.getBreedte() * PIXELS_PER_VAKJE;
         int kamerMiddenInPixels  = kamerLinksInPixels + kamerBreedteInPixels / 2;
@@ -328,12 +327,12 @@ public class Pathfinder {
 
 
 
-    // pixelNaarGrid: pixel → grid-index, vastgezet tussen 0 en AANTAL_VAKJES
-        private static int pixelNaarGrid(int pixels) {
+    // pixelNaarGrid: pixel → grid-index, vastgezet tussen 0 en maxVakjes
+    private static int pixelNaarGrid(int pixels, int maxVakjes) {
         int index = pixels / PIXELS_PER_VAKJE;
 
-        if (index < 0)             index = 0;
-        if (index > AANTAL_VAKJES) index = AANTAL_VAKJES;
+        if (index < 0)          index = 0;
+        if (index > maxVakjes)  index = maxVakjes;
 
         return index;
     }

@@ -93,22 +93,42 @@ public class Hotel {
         }
 
         //forloops om de maximale hoogte en breedte te achterhalen
-        for(int i= 0; i < ruimtes.size(); i++){
-            if((ruimtes.get(i).getOrgineleY()+ruimtes.get(i).getHoogte()) > maxHoogte){maxHoogte = ruimtes.get(i).getOrgineleY() + ruimtes.get(i).getHoogte();}
+
+        for (HotelRuimte ruimte : ruimtes) {
+            int top = ruimte.getOrgineleY() + ruimte.getHoogte();
+            if (top > maxHoogte) maxHoogte = top;
         }
 
-        for(int i= 0; i < ruimtes.size(); i++){
-            if(ruimtes.get(i).getX() > maxBreedte){maxBreedte = ruimtes.get(i).getX();}
+        // maxBreedte berekenen: x + breedte - 1 is de rechterkant
+        for (HotelRuimte ruimte : ruimtes) {
+            int rechts = ruimte.getX() + ruimte.getBreedte() - 1;
+            if (rechts > maxBreedte) maxBreedte = rechts;
         }
+
+        // Herbereken Y voor alle kamers uit JSON
+        for (HotelRuimte ruimte : ruimtes) {
+            ruimte.herberekenY(maxHoogte);
+        }
+
         kiesVerdiepingen();
 
-        //deze zelf aanmaken, want zitten niet in json
+// Schacht: y=0, hoogte=maxHoogte+1
+// herberekenY: y = maxHoogte - 0 - (maxHoogte+1) + 2 = 1
+// print: (1-1)*cellSize = 0 → begint op rij 0... maar moet rij 1 zijn
+// Dus hoogte = maxHoogte, dan: y = maxHoogte - 0 - maxHoogte + 2 = 2
+// print: (2-1)*cellSize = rij 1 ✓, hoogte maxHoogte dekt t/m lobby ✓
         schacht = new Schacht("Schacht", 0, 0, 0, 1, maxHoogte, 0);
-        Lobby lobby = new Lobby("Lobby", 0, 0, 1, maxBreedte, 1, 0);
-        Trap trap = new Trap("trap", 0, 0, maxBreedte+ 1, 1, maxHoogte, 999, getverdiepingen());
-        lift = new Lift("Lift", 0, 0, 0, 1, 1, 5, getverdiepingen());
+        schacht.herberekenY(maxHoogte);
 
-        //toevoegen aan arraylist
+        Lobby lobby = new Lobby("Lobby", 0, 0, 1, maxBreedte, 1, 0);
+        lobby.herberekenY(maxHoogte);
+
+        Trap trap = new Trap("trap", 0, 0, maxBreedte + 1, 1, maxHoogte, 999, getverdiepingen());
+        trap.herberekenY(maxHoogte);
+
+        lift = new Lift("Lift", 0, maxHoogte + 1, 0, 1, 1, 5, getverdiepingen());
+// Lift positie wordt runtime bepaald, geen herberekenY nodig
+
         ruimtes.add(schacht);
         ruimtes.add(lobby);
         ruimtes.add(trap);
@@ -173,12 +193,12 @@ public class Hotel {
 
             // Voeg een groep van maximaal 5 gasten toe
             for (int i = 0; i < 5 && gastIndex < aantalGasten; i++, gastIndex++) {
-                personen.add(new Gast(lift, schacht, this, hotelEventManager, simulatieConfig, gastIndex + 1, getMaxBreedte()));
+                personen.add(new Gast(lift, schacht, this, hotelEventManager, simulatieConfig, gastIndex + 1, getMaxBreedte(),getMaxHoogte()));
             }
 
             // Voeg daarna maximaal 2 schoonmakers toe
             for (int i = 0; i < 2 && schoonmakerIndex < aantalSchoonmakers; i++, schoonmakerIndex++) {
-                personen.add(new Schoonmaker(lift, schacht, this, hotelEventManager, simulatieConfig, getMaxBreedte()));
+                personen.add(new Schoonmaker(lift, schacht, this, hotelEventManager, simulatieConfig, getMaxBreedte(),getMaxHoogte()));
             }
         }
     }

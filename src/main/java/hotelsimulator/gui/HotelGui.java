@@ -41,10 +41,7 @@ public class HotelGui extends JPanel {
 
 
 // preferredSize in constructor:
-        setPreferredSize(new Dimension(
-                (hotel.getMaxBreedte() + 4) * cellSize,
-                (hotel.getMaxHoogte() + 2) * cellSize
-        ));
+        setPreferredSize(new Dimension((hotel.getMaxBreedte() + 4) * cellSize, (hotel.getMaxHoogte() + 2) * cellSize));
     }
 
     @Override
@@ -137,6 +134,15 @@ public class HotelGui extends JPanel {
                     hotel.reset();
                     hotel.maakHotelLayout(layoutStr);
                     hoofdSimulator.herstart(hoofdSimulator.getConfig().getScenario());
+
+                    setPreferredSize(new Dimension((hotel.getMaxBreedte() + 4) * cellSize, (hotel.getMaxHoogte() + 2) * cellSize));
+
+                    setPreferredSize(new Dimension(
+                            (hotel.getMaxBreedte() + 4) * cellSize,
+                            (hotel.getMaxHoogte() + 2) * cellSize
+                    ));
+                    revalidate();
+                    repaint();
 
                     hotelEventManager = hoofdSimulator.getEventManager();
 

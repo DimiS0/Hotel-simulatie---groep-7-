@@ -36,14 +36,17 @@ public class Schoonmaker extends Persoon {
     private int huidigeVerdieping = 8;
 
     // Wachtpositie: naast de lobby (rechts van de lift/schacht, op de lobbyverdieping)
-    protected static final int WACHT_Y = 450;  // lobbyverdieping (rij 9 = y=450)
+    protected int WACHT_Y;
     protected int WACHT_X;
 
     public Schoonmaker(Lift lift, Schacht schacht, Hotel hotel,
                        HotelEventManager hotelEventManager,
-                       SimulatieConfig simulatieConfig, int maxBreedte) {
-        super (berekenSchoonmakerPauzePositie(maxBreedte), WACHT_Y, lift, schacht, hotel, hotelEventManager, simulatieConfig);
+                       SimulatieConfig simulatieConfig, int maxBreedte, int maxHoogte) {
+        super(berekenSchoonmakerPauzePositie(maxBreedte), maxHoogte * 50, lift, schacht, hotel, hotelEventManager, simulatieConfig);
         this.WACHT_X = berekenSchoonmakerPauzePositie(maxBreedte);
+        this.WACHT_Y = maxHoogte * 50;
+        this.doelVerdieping = maxHoogte;
+        this.huidigeVerdieping = maxHoogte;
     }
 
     @Override
