@@ -136,11 +136,6 @@ public class HotelGui extends JPanel {
                     hoofdSimulator.herstart(hoofdSimulator.getConfig().getScenario());
 
                     setPreferredSize(new Dimension((hotel.getMaxBreedte() + 4) * cellSize, (hotel.getMaxHoogte() + 2) * cellSize));
-
-                    setPreferredSize(new Dimension(
-                            (hotel.getMaxBreedte() + 4) * cellSize,
-                            (hotel.getMaxHoogte() + 2) * cellSize
-                    ));
                     revalidate();
                     repaint();
 
@@ -213,6 +208,14 @@ public class HotelGui extends JPanel {
                                 hotelEventManager.pauze();
                                 simulatieLus.stop();
                                 overzicht = new HotelOverzicht(hotel,hotelEventManager);
+
+                                overzicht.addWindowListener(new java.awt.event.WindowAdapter() {
+                                    public void windowClosing(java.awt.event.WindowEvent e) {
+                                        hotelEventManager.pauze();
+                                        simulatieLus.start();
+                                        overzicht = null;
+                                    }
+                                });
                             }
                             else{
                                 hotelEventManager.pauze();
