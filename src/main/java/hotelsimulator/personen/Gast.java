@@ -179,7 +179,7 @@ public class Gast extends Persoon {
                     }
 
                     doelKamer = null;
-                    doelVerdieping = 8;
+                    doelVerdieping = hotel.getLobbyVerdieping();
 
                     if (huidigeVerdieping == 8) {
 
@@ -286,7 +286,7 @@ public class Gast extends Persoon {
                     }
                     // Geen doelkamer — check of we naar lobby moeten
                     if (doelKamer == null) {
-                        int lobbyVerdieping = hotel.getLift().getVerdiepingenY()[hotel.getLift().getVerdiepingenY().length - 1];
+                        int lobbyVerdieping =hotel.getLobbyVerdieping();
                         if (huidigeVerdieping == lobbyVerdieping) {
                             Point lobbyPunt = new Point(SPAWN_X, SPAWN_Y);
                             List<Point> naarLobby = Pathfinder.vindPad(
@@ -430,7 +430,7 @@ public class Gast extends Persoon {
             return;
         }
         // Geen doelkamer — check of we naar lobby moeten
-        int lobbyVerdieping = hotel.getLift().getVerdiepingenY()[hotel.getLift().getVerdiepingenY().length - 1];
+        int lobbyVerdieping = hotel.getLobbyVerdieping();
         if (huidigeVerdieping == lobbyVerdieping) {
             Point lobbyPunt = new Point(SPAWN_X, SPAWN_Y);
             List<Point> naarLobby = Pathfinder.vindPad(
@@ -452,7 +452,7 @@ public class Gast extends Persoon {
         pixelX = SPAWN_X; pixelY = SPAWN_Y;
         pad.clear();
         doelKamer = null;
-        huidigeVerdieping = huidigeVerdieping;
+        huidigeVerdieping = hotel.getLobbyVerdieping();
         status = Status.WACHT_IN_LOBBY;
     }
 
@@ -481,7 +481,7 @@ public class Gast extends Persoon {
             hotel.voegToeAanSchoonmaakWachtrij(toegewezenKamer);
         }
 
-        doelVerdieping = 8; // lobby
+        doelVerdieping = hotel.getLobbyVerdieping();
 
         if (huidigeVerdieping == doelVerdieping) {
 
