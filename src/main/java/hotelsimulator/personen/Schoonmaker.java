@@ -203,7 +203,7 @@ public class Schoonmaker extends Persoon {
         }
     }
     private static int berekenSchoonmakerPauzePositie(int maxBreedte){
-        return (maxBreedte +1) * 50;
+        return (maxBreedte) * 50;
     }
 
     private void loopTerugNaarPost() {

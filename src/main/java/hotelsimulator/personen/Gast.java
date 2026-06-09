@@ -338,7 +338,7 @@ public class Gast extends Persoon {
 
     private static int berekenGastSpawnLocatie(int maxBreedte){
         if (maxBreedte > 4){
-            return (maxBreedte - 2) * 50;
+            return (maxBreedte - 3) * 50;
         }
         else{
             return 150;

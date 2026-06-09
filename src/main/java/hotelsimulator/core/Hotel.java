@@ -115,7 +115,7 @@ public class Hotel {
         }
         //forloop om de maximale Breedte te achterhalen
         for (HotelRuimte ruimte : ruimtes) {
-            int rechts = ruimte.getX() + ruimte.getBreedte() - 1;
+            int rechts = ruimte.getX() + ruimte.getBreedte();
             if (rechts > maxBreedte) maxBreedte = rechts;
         }
 
@@ -139,7 +139,7 @@ public class Hotel {
         lobby.herberekenY(maxHoogte);
 
         //Trap object aanmaken staat niet in JSON komt altijd rechts van het hotel
-        Trap trap = new Trap("trap", 0, 0, maxBreedte + 1, 1, maxHoogte, 999, getverdiepingen());
+        trap = new Trap("trap", 0, 0, maxBreedte, 1, maxHoogte, 999, getverdiepingen());
 
         //Trap herberekenen zodat het op alle layouts past
         trap.herberekenY(maxHoogte);
