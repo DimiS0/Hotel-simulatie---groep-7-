@@ -215,7 +215,7 @@ public class Schoonmaker extends Persoon {
         } else {
             // Direct naar post teleporteren als pad niet gevonden
             setPositie(WACHT_X, WACHT_Y);
-            huidigeVerdieping = 8;
+            huidigeVerdieping = hotel.getMaxHoogte()-1;
             status = Status.WACHT_OP_WERK;
         }
     }
