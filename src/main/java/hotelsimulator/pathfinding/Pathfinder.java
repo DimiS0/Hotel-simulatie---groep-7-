@@ -17,6 +17,7 @@ import java.util.PriorityQueue;
 /*
   Zoekt de kortste looproute van A naar B met het A*-algoritme.
   Het hotel wordt gezien als een dynamisch grid van vakjes (elk 50x50 pixels).
+  Werkt met verschillende hotel layouts.
  */
 public class Pathfinder {
 
