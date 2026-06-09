@@ -252,7 +252,9 @@ public class Hotel {
         }
         return null;
     }
-
+    public int getLobbyVerdieping() {
+        return maxHoogte;
+    }
     public synchronized void voegToeAanSchoonmaakWachtrijVooraan(HotelKamer kamer) {
         if (!schoonmaakWachtrij.contains(kamer)) {
             schoonmaakWachtrij.addFirst(kamer);

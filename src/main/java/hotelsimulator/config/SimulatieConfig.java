@@ -3,7 +3,7 @@ import hotelsimulator.config.HTE;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SimulatieConfig {
+public class SimulatieConfig  {
     private Snelheid snelheid;
 	private int aantalGasten;
 	private int brightness;
@@ -17,15 +17,15 @@ public class SimulatieConfig {
 		this.volume = 50;
 	}
     //  listeners
-    private final List<Runnable> listeners = new ArrayList<>();
+    private final List<ConfigListener> listeners = new ArrayList<>();
 
-    public void addListener(Runnable r) {
-        listeners.add(r);
+    public void addListener(ConfigListener listener) {
+        listeners.add(listener);
     }
 
     private void notifyListeners() {
-        for (Runnable r : listeners) {
-            r.run();
+        for (ConfigListener listener : listeners) {
+            listener.onConfigChanged();
         }
     }
 	// GETTERS
