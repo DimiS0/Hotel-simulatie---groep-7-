@@ -28,6 +28,7 @@ public class CleaningEmergency implements EventStrategie {
                 .map(r -> (HotelKamer) r)
                 .toList();
 
+        //als er geen kamer is gevonden
         if (kamers.isEmpty()) return;
 
         HotelKamer noodkamer = kamers.get(random.nextInt(kamers.size()));

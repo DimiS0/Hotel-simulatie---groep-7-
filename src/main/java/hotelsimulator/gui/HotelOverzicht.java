@@ -9,6 +9,8 @@ import hotelsimulator.ruimtes.HotelRuimte;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class HotelOverzicht extends JFrame {
 
@@ -28,23 +30,22 @@ public class HotelOverzicht extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // --- Legenda bovenaan ---
-        // Legt uit welk symbool bij welke rol hoort
+        //legenda bovenaan, Legt uit welk symbool bij welke rol hoort
         JPanel legendaPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 6));
         legendaPanel.setBorder(BorderFactory.createTitledBorder("Legenda"));
 
-        // Gast-symbool: blauwe gevulde cirkel met "G"
+        //Gast symbool, blauwe gevulde cirkel met "G"
         legendaPanel.add(maakSymboolLabel("G", new Color(50, 255, 50), "Gast"));
 
         // Scheidingsteken
         legendaPanel.add(new JLabel("|"));
 
-        // Schoonmaker-symbool: paarse gevulde cirkel met "S"
+        //Schoonmakersymbool paarse gevulde cirkel met "S"
         legendaPanel.add(maakSymboolLabel("S", new Color(160, 32, 240), "Schoonmaker"));
 
         add(legendaPanel, BorderLayout.NORTH);
 
-        // --- Ruimtenoverzicht in het midden ---
+        //Ruimtenoverzicht in het midden
         mainPanel = new JPanel(new GridBagLayout());
 
         JScrollPane scrollPane = new JScrollPane(
@@ -67,21 +68,20 @@ public class HotelOverzicht extends JFrame {
         Timer timer = new Timer(500, e -> SwingUtilities.invokeLater(this::verversen));
         timer.start();
 
+        //Stopt de timer wanneer het overzichtvenster wordt gesloten
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosed(java.awt.event.WindowEvent e) {
                 timer.stop();
             }
         });
-
     }
 
-    // Maakt een klein label met een gekleurd cirkel-icoon en een tekst ernaast
-    // Wordt gebruikt in de legenda om het symbool uit te leggen
+    // Maakt een label voor de legenda met een gekleurde cirkel en een beschrijving.
     private JPanel maakSymboolLabel(String letter, Color kleur, String beschrijving) {
         JPanel wrapper = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
         wrapper.setOpaque(false);
 
-        // Cirkel met letter erin als custom component
+        //ekent een gekleurde cirkel met daarin een letter
         JPanel cirkel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -98,14 +98,17 @@ public class HotelOverzicht extends JFrame {
         cirkel.setPreferredSize(new Dimension(22, 22));
         cirkel.setOpaque(false);
 
+        // Zet het symbool en de beschrijving naast elkaar
         wrapper.add(cirkel);
         wrapper.add(new JLabel("= " + beschrijving));
         return wrapper;
     }
 
+    //overzicht verversen voor real time info
     public void verversen() {
         mainPanel.removeAll();
 
+        //Plaatst voor elke ruimte een knop op de juiste positie
         for (HotelRuimte ruimte : hotel.getRuimtes()) {
             GridBagConstraints gbc = new GridBagConstraints();
             gbc.gridx = ruimte.getX();
@@ -117,29 +120,36 @@ public class HotelOverzicht extends JFrame {
             gbc.weightx = 1.0;
             gbc.weighty = 1.0;
 
-            // Elke ruimte krijgt een knop met ruimtenaam + symbolen voor aanwezige personen
+            // Elke knop toont de naam van de ruimte en aanwezige personen
             JButton btn = maakRuimteKnop(ruimte);
             btn.addActionListener(e -> openRuimteDialog(ruimte));
             mainPanel.add(btn, gbc);
         }
 
+        //Laat onderaan zien hoeveel personen er in totaal in de simulatie zitten
         statusLabel.setText("Totaal aantal personen in simulatie: " + hotel.getPersonen().size());
 
+        //Tekent het paneel opnieuw nadat alle knoppen zijn toegevoegd
         mainPanel.revalidate();
         mainPanel.repaint();
     }
 
+    //maakt elke knop
     private JButton maakRuimteKnop(HotelRuimte ruimte) {
-        //Long omdat count een long terug geeft
+        // Telt hoeveel gasten zich in deze ruimte bevinden, long omdat count met long werkt
         long aantalG = hotel.getPersonen().stream()
                 .filter(p -> p instanceof Gast && p.getHuidigeRuimte() == ruimte)
                 .count();
+
+        // Telt hoeveel schoonmakers zich in deze ruimte bevinden
         long aantalS = hotel.getPersonen().stream()
                 .filter(p -> p instanceof Schoonmaker && p.getHuidigeRuimte() == ruimte)
                 .count();
 
+        //controlle voor de zekerheid
         boolean inGebruik = (aantalG + aantalS) > 0;
 
+        //kiest een emoji bij de juiste ruimte
         String emoji = switch (ruimte.getAreaType()) {
             case "Cinema"     -> "🎬";
             case "Restaurant" -> "🍽";
@@ -148,32 +158,32 @@ public class HotelOverzicht extends JFrame {
             default           -> "";
         };
 
-        //html mode, omdat dit het misnte werk is dan component g of meerderelabels in een panel stoppen
+        // Gebruikt HTML om tekst en symbolen eenvoudig in de knop te tonen
         StringBuilder html = new StringBuilder("<html><center>");
 
-        //als er een emoji is die toevoegen, daarna naam van ruimte
+        //Toont eerst de emoji en daarna de naam van de ruimte
         if (!emoji.isEmpty()) html.append(emoji).append(" ");
         html.append("<b>").append(ruimte.getAreaType()).append("</b><br>");
 
-        //blauwe G
+        //blauwe G  voor elke aanwezige gast
         for (int i = 0; i < aantalG; i++) {
             html.append("<font color='#0064FF'><b>G</b></font> ");
         }
-        //paarse S
+        //Voegt voor elke aanwezige schoonmaker een paarse S
         for (int i = 0; i < aantalS; i++) {
             html.append("<font color='#9400D3'><b>S</b></font> ");
         }
-        //html afsluiten
+        //html string afmaken
         html.append("</center></html>");
 
-        //knop krijgt het als tekst
+        //knop maken emt de html tekst
         JButton btn = new JButton(html.toString());
 
         //zet de tekst in het midden
         btn.setVerticalTextPosition(SwingConstants.CENTER);
         btn.setHorizontalTextPosition(SwingConstants.CENTER);
 
-        //iemeand is in de ruimte
+        //in bezette ruimtes een kleur geven die opvallend is
         if (inGebruik) {
             btn.setBackground(new Color(144, 238, 144));
             btn.setOpaque(true);
@@ -193,11 +203,12 @@ public class HotelOverzicht extends JFrame {
         dialog.setLocationRelativeTo(this);
         dialog.setLayout(new BorderLayout());
 
+        // Tekstvak waarin de details van de ruimte worden getoond
         JTextArea infoArea = new JTextArea();
         infoArea.setEditable(false);
         infoArea.setFont(new Font("Arial", Font.PLAIN, 14));
 
-        // Runnable die de tekst in het dialoogvenster bijwerkt.
+        // Runnable die de tekst in het dialoogvenster bijwerkt. geen nieuwe thread
         Runnable updateInfo = () -> {
             long gastenAanwezig = hotel.getPersonen().stream()
                     .filter(p -> p instanceof Gast && p.getHuidigeRuimte() == ruimte)
@@ -213,9 +224,10 @@ public class HotelOverzicht extends JFrame {
             );
         };
 
-
+        // Toont direct de eerste informatie
         updateInfo.run();
 
+        //Knop om het dialoogvenster te sluiten
         JButton sluitBtn = new JButton("Sluiten");
         sluitBtn.addActionListener(e -> dialog.dispose());
 
@@ -226,6 +238,7 @@ public class HotelOverzicht extends JFrame {
         // Ververst de info in het dialoogvenster elke keer via de eventManager
         eventManager.register(evt -> {
             if (dialog.isShowing()) {
+                //opnieuw uitvoeren van de runnable bij elke event
                 SwingUtilities.invokeLater(updateInfo);
             }
         });

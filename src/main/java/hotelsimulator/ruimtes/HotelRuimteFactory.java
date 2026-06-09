@@ -2,8 +2,9 @@ package hotelsimulator.ruimtes;
 
 public class HotelRuimteFactory implements IRuimteFactory  {
 @Override
-    public HotelRuimte maak(String type, int sterrenAantal,
-                            int y, int x, int breedte, int hoogte, int maxPersonen) {
+    public HotelRuimte maak(String type, int sterrenAantal,int y, int x, int breedte, int hoogte, int maxPersonen) {
+
+    //objecten aanmaken voor het hotel
         return switch (type) {
             case "Cinema"     -> new Bioscoop(type, sterrenAantal, y, x, breedte, hoogte, maxPersonen);
             case "Fitness"    -> new FitnessRuimtes(type, sterrenAantal, y, x, breedte, hoogte, maxPersonen);

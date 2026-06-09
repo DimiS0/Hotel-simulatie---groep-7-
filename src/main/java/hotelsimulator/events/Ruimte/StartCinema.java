@@ -22,17 +22,20 @@ public class StartCinema implements EventStrategie {
         filmEinde = System.currentTimeMillis() + FILM_DUUR_MS;
         System.out.println("Film gestart! Duurt 60 seconden.");
 
-        // Aparte thread zodat de timer niet de simulatie blokkeert
+        // Aparte thread maken zodat de timer niet de simulatie crasht
         new Thread(() -> {
             try {
                 Thread.sleep(FILM_DUUR_MS);
             } catch (InterruptedException e) {
+                //crash opvangen met timer
                 return;
             }
 
+            //film klaar
             System.out.println("Film klaar! Gasten verlaten bioscoop.");
             filmEinde = -1;
 
+            //gasten ophalen als ze in bioscoop zitten dan naar hun kamer sturen!
             for (Persoon persoon : hotel.getPersonen()) {
                 if (persoon instanceof Gast gast && gast.isGespawnd()) {
                     if (gast.getHuidigeRuimte() instanceof Bioscoop) {
@@ -40,10 +43,7 @@ public class StartCinema implements EventStrategie {
                     }
                 }
             }
+            //timer starten
         }).start();
-    }
-
-    public static boolean isFilmBezig() {
-        return filmEinde != -1 && System.currentTimeMillis() < filmEinde;
     }
 }

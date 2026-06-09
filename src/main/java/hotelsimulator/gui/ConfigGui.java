@@ -63,14 +63,20 @@ public class ConfigGui {
         panel.add(scenarioSlider);
 
         panel.add(new JLabel("Aantal gasten:"));
-        JTextField gastenField = new JTextField(String.valueOf(config.getAantalGasten()));
-        gastenField.addFocusListener(new FocusAdapter() {
 
+        //tekst veld en vult het met 10 in
+        JTextField gastenField = new JTextField(String.valueOf(config.getAantalGasten()));
+
+        //focus adapter klasse gebruiken, en we hebben focus lsot nodig dus schrijven we die methode uit
+        //wanneer het textveld dus focus verliest slaan we de gasten op
+        gastenField.addFocusListener(new FocusAdapter() {
             public void focusLost(FocusEvent e) {
                 try {
                     int g = Integer.parseInt(gastenField.getText());
                     config.setAantalGasten(g);
                 } catch (NumberFormatException ex) {
+
+                    //opvangen als het geen int is met een dialoog
                     JOptionPane.showMessageDialog(frame, "Ongeldige waarde");
                 }}});
 
