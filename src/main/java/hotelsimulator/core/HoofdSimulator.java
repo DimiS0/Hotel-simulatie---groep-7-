@@ -53,6 +53,11 @@ public class HoofdSimulator {
         try {
             String layoutStr = new LayoutLader().laadVanResources("/hotel_layout.json");
             hotel.maakHotelLayout(layoutStr);
+
+            String naam = "Standaard Layout 1";
+            OpgeslagenLayouts layout = new OpgeslagenLayouts(naam, layoutStr);
+            layout.layoutsInMapStoppen();
+
             System.out.println("Standaard layout succesvol ingeladen.");
         } catch (IOException e) {
             System.out.println("Fout bij laden standaard layout: " + e.getMessage());
