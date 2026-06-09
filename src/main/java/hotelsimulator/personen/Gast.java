@@ -31,8 +31,8 @@ public class Gast extends Persoon {
     private long verblijfEinde = 0;
     private final LinkedList<HotelRuimte> eventWachtrij = new LinkedList<>();
 
-    private int doelVerdieping    = 8;
-    private int huidigeVerdieping = 8;
+    private int doelVerdieping;
+    private int huidigeVerdieping;
     private int SPAWN_X;
     private int SPAWN_Y;
 
@@ -42,8 +42,8 @@ public class Gast extends Persoon {
         this.guestID = guestID;
         this.SPAWN_X = berekenGastSpawnLocatie(maxBreedte);
         this.SPAWN_Y = (maxHoogte + 1) * 50 - 25;
-        this.doelVerdieping = maxHoogte;
-        this.huidigeVerdieping = maxHoogte;
+        this.doelVerdieping = maxHoogte - 1;
+        this.huidigeVerdieping = maxHoogte - 1;
     }
     public int getGuestID() {
         return guestID;
@@ -379,7 +379,6 @@ public class Gast extends Persoon {
         pixelX = SPAWN_X; pixelY = SPAWN_Y;
         pad.clear();
         doelKamer = null;
-        huidigeVerdieping = huidigeVerdieping;
         status = Status.WACHT_IN_LOBBY;
     }
 

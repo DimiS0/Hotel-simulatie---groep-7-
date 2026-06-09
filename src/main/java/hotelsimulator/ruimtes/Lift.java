@@ -96,22 +96,12 @@ public class Lift extends HotelRuimte {
         }
     }
     public void kiesVerdiepingenY(){
-        switch(verdiepingen){
-            case 1:
-                tijdelijkeArray.add(8);
-                verdiepingenY = tijdelijkeArray.stream().mapToInt(Integer::intValue).toArray();
-                break;
-            case 2:
-                tijdelijkeArray.add(8);
-                tijdelijkeArray.add(5);
-                verdiepingenY = tijdelijkeArray.stream().mapToInt(Integer::intValue).toArray();
-                break;
-            default:
-                tijdelijkeArray.add(8);
-                tijdelijkeArray.add(5);
-                tijdelijkeArray.add(2);
-                verdiepingenY = tijdelijkeArray.stream().mapToInt(Integer::intValue).toArray();
+        int p = 2;
+        for(int i = 0; i < verdiepingen; i++){
+            tijdelijkeArray.add(p);
+            p +=3;
         }
+        verdiepingenY = tijdelijkeArray.stream().mapToInt(Integer::intValue).toArray();
     }
 
     // ────────────────────────────────────────────────────────

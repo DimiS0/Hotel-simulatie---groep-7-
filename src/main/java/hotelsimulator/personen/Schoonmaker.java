@@ -45,8 +45,8 @@ public class Schoonmaker extends Persoon {
         super(berekenSchoonmakerPauzePositie(maxBreedte), maxHoogte * 50, lift, schacht, hotel, hotelEventManager, simulatieConfig);
         this.WACHT_X = berekenSchoonmakerPauzePositie(maxBreedte);
         this.WACHT_Y = maxHoogte * 50;
-        this.doelVerdieping = maxHoogte;
-        this.huidigeVerdieping = maxHoogte;
+        this.doelVerdieping = maxHoogte - 1;
+        this.huidigeVerdieping = maxHoogte - 1;
     }
 
     @Override
@@ -258,7 +258,7 @@ public class Schoonmaker extends Persoon {
         setPositie(WACHT_X, WACHT_Y);
         pad.clear();
         doelKamer = null;
-        huidigeVerdieping = 8;
+        huidigeVerdieping = hotel.getMaxHoogte() - 1;
         status = Status.WACHT_OP_WERK;
     }
 

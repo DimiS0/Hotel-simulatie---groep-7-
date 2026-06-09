@@ -31,10 +31,10 @@ public abstract class Persoon {
 
     //  Beweging
     protected LinkedList<Point> pad = new LinkedList<>();
-    private double doubleTRAP_PIXEL_X;
     protected static final int    SNELHEID         = 2;
     protected int    SCHACHT_PIXEL_X;
     protected int TRAP_PIXEL_X;
+    protected double Double_TRAP_PIXEL_X;
     protected int    LIFT_CENTER_X;
     protected static final Random random           = new Random();
     private boolean heeftVerzoekIngediend = false;
@@ -51,8 +51,8 @@ public abstract class Persoon {
         this.hotelEventManager = hotelEventManager;
         this.SCHACHT_PIXEL_X = (schacht.getX() + 2) * 50;
         this.LIFT_CENTER_X   = (schacht.getX() + 1) * 50 + 25;
-        this.doubleTRAP_PIXEL_X = (hotel.getMaxBreedte() + 2.5) * 50;
-        this.TRAP_PIXEL_X    = (int) doubleTRAP_PIXEL_X;
+        this.Double_TRAP_PIXEL_X = (hotel.getTrap().getX() + 1.5) * 50;
+        this.TRAP_PIXEL_X = (int) Double_TRAP_PIXEL_X;
         setPositie(startX, startY);
     }
 
@@ -96,8 +96,17 @@ public abstract class Persoon {
     }
 
 
-    protected int getNabijeStop(int gridY) {
+    protected int getNabijeStop(double gridY) {
         int[] stops = hotel.getLift().getVerdiepingenY();
+        int dichtstbij = stops[0];
+        for (int stop : stops) {
+            if (Math.abs(gridY - stop) < Math.abs(gridY - dichtstbij))
+                dichtstbij = stop;
+        }
+        return dichtstbij;
+    }
+    protected int getNabijeStopTrap(int gridY){
+        int[] stops = hotel.getTrap().getIngangen();
         int dichtstbij = stops[0];
         for (int stop : stops) {
             if (Math.abs(gridY - stop) < Math.abs(gridY - dichtstbij))
@@ -110,6 +119,7 @@ public abstract class Persoon {
     protected void loopNaarSchachtOfTrapGemeen(int huidigeVerdieping,
                                                Runnable zetStatusSchacht,
                                                Runnable zetStatusTrap) {
+        System.out.println("trapx: "+TRAP_PIXEL_X);
         int kies = random.nextInt(1, 3);
         if (kies == 1) {
             int wachtY = (huidigeVerdieping - 1) * 50;
@@ -120,7 +130,7 @@ public abstract class Persoon {
                 zetStatusSchacht.run();
             }
         } else {
-            int wachtY = getNabijeStop(huidigeVerdieping) * 50;
+            int wachtY = getNabijeStopTrap(huidigeVerdieping - 1) * 50;
             List<Point> trapPad = Pathfinder.vindPad(
                     pixelX, pixelY, TRAP_PIXEL_X, wachtY, hotel.getRuimtes(), hotel);
             if (!trapPad.isEmpty()) {
@@ -143,7 +153,7 @@ public abstract class Persoon {
 
     protected boolean updateInTrap(int doelVerdieping) {
         int doelY = doelVerdieping * 50;
-        if (Math.abs(pixelY - doelY) <= SNELHEID) {
+        if (Math.abs(pixelY - doelY) <= 1) {
             setPositie(TRAP_PIXEL_X, doelY);
             pixelX  = (TRAP_PIXEL_X / 50) * 50;
             pixelXD = pixelX;

@@ -30,6 +30,7 @@ public class Hotel {
     private int maxBreedte = 0;
     private int verdiepingen = 0;
     private int lobbyBreedte = 0;
+    private Trap trap;
 
     //waarom? test
     public Hotel(SimulatieConfig config, HotelEventManager eventManager, SimulatieConfig simulatieConfig) {
@@ -123,7 +124,7 @@ public class Hotel {
         Lobby lobby = new Lobby("Lobby", 0, 0, 1, maxBreedte, 1, 0);
         lobby.herberekenY(maxHoogte);
 
-        Trap trap = new Trap("trap", 0, 0, maxBreedte + 1, 1, maxHoogte, 999, getverdiepingen());
+        trap = new Trap("trap", 0, 0,maxBreedte +1, 1, maxHoogte, 999, getverdiepingen());
         trap.herberekenY(maxHoogte);
 
         lift = new Lift("Lift", 0, maxHoogte + 1, 0, 1, 1, 5, getverdiepingen());
@@ -136,22 +137,9 @@ public class Hotel {
     }
 
     public void kiesVerdiepingen(){
-        switch(maxHoogte){
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-                verdiepingen = 1;
-                break;
-            case 5:
-            case 6:
-            case 7:
-                verdiepingen = 2;
-                break;
-            default:
-                verdiepingen = 3;
-        }
-
+        int x = maxHoogte % 3;
+        int p = maxHoogte - x;
+        verdiepingen = p / 3;
     }
     public int getMaxBreedte(){
         return maxBreedte;
@@ -173,11 +161,30 @@ public class Hotel {
         return lift;
     }
 
+    public Trap getTrap(){
+        return trap;
+    }
+
     private class JsonItem {
         String AreaType, Position, Dimension, Capacity, Classification;
     }
 
     public void maakPersonen(int aantalGasten) {
+        System.out.println("=== HOTEL DEBUG INFO ===");
+        System.out.println("maxHoogte: " + maxHoogte);
+        System.out.println("maxBreedte: " + maxBreedte);
+        System.out.println("verdiepingen: " + verdiepingen);
+        System.out.println("Lift stops: " + java.util.Arrays.toString(lift.getVerdiepingenY()));
+        System.out.println("Schacht X: " + schacht.getX());
+
+        // Vind trap
+        for (HotelRuimte r : ruimtes) {
+            if (r instanceof Trap) {
+                System.out.println("Trap X: " + r.getX());
+                System.out.println("Trap ingangen: " + java.util.Arrays.toString(r.getIngangen()));
+                break;
+            }
+        }
         //mensen opslaan
         personen = new ArrayList<>();
 

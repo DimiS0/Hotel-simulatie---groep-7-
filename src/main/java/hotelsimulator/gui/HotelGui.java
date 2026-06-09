@@ -136,11 +136,6 @@ public class HotelGui extends JPanel {
                     hoofdSimulator.herstart(hoofdSimulator.getConfig().getScenario());
 
                     setPreferredSize(new Dimension((hotel.getMaxBreedte() + 4) * cellSize, (hotel.getMaxHoogte() + 2) * cellSize));
-
-                    setPreferredSize(new Dimension(
-                            (hotel.getMaxBreedte() + 4) * cellSize,
-                            (hotel.getMaxHoogte() + 2) * cellSize
-                    ));
                     revalidate();
                     repaint();
 
