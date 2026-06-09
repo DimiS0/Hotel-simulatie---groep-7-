@@ -19,7 +19,7 @@ class OnbekendePersoonTest {
 
         // Arrange
         SimulatieConfig config = new SimulatieConfig();
-        Hotel hotel = new Hotel(config, new HotelEventManager(), config);
+        Hotel hotel = new Hotel(new HotelEventManager(), config);
         hotel.maakHotelLayout("[]");
         hotel.maakPersonen(3); // gasten 1, 2, 3 bestaan
         HotelEvent event = new HotelEvent(1, HotelEventType.GOTO_FITNESS, 4, -1);

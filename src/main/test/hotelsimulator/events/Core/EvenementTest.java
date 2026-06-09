@@ -19,7 +19,7 @@ class EvenementTest {
 
             // Arrange
             SimulatieConfig config = new SimulatieConfig();
-            Hotel hotel = new Hotel(config, new HotelEventManager(), config);
+            Hotel hotel = new Hotel(new HotelEventManager(), config);
             HotelEvent event = new HotelEvent(1, HotelEventType.GODZILLA, -1, -1);
 
             // Act

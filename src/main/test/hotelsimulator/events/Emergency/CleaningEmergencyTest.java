@@ -18,7 +18,7 @@ public class CleaningEmergencyTest {
     @BeforeEach
     void setup() {
         SimulatieConfig config = new SimulatieConfig();
-        hotel = new Hotel(config, null, config);
+        hotel = new Hotel(null, config);
         CleaningEmergency.setHotel(hotel);
     }
 

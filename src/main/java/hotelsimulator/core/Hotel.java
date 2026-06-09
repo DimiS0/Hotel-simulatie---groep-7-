@@ -29,15 +29,14 @@ public class Hotel {
     private int maxHoogte = 0;
     private int maxBreedte = 0;
     private int verdiepingen = 0;
-    private int lobbyBreedte = 0;
     private Trap trap;
 
     //waarom? test
-    public Hotel(SimulatieConfig config, HotelEventManager eventManager, SimulatieConfig simulatieConfig) {
-        this(config, eventManager, simulatieConfig, new HotelRuimteFactory());
+    public Hotel(HotelEventManager eventManager, SimulatieConfig simulatieConfig) {
+        this(eventManager, simulatieConfig, new HotelRuimteFactory());
     }
 
-    public Hotel(SimulatieConfig config, HotelEventManager eventManager,
+    public Hotel(HotelEventManager eventManager,
                  SimulatieConfig simulatieConfig, IRuimteFactory factory) {
         this.hotelEventManager = eventManager;
         this.simulatieConfig = simulatieConfig;
@@ -159,6 +158,13 @@ public class Hotel {
         int p = maxHoogte - x;
         verdiepingen = p / 3;
     }
+
+    //hoteleventmanager opvragen voor testcase
+
+    public HotelEventManager getHotelEventManager() {
+        return hotelEventManager;
+    }
+
     //max breedte opvragen
     public int getMaxBreedte(){
         return maxBreedte;
@@ -188,6 +194,10 @@ public class Hotel {
     // Dit is  geen echte ruimte in het hotel, alleen data.
     public Trap getTrap(){
         return trap;
+    }
+
+    public Schacht getSchacht() {
+        return schacht;
     }
 
     private class JsonItem {
