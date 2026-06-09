@@ -53,82 +53,100 @@ public class Hotel {
         return schoonmaakWachtrij.isEmpty() ? null : schoonmaakWachtrij.removeFirst();
     }
 
-
+    //getter van de lijst van lift oproepen
     public LinkedList<Integer> getLiftOproepen() {
         return liftOproepen;
     }
 
     public void maakHotelLayout(String layoutJson) {
+        //Gson-object dat de JSON tekst kan omzetten naar Java objecten
         Gson gson = new Gson();
-        Type listType = new TypeToken<List<JsonItem>>() {
-        }.getType();
+
+        //Gson vertellen dat layoutJson een lijst van JsonItem-objecten bevat
+        //Zonder deze TypeToken weet Gson niet dat het om een lijst van JsonItem gaat
+        Type listType = new TypeToken<List<JsonItem>>() {}.getType();
+
+        // Zet de JSON-layout (String) om naar een lijst met JsonItem objecten
         List<JsonItem> items = gson.fromJson(layoutJson, listType);
 
         //Lijst leegmaken zodat oude data niet overblijft bij hergebruik
         ruimtes.clear();
 
         //loop door de lijst elke item krijgt een AreaType, een positie een breedte en hoogte, en een cappaciteit en sterren
+        // voor maxPersonen en SterrenAantal gebruiken we een if else maar dan korter geschreven (tenary)
         for (JsonItem item : items) {
             String areaType = item.AreaType;
 
+            // Positie (x,y) opsplitsen en omzetten naar ints
             String[] pos = item.Position.split(",");
             int x = Integer.parseInt(pos[0].trim());
             int y = Integer.parseInt(pos[1].trim());
 
+            // Afmetingen (breedte,hoogte) opsplitsen en omzetten naar ints
             String[] dim = item.Dimension.split(",");
             int dimX = Integer.parseInt(dim[0].trim());
             int dimY = Integer.parseInt(dim[1].trim());
 
-            // waarom tenary if? Omdat het een kortere if - else is
+            // Lees capaciteit uit, als die ontbreekt gebruiken we 0
             int maxPersonen = (item.Capacity != null) ? Integer.parseInt(item.Capacity.trim()) : 0;
+
+            // Lees sterren uit, neem het eerste getal uit de classificatie-string, anders 0
             int sterrenAantal = (item.Classification != null && !item.Classification.isBlank()) ? Integer.parseInt(item.Classification.trim().split("\\s+")[0]) : 0;
 
-            //elke item maakt een nieuwe object aan met die specificaties
+            // Voor elke JSON item  een nieuwe object aan met al de vorige specificaties
             try {
+                //factory maakt de juiste ruimte
                 HotelRuimte r = ruimteFactory.maak(areaType, sterrenAantal, y, x, dimX, dimY, maxPersonen);
+
+                // voeg de aangemaakte ruimtes toe aan in de lijst
                 ruimtes.add(r);
             } catch (IllegalArgumentException e) {
+
+                // onbekende ruimtes slaan we over en we loggen het
                 System.out.println("Onbekend ruimtetype overgeslagen: " + areaType);
             }
         }
 
-        //forloops om de maximale hoogte en breedte te achterhalen
-
+        //forloop om de maximale hoogte te achterhalen
         for (HotelRuimte ruimte : ruimtes) {
             int top = ruimte.getOrgineleY() + ruimte.getHoogte();
             if (top > maxHoogte) maxHoogte = top;
         }
-
-        // maxBreedte berekenen: x + breedte - 1 is de rechterkant
+        //forloop om de maximale Breedte te achterhalen
         for (HotelRuimte ruimte : ruimtes) {
             int rechts = ruimte.getX() + ruimte.getBreedte() - 1;
             if (rechts > maxBreedte) maxBreedte = rechts;
         }
 
-        // Herbereken Y voor alle kamers uit JSON
+        // Herbereken Y voor alle kamers uit JSON zodat we elke layout kunnen gebruiken
         for (HotelRuimte ruimte : ruimtes) {
             ruimte.herberekenY(maxHoogte);
         }
 
         kiesVerdiepingen();
 
-// Schacht: y=0, hoogte=maxHoogte+1
-// herberekenY: y = maxHoogte - 0 - (maxHoogte+1) + 2 = 1
-// print: (1-1)*cellSize = 0 → begint op rij 0... maar moet rij 1 zijn
-// Dus hoogte = maxHoogte, dan: y = maxHoogte - 0 - maxHoogte + 2 = 2
-// print: (2-1)*cellSize = rij 1 ✓, hoogte maxHoogte dekt t/m lobby ✓
+        //schacht object aanmaken staat niet in JSON komt altijd links van het hotel
         schacht = new Schacht("Schacht", 0, 0, 0, 1, maxHoogte, 0);
+
+        //schacht herberekenen zodat het op alle layouts past
         schacht.herberekenY(maxHoogte);
 
+        //Lobby object aanmaken staat niet in JSON komt altijd onder het hotel
         Lobby lobby = new Lobby("Lobby", 0, 0, 1, maxBreedte, 1, 0);
+
+        //lobby herberekenen zodat het op alle layouts past
         lobby.herberekenY(maxHoogte);
 
+        //Trap object aanmaken staat niet in JSON komt altijd rechts van het hotel
         Trap trap = new Trap("trap", 0, 0, maxBreedte + 1, 1, maxHoogte, 999, getverdiepingen());
+
+        //Trap herberekenen zodat het op alle layouts past
         trap.herberekenY(maxHoogte);
 
+        //lift aanmaken, geen herbereken methode nodig positie wordt bepaald
         lift = new Lift("Lift", 0, maxHoogte + 1, 0, 1, 1, 5, getverdiepingen());
-// Lift positie wordt runtime bepaald, geen herberekenY nodig
 
+        //alle ruimtes die we net hebben gemaakt toevoegen aan de lijst
         ruimtes.add(schacht);
         ruimtes.add(lobby);
         ruimtes.add(trap);
@@ -153,38 +171,45 @@ public class Hotel {
         }
 
     }
+    //max breedte opvragen
     public int getMaxBreedte(){
         return maxBreedte;
     }
 
+    //max hoogte opvragen
     public int getMaxHoogte(){
         return maxHoogte;
     }
 
+    //verdiepingen opvragen
     public int getverdiepingen(){
         return verdiepingen;
     }
 
+    //de lijst ophalen met de ruimtes
     public ArrayList<HotelRuimte> getRuimtes() {
         return ruimtes;
     }
 
+    //lift ophalen
     public Lift getLift() {
         return lift;
     }
 
+    // Hulpklasse die één item uit het bestand voorstelt.
+    // Dit is  geen echte ruimte in het hotel, alleen data.
     private class JsonItem {
         String AreaType, Position, Dimension, Capacity, Classification;
     }
 
     public void maakPersonen(int aantalGasten) {
-        //mensen opslaan
+        //personen die gemaakt worden opslaan
         personen = new ArrayList<>();
 
-        //schoonmakers
+        //schoonmakers max aantal
         int aantalSchoonmakers = 2;
 
-
+        //de huidige aantal gemaakte gasten/schoonmakers
         int gastIndex = 0;
         int schoonmakerIndex = 0;
 
@@ -202,18 +227,8 @@ public class Hotel {
             }
         }
     }
-    //waar gasten op mogen lopen in dit geval dus niet in lobby
-    public List<HotelRuimte> getKamers() {
-        List<HotelRuimte> result = new ArrayList<>();
-        for (HotelRuimte r : ruimtes) {
-            if (r instanceof HotelKamer || r instanceof Restaurant ||
-                    r instanceof Bioscoop || r instanceof FitnessRuimtes) {
-                result.add(r);
-            }
-        }
-        return result;
-    }
 
+    // Array van personen ophalen
     public ArrayList<Persoon> getPersonen() {
         return personen;
     }
@@ -231,25 +246,35 @@ public class Hotel {
 
     // Zoekt naar een vrije kamer voor de gast
     public HotelKamer zoekVrijeHotelKamer(int minimalesterren) {
+
+        // for loop  we lopen door de minimale sterren tot en met maimale sterren
+        //als we geen kamer vinden voor gast met gewenste sterren geven we hem een bettere kamer
         for (int sterren = minimalesterren; sterren <= 5; sterren++) {
             List<HotelKamer> kandidaten = new ArrayList<>();
             for (HotelRuimte ruimte : getRuimtes()) {
+
+                //kijkt naar alleen hotelkamers die niet vol zijn, niet gereserveerd en er geen cleaning emergency is
                 if (ruimte instanceof HotelKamer kamer
                         && !kamer.isVol()
                         && kamer.getSterrenAantal() == sterren
                         && !kamer.isGereserveerd()
                         && !kamer.isCleaningEmergency()) {
+
+                    //als er een kamer gevonden is dan voegen we hem toe in kanditaten arraylist
                     kandidaten.add(kamer);
                 }
             }
+            //als de array gevuld is
             if (!kandidaten.isEmpty()) {
-                HotelKamer gekozen = kandidaten.get(
-                        new java.util.Random().nextInt(kandidaten.size())
-                );
+
+                // random kamer kiezen uit die arraylist
+                HotelKamer gekozen = kandidaten.get(new java.util.Random().nextInt(kandidaten.size()));
+                //en reserveer hem
                 gekozen.reserveer();
                 return gekozen;
             }
         }
+        //geen kamer gevonden? return null
         return null;
     }
 
@@ -258,6 +283,8 @@ public class Hotel {
             schoonmaakWachtrij.addFirst(kamer);
         }
     }
+
+    //methode om de hotel te reseten
     public void reset(){
         ruimtes.clear();
         personen.clear();
