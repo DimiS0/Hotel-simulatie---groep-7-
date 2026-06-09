@@ -14,40 +14,46 @@ public class SimulatieLus {
     private final Timer spawnTimer;
     private final Hotel hotel;
 
-    private static final int[] LIFT_STOPS = {8, 5, 2};
-    private int liftTeller    = 0;
-    private int liftStopIndex = 0;
-
     public SimulatieLus(Hotel hotel, HotelGui gui) {
         this.hotel = hotel;
 
         // Bewegingstimer: ~60 FPS
         bewegingsTimer = new Timer(16, e -> {
+            //alle personen updaten
             for (Persoon p : hotel.getPersonen()) {
+                //gasten hebben hun eigen update
                 if (p instanceof Gast gast) {
                     gast.update();
                 } else if (p instanceof Schoonmaker schoonmaker) {
+                    //schoonmakers hebben ook hun speciale update
                     schoonmaker.update();
-                } else {
-                    p.beweeg();
                 }
             }
+            // Verwijder personen die het hotel hebben verlaten / hebben geen kamer
             hotel.getPersonen().removeIf(Persoon::moetVerwijderdWorden);
+
+            //regenereer de GUI
             gui.repaint();
         });
 
         // Spawntimer: één gast per seconde
         List<Persoon> personen = hotel.getPersonen();
+
+        //index om bij te houden welke gast is ge spawned
         final int[] spawnIndex = {0};
 
+        //spawnt een gast elke 1s
         spawnTimer = new Timer(1000, e -> {
             while (spawnIndex[0] < personen.size()) {
                 Persoon p = personen.get(spawnIndex[0]);
+
+                // Als het een nog niet gespawnde gast is, activeer hem
                 if (p instanceof Gast gast && !gast.isGespawnd()) {
                     gast.activeer();
                     spawnIndex[0]++;
                     break;
                 }
+                //naar volgende gast gaan
                 spawnIndex[0]++;
             }
         });
@@ -59,15 +65,10 @@ public class SimulatieLus {
         spawnTimer.start();
     }
 
-    // Stopt beide timers (bijv. bij pauzeren).
+    // Stopt beide timers bij pauzeren
     public void stop() {
         bewegingsTimer.stop();
         spawnTimer.stop();
-    }
-
-    // Geeft terug of de simulatie momenteel loopt.
-    public boolean isActief() {
-        return bewegingsTimer.isRunning();
     }
 }
 
