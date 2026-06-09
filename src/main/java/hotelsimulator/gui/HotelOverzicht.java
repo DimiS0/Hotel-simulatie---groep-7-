@@ -50,7 +50,7 @@ public class HotelOverzicht extends JFrame {
         JScrollPane scrollPane = new JScrollPane(
                 mainPanel,
                 JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
+                JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS
         );
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         add(scrollPane, BorderLayout.CENTER);
@@ -63,10 +63,16 @@ public class HotelOverzicht extends JFrame {
         verversen();
         setVisible(true);
 
-        // Ververst het overzicht elke keer dat de eventManager een NONE-event stuurt
-        eventManager.register(evt -> {
-                SwingUtilities.invokeLater(this::verversen);
+        // Ververst het overzicht elke 500ms
+        Timer timer = new Timer(500, e -> SwingUtilities.invokeLater(this::verversen));
+        timer.start();
+
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent e) {
+                timer.stop();
+            }
         });
+
     }
 
     // Maakt een klein label met een gekleurd cirkel-icoon en een tekst ernaast
