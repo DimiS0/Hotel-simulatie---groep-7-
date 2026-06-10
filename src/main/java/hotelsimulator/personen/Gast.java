@@ -30,7 +30,7 @@ public class Gast extends Persoon {
     private HotelRuimte doelKamer;
     private long verblijfEinde = 0;
     private final LinkedList<HotelRuimte> eventWachtrij = new LinkedList<>();
-
+    private boolean gaatNaarLobby = false;
     private int doelVerdieping;
     private int huidigeVerdieping;
     private int SPAWN_X;
@@ -175,12 +175,27 @@ public class Gast extends Persoon {
                         hotel.voegToeAanSchoonmaakWachtrij(toegewezenKamer);
                     }
 
-                    Point lobbyPunt = new Point(SPAWN_X, SPAWN_Y);
-                    List<Point> naarLobby = Pathfinder.vindPad(
-                            pixelX, pixelY, lobbyPunt.x, lobbyPunt.y, hotel.getRuimtes(), hotel);
-                    if (!naarLobby.isEmpty()) {
-                        setPad(naarLobby);
-                        status = Status.LOOP_NAAR_LOBBY;
+                    doelKamer = null;
+                    doelVerdieping = 8;
+
+                    if (huidigeVerdieping == 8) {
+
+                        Point lobbyPunt = new Point(SPAWN_X, SPAWN_Y);
+
+                        List<Point> pad = Pathfinder.vindPad(
+                                pixelX, pixelY,
+                                lobbyPunt.x, lobbyPunt.y,
+                                hotel.getRuimtes(),hotel);
+
+                        if (!pad.isEmpty()) {
+                            setPad(pad);
+                            status = Status.LOOP_NAAR_LOBBY;
+                        }
+
+                    } else {
+                        gaatNaarLobby = true;
+                        doelVerdieping = lobbyVerdieping;
+                        loopNaarSchachtOfTrap();
                     }
                     return;
                 }
@@ -252,7 +267,35 @@ public class Gast extends Persoon {
                         doelKamer.verlaat();
                         doelKamer = null;
                     }
-
+                    // Na aankomst op verdieping
+                    if (gaatNaarLobby && huidigeVerdieping == doelVerdieping) {
+                        gaatNaarLobby = false;
+                        Point lobbyPunt = new Point(SPAWN_X, SPAWN_Y);
+                        List<Point> naarLobby = Pathfinder.vindPad(
+                                pixelX, pixelY, lobbyPunt.x, lobbyPunt.y, hotel.getRuimtes(), hotel);
+                        if (!naarLobby.isEmpty()) {
+                            setPad(naarLobby);
+                            status = Status.LOOP_NAAR_LOBBY;
+                        } else {
+                            markeerVoorVerwijdering();
+                        }
+                        return;
+                    }
+                    // Geen doelkamer — check of we naar lobby moeten
+                    if (doelKamer == null) {
+                        int lobbyVerdieping = hotel.getLift().getVerdiepingenY()[hotel.getLift().getVerdiepingenY().length - 1];
+                        if (huidigeVerdieping == lobbyVerdieping) {
+                            Point lobbyPunt = new Point(SPAWN_X, SPAWN_Y);
+                            List<Point> naarLobby = Pathfinder.vindPad(
+                                    pixelX, pixelY, lobbyPunt.x, lobbyPunt.y, hotel.getRuimtes(), hotel);
+                            if (!naarLobby.isEmpty()) {
+                                setPad(naarLobby);
+                                status = Status.LOOP_NAAR_LOBBY;
+                            } else {
+                                markeerVoorVerwijdering();
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -369,6 +412,33 @@ public class Gast extends Persoon {
             doelKamer.verlaat();
             doelKamer = null;
         }
+        // Na aankomst op verdieping
+        if (gaatNaarLobby && huidigeVerdieping == doelVerdieping) {
+            gaatNaarLobby = false;
+            Point lobbyPunt = new Point(SPAWN_X, SPAWN_Y);
+            List<Point> naarLobby = Pathfinder.vindPad(
+                    pixelX, pixelY, lobbyPunt.x, lobbyPunt.y, hotel.getRuimtes(), hotel);
+            if (!naarLobby.isEmpty()) {
+                setPad(naarLobby);
+                status = Status.LOOP_NAAR_LOBBY;
+            } else {
+                markeerVoorVerwijdering();
+            }
+            return;
+        }
+        // Geen doelkamer — check of we naar lobby moeten
+        int lobbyVerdieping = hotel.getLift().getVerdiepingenY()[hotel.getLift().getVerdiepingenY().length - 1];
+        if (huidigeVerdieping == lobbyVerdieping) {
+            Point lobbyPunt = new Point(SPAWN_X, SPAWN_Y);
+            List<Point> naarLobby = Pathfinder.vindPad(
+                    pixelX, pixelY, lobbyPunt.x, lobbyPunt.y, hotel.getRuimtes(), hotel);
+            if (!naarLobby.isEmpty()) {
+                setPad(naarLobby);
+                status = Status.LOOP_NAAR_LOBBY;
+            } else {
+                markeerVoorVerwijdering();
+            }
+        }
     }
 
     @Override
@@ -389,38 +459,41 @@ public class Gast extends Persoon {
         //boolean zodat lobby weet dat gast mag inchecken
         wachtOpCheckIn = true;
     }
-    public void checkOutHandleIn(){
-            // Als gast al in zijn hotelkamer zit, normaal checkout proces
-            if (status == Status.IN_KAMER && doelKamer instanceof HotelKamer) {
-                isWachtOpCheckOut = true;
-                return;
-            }
+    public void checkOutHandleIn() {
+        if (status == Status.IN_KAMER && doelKamer instanceof HotelKamer) {
+            isWachtOpCheckOut = true;
+            return;
+        }
 
-            // Als gast onderweg is of in een andere kamer zit, direct naar lobby
-            // zonder door kamers te lopen
-            if (doelKamer != null) {
-                doelKamer.verlaat();
-                doelKamer = null;
-            }
+        if (doelKamer != null) {
+            doelKamer.verlaat();
+            doelKamer = null;
+        }
 
-            if (toegewezenKamer != null) {
-                hotel.voegToeAanSchoonmaakWachtrij(toegewezenKamer);
-                toegewezenKamer.verlaat();
-                toegewezenKamer = null;
-            }
+        if (toegewezenKamer != null) {
+            hotel.voegToeAanSchoonmaakWachtrij(toegewezenKamer);
+            toegewezenKamer.verlaat();
+            toegewezenKamer = null;
+        }
 
-            // Pad berekenen naar lobby vanuit huidige positie
+        int lobbyVerdieping = hotel.getLobbyVerdieping();
+
+        if (huidigeVerdieping == lobbyVerdieping) {
             Point lobbyPunt = new Point(SPAWN_X, SPAWN_Y);
             List<Point> naarLobby = Pathfinder.vindPad(
                     pixelX, pixelY, lobbyPunt.x, lobbyPunt.y, hotel.getRuimtes(), hotel);
-
             if (!naarLobby.isEmpty()) {
                 setPad(naarLobby);
                 status = Status.LOOP_NAAR_LOBBY;
             } else {
                 markeerVoorVerwijdering();
             }
+        } else {
+            gaatNaarLobby = true;
+            doelVerdieping = lobbyVerdieping;
+            loopNaarSchachtOfTrap();
         }
+    }
 
 
     private void startCheckInNaarKamer(HotelRuimte kamer) {
