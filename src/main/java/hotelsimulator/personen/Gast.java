@@ -169,28 +169,21 @@ public class Gast extends Persoon {
                 if (isWachtOpCheckOut) {
                     isWachtOpCheckOut = false;
 
-                    // Kamer toevoegen aan schoonmaakwachtrij vóór de gast vertrekt
                     if (toegewezenKamer != null) {
                         hotel.voegToeAanSchoonmaakWachtrij(toegewezenKamer);
                     }
 
                     doelKamer = null;
-                    doelVerdieping = 8;
+                    int lobbyVerdieping = hotel.getLobbyVerdieping();
 
-                    if (huidigeVerdieping == 8) {
-
+                    if (huidigeVerdieping == lobbyVerdieping) {
                         Point lobbyPunt = new Point(SPAWN_X, SPAWN_Y);
-
                         List<Point> pad = Pathfinder.vindPad(
-                                pixelX, pixelY,
-                                lobbyPunt.x, lobbyPunt.y,
-                                hotel.getRuimtes(),hotel);
-
+                                pixelX, pixelY, lobbyPunt.x, lobbyPunt.y, hotel.getRuimtes(), hotel);
                         if (!pad.isEmpty()) {
                             setPad(pad);
                             status = Status.LOOP_NAAR_LOBBY;
                         }
-
                     } else {
                         gaatNaarLobby = true;
                         doelVerdieping = lobbyVerdieping;
