@@ -42,8 +42,7 @@ public class Gast extends Persoon {
         this.guestID = guestID;
         this.SPAWN_X = berekenGastSpawnLocatie(maxBreedte);
         this.SPAWN_Y = (maxHoogte + 1) * 50 - 25;
-        this.doelVerdieping = maxHoogte - 1;
-        this.huidigeVerdieping = maxHoogte - 1;
+        berekenHuidigeVerdiepingEnDoelVerdieping();
     }
     public int getGuestID() {
         return guestID;
@@ -301,6 +300,14 @@ public class Gast extends Persoon {
         }
     }
 
+    public void berekenHuidigeVerdiepingEnDoelVerdieping(){
+        huidigeVerdieping = 2;
+        for(int i = 1; i < hotel.getverdiepingen(); i++){
+            huidigeVerdieping += 3;
+        }
+        doelVerdieping = huidigeVerdieping;
+    }
+
     public void gaNaarRuimte(HotelRuimte ruimte) {
         //algemene methode om een gast naar een ruimte te sturen
         //wordt door alle toekomstige events gebruikt die te maken hebben met lopen bijvoorbeeld
@@ -552,6 +559,14 @@ public class Gast extends Persoon {
             return;
         }
         gaNaarRuimte(kandidaten.get(random.nextInt(kandidaten.size())));
+    }
+
+    public int getHuidigeVerdieping() {
+        return huidigeVerdieping;
+    }
+
+    public Status getStatus() {
+        return status;
     }
 
     @Override

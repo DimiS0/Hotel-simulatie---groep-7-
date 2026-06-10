@@ -28,7 +28,7 @@ public class HoofdSimulator {
 
     public HoofdSimulator() {
 		this.config = new SimulatieConfig();
-        this.hotel = new Hotel(config,eventManager,config);
+        this.hotel = new Hotel(eventManager,config);
         this.swingGui = new StarterGui(this);
 		this.eventManager = new hotelevents.HotelEventManager();
         this.event = new Evenement(eventManager,hotel);
@@ -40,6 +40,10 @@ public class HoofdSimulator {
 			eventManager.setHte(config.getSnelheid().getDelay());
 		});
 	}
+
+    public Hotel getHotel() {
+        return hotel;
+    }
 
     // start de applicatie scherm
 	public void start() {
