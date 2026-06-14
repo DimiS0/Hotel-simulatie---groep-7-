@@ -7,6 +7,7 @@ import hotelsimulator.korting.KortingFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Random;
 
 
@@ -18,6 +19,7 @@ public class ReceptieScherm extends JFrame {
     private Timer timer;
 
     private JButton studentenKorting = new JButton("StudentenKorting");
+    private JLabel infoKaart;
     private JButton loyaliteitskorting = new JButton("LoyaliteitsKorting");
     private JButton lastMinuteKorting = new JButton("LastMinuteKorting");
     private JButton geenKorting = new JButton("GEEN KORTING");
@@ -28,6 +30,7 @@ public class ReceptieScherm extends JFrame {
     private JLabel dialoog;
     private SimulatieLus simulatieLus;
     private double [] prijsKamers = {100.0,150.0,200.0,250.0,300.0};
+    private String [] prijsKamersString;
     private double saldoBerekenen = 0.0;
     private String[][] klantenDialoog = {
             // 1 ster
@@ -68,10 +71,25 @@ public class ReceptieScherm extends JFrame {
     };
 
     public ReceptieScherm(){
-        dialoog = new JLabel(klantenDialoog[randomSterren][randomDialoog]);
+        prijsKamersString =  new String[prijsKamers.length];
+        for(int i = 0; i < prijsKamers.length; i++){
+            prijsKamersString[i] = String.valueOf(prijsKamers[i]);
+        }
+        dialoog = new JLabel("<html><div style='width: 300px'>" + klantenDialoog[randomSterren][randomDialoog] + "</div></html>");
+        infoKaart = new JLabel(
+                "<html>" +
+                        "kamerprijs<br>" +
+                        "1 ster € " + prijsKamersString[0] + "<br>" +
+                        "2 ster € " + prijsKamersString[1] + "<br>" +
+                        "3 ster € " + prijsKamersString[2] + "<br>" +
+                        "4 ster € " + prijsKamersString[3] + "<br>" +
+                        "5 ster € " + prijsKamersString[4] +
+                        "</html>"
+        );
 
         kortingFrame.setTitle("ReceptieScherm");
-        kortingFrame.setSize(600, 560);
+        kortingFrame.setMinimumSize(new Dimension(800, 650));
+        kortingFrame.pack();
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setResizable(false);
         setLocationRelativeTo(null);
@@ -88,15 +106,22 @@ public class ReceptieScherm extends JFrame {
         JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.add(kortingScherm, BorderLayout.CENTER);
 
-        JPanel noordPanel = new JPanel(new GridLayout(3, 1));
-        noordPanel.setPreferredSize(new Dimension(600, 100));
+        JPanel EastPanel = new JPanel(new BorderLayout());
+        EastPanel.add(infoKaart, BorderLayout.EAST);
+        EastPanel.setBorder(BorderFactory.createEmptyBorder(10,20,70,10));
+        saldo.setBorder(BorderFactory.createEmptyBorder(10,20,0,0));
+        dialoog.setBorder(BorderFactory.createEmptyBorder(0,200,0,0));
+
+        JPanel noordPanel = new JPanel(new GridLayout(4, 1));
+        noordPanel.setPreferredSize(new Dimension(400, 100));
+        noordPanel.add(saldo);
         noordPanel.add(dialoog);
         noordPanel.add(foutLabel);
-        noordPanel.add(saldo);
 
         kortingFrame.setLayout(new BorderLayout());
-        kortingFrame.add(noordPanel, BorderLayout.NORTH);
+        kortingFrame.add(noordPanel, BorderLayout.CENTER);
         kortingFrame.add(wrapper, BorderLayout.SOUTH);
+        kortingFrame.add(EastPanel,BorderLayout.EAST);
 
         kortingFrame.setVisible(true);
 
@@ -113,13 +138,13 @@ public class ReceptieScherm extends JFrame {
 
         studentenKorting.addActionListener(e -> {
             if(randomDialoog == 0){
+                foutLabel.setText("");
+                new KortingFactory("StudentenKorting",this, randomSterren);
                 randomDialoog = new Random().nextInt(0,4);
                 randomSterren = new Random().nextInt(0,5);
-                foutLabel.setText("");
-                dialoog.setText(klantenDialoog[randomSterren][randomDialoog]);
-                new KortingFactory("StudentenKorting",this);
+                dialoog.setText("<html><div style='width: 300px'>" + klantenDialoog[randomSterren][randomDialoog] + "</div></html>");
             } else {
-                foutLabel.setText("Deze klant is geen student en heeft geen recht op studentenkorting!");
+                foutLabel.setText("Deze klant is GEEN student en heeft geen recht op studentenkorting!");
                 kortingFrame.revalidate();
                 kortingFrame.repaint();
             }
@@ -127,13 +152,13 @@ public class ReceptieScherm extends JFrame {
 
         loyaliteitskorting.addActionListener(e -> {
             if(randomDialoog == 1){
+                foutLabel.setText("");
+                new KortingFactory("LoyaliteitsKorting",this, randomSterren);
                 randomDialoog = new Random().nextInt(0,4);
                 randomSterren = new Random().nextInt(0,5);
-                dialoog.setText(klantenDialoog[randomSterren][randomDialoog]);
-                foutLabel.setText("");
-                new KortingFactory("LoyaliteitsKorting",this);
+                dialoog.setText("<html><div style='width: 300px'>" + klantenDialoog[randomSterren][randomDialoog] + "</div></html>");
             } else {
-                foutLabel.setText("Deze klant heeft geen loyaliteitskorting!");
+                foutLabel.setText("Deze klant heeft GEEN loyaliteitskorting!");
                 kortingFrame.revalidate();
                 kortingFrame.repaint();
             }
@@ -141,13 +166,13 @@ public class ReceptieScherm extends JFrame {
 
         lastMinuteKorting.addActionListener(e -> {
             if(randomDialoog == 2){
+                foutLabel.setText("");
+                new KortingFactory("LastMinuteKorting",this, randomSterren);
                 randomDialoog = new Random().nextInt(0,4);
                 randomSterren = new Random().nextInt(0,5);
-                foutLabel.setText("");
-                dialoog.setText(klantenDialoog[randomSterren][randomDialoog]);
-                new KortingFactory("LastMinuteKorting",this);
+                dialoog.setText("<html><div style='width: 300px'>" + klantenDialoog[randomSterren][randomDialoog] + "</div></html>");
             } else {
-                foutLabel.setText("Deze klant heeft geen lastminutekorting");
+                foutLabel.setText("Deze klant heeft GEEN lastminutekorting");
                 kortingFrame.revalidate();
                 kortingFrame.repaint();
             }
@@ -155,22 +180,22 @@ public class ReceptieScherm extends JFrame {
 
         geenKorting.addActionListener(e -> {
             if(randomDialoog == 3){
+                foutLabel.setText("");
+                new KortingFactory("GEENKORTING",this, randomSterren);
                 randomDialoog = new Random().nextInt(0,4);
                 randomSterren = new Random().nextInt(0,5);
-                foutLabel.setText("");
-                dialoog.setText(klantenDialoog[randomSterren][randomDialoog]);
-                new KortingFactory("GEENKORTING",this);
+                dialoog.setText("<html><div style='width: 300px'>" + klantenDialoog[randomSterren][randomDialoog] + "</div></html>");
             } else {
-                foutLabel.setText("Deze klant heeft geen recht op korting");
+                foutLabel.setText("Deze klant heeft WEL recht op korting");
                 kortingFrame.revalidate();
                 kortingFrame.repaint();
             }
         });
     }
 
-    public void receptie(double kortingFactor){
+    public void receptie(double kortingFactor, int sterrenAantal){
         saldo.setText("€");
-        this.saldoBerekenen = saldoBerekenen + prijsKamers[randomSterren]*kortingFactor;
+        this.saldoBerekenen = saldoBerekenen + prijsKamers[sterrenAantal] * kortingFactor;
         saldoString = String.valueOf(saldoBerekenen);
         saldo.setText("€ "+saldoString);
     }

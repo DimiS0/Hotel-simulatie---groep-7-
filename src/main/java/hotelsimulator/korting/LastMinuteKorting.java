@@ -4,12 +4,14 @@ import hotelsimulator.gui.ReceptieScherm;
 
 public class LastMinuteKorting implements SoortKortingen{
     private ReceptieScherm receptieScherm;
-    public LastMinuteKorting(ReceptieScherm receptieScherm){
+    private int aantSterren;
+    public LastMinuteKorting(ReceptieScherm receptieScherm, int aantSterren){
+        this.aantSterren = aantSterren;
         this.receptieScherm = receptieScherm;
         kortingToepassen();
     }
     @Override
     public void kortingToepassen(){
-        receptieScherm.receptie(0.85);
+        receptieScherm.receptie(0.90, aantSterren);
     }
 }
