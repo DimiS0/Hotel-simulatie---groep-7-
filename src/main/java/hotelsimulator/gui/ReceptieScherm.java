@@ -19,18 +19,14 @@ public class ReceptieScherm extends JFrame {
     private Timer timer;
 
     private JButton studentenKorting = new JButton("StudentenKorting");
-    private JLabel infoKaart;
     private JButton loyaliteitskorting = new JButton("LoyaliteitsKorting");
     private JButton lastMinuteKorting = new JButton("LastMinuteKorting");
     private JButton geenKorting = new JButton("GEEN KORTING");
-    private Dimension buttonSize = new Dimension(400,150);
     private int randomSterren = new Random().nextInt(0,5);
     private int randomDialoog = new Random().nextInt(0,4);
     private JLabel foutLabel = new JLabel();
     private JLabel dialoog;
-    private SimulatieLus simulatieLus;
     private double [] prijsKamers = {100.0,150.0,200.0,250.0,300.0};
-    private String [] prijsKamersString;
     private double saldoBerekenen = 0.0;
     private String[][] klantenDialoog = {
             // 1 ster
@@ -71,21 +67,7 @@ public class ReceptieScherm extends JFrame {
     };
 
     public ReceptieScherm(){
-        prijsKamersString =  new String[prijsKamers.length];
-        for(int i = 0; i < prijsKamers.length; i++){
-            prijsKamersString[i] = String.valueOf(prijsKamers[i]);
-        }
         dialoog = new JLabel("<html><div style='width: 300px'>" + klantenDialoog[randomSterren][randomDialoog] + "</div></html>");
-        infoKaart = new JLabel(
-                "<html>" +
-                        "kamerprijs<br>" +
-                        "1 ster € " + prijsKamersString[0] + "<br>" +
-                        "2 ster € " + prijsKamersString[1] + "<br>" +
-                        "3 ster € " + prijsKamersString[2] + "<br>" +
-                        "4 ster € " + prijsKamersString[3] + "<br>" +
-                        "5 ster € " + prijsKamersString[4] +
-                        "</html>"
-        );
 
         kortingFrame.setTitle("ReceptieScherm");
         kortingFrame.setMinimumSize(new Dimension(800, 650));
@@ -106,22 +88,18 @@ public class ReceptieScherm extends JFrame {
         JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.add(kortingScherm, BorderLayout.CENTER);
 
-        JPanel EastPanel = new JPanel(new BorderLayout());
-        EastPanel.add(infoKaart, BorderLayout.EAST);
-        EastPanel.setBorder(BorderFactory.createEmptyBorder(10,20,70,10));
-        saldo.setBorder(BorderFactory.createEmptyBorder(10,20,0,0));
-        dialoog.setBorder(BorderFactory.createEmptyBorder(0,200,0,0));
+
+        saldo.setBorder(BorderFactory.createEmptyBorder(10,50,0,0));
+        dialoog.setHorizontalAlignment(SwingConstants.CENTER);
 
         JPanel noordPanel = new JPanel(new GridLayout(4, 1));
-        noordPanel.setPreferredSize(new Dimension(400, 100));
         noordPanel.add(saldo);
-        noordPanel.add(dialoog);
+        noordPanel.add(dialoog, BorderLayout.CENTER);
         noordPanel.add(foutLabel);
 
         kortingFrame.setLayout(new BorderLayout());
         kortingFrame.add(noordPanel, BorderLayout.CENTER);
         kortingFrame.add(wrapper, BorderLayout.SOUTH);
-        kortingFrame.add(EastPanel,BorderLayout.EAST);
 
         kortingFrame.setVisible(true);
 
