@@ -145,7 +145,7 @@ public class ReceptieScherm extends JFrame {
                 randomSterren = new Random().nextInt(0,5);
                 foutLabel.setText("");
                 dialoog.setText(klantenDialoog[randomSterren][randomDialoog]);
-                new KortingFactory("LoyaliteitsKorting",this);
+                new KortingFactory("LastMinuteKorting",this);
             } else {
                 foutLabel.setText("Deze klant heeft geen lastminutekorting");
                 kortingFrame.revalidate();

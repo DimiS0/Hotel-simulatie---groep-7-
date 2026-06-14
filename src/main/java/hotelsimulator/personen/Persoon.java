@@ -119,7 +119,6 @@ public abstract class Persoon {
     protected void loopNaarSchachtOfTrapGemeen(int huidigeVerdieping,
                                                Runnable zetStatusSchacht,
                                                Runnable zetStatusTrap) {
-        System.out.println("trapx: "+TRAP_PIXEL_X);
         int kies = random.nextInt(1, 3);
         if (kies == 1) {
             int wachtY = (huidigeVerdieping - 1) * 50;
