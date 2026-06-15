@@ -36,8 +36,7 @@ public class Hotel {
         this(eventManager, simulatieConfig, new HotelRuimteFactory());
     }
 
-    public Hotel(HotelEventManager eventManager,
-                 SimulatieConfig simulatieConfig, IRuimteFactory factory) {
+    public Hotel(HotelEventManager eventManager, SimulatieConfig simulatieConfig, IRuimteFactory factory) {
         this.hotelEventManager = eventManager;
         this.simulatieConfig = simulatieConfig;
         this.ruimteFactory = factory;
@@ -165,12 +164,6 @@ public class Hotel {
         }
     }
 
-    //hoteleventmanager opvragen voor testcase
-
-    public HotelEventManager getHotelEventManager() {
-        return hotelEventManager;
-    }
-
     //max breedte opvragen
     public int getMaxBreedte(){
         return maxBreedte;
@@ -196,7 +189,6 @@ public class Hotel {
         return lift;
     }
 
-    // Hulpklasse die één item uit het bestand voorstelt.
     // Dit is  geen echte ruimte in het hotel, alleen data.
     public Trap getTrap(){
         return trap;
@@ -206,11 +198,13 @@ public class Hotel {
         return schacht;
     }
 
+    // Hulpklasse die één item uit het bestand voorstelt.
     private class JsonItem {
         String AreaType, Position, Dimension, Capacity, Classification;
     }
 
     public void maakPersonen(int aantalGasten) {
+
         //personen die gemaakt worden opslaan
         personen = new ArrayList<>();
 
@@ -285,6 +279,8 @@ public class Hotel {
         //geen kamer gevonden? return null
         return null;
     }
+
+    //getter om de lobby hoogte te pakken
     public int getLobbyVerdieping() {
         return maxHoogte;
     }

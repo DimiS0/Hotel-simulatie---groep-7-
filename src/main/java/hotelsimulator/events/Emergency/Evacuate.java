@@ -6,6 +6,6 @@ public class Evacuate implements EventStrategie {
 
     @Override
     public void eventUitvoeren() {
-
+        //leeg event voor test eventueel
     }
 }
