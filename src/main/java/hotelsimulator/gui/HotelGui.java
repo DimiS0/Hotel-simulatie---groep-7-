@@ -28,6 +28,7 @@ public class HotelGui extends JPanel {
     private HotelOverzicht overzicht;
     private SimulatieLus simulatieLus;
     private HoofdSimulator hoofdSimulator;
+    private ReceptieScherm receptieScherm;
 
 
     public HotelGui(Hotel hotel, SimulatieConfig config, HotelEventManager eventManager, HoofdSimulator hoofdSimulator) {
@@ -89,11 +90,13 @@ public class HotelGui extends JPanel {
         JButton instellingenBtn = new JButton("Instellingen");
         JButton layoutPlusKnop = new JButton("+");
         JButton layoutInladenKnop = new JButton("Opgeslagen Layouts");
+        JButton receptieKnop = new JButton("receptie");
 
         topPanel.add(layoutPlusKnop);
         topPanel.add(layoutInladenKnop);
         topPanel.add(instellingenBtn);
         topPanel.add(speed);
+        topPanel.add(receptieKnop);
         frame.add(topPanel, BorderLayout.NORTH);
         frame.add(speed, BorderLayout.SOUTH);
 
@@ -101,9 +104,29 @@ public class HotelGui extends JPanel {
             LayoutBeheer.layoutOpslaanInMap();
         });
 
+        receptieKnop.addActionListener(e -> {
+            if (receptieScherm == null) {
+                hotelEventManager.pauze();
+                simulatieLus.stop();
+                receptieScherm = new ReceptieScherm();
+
+                receptieScherm.getKortingFrame().addWindowListener(new java.awt.event.WindowAdapter() {
+                    public void windowClosing(java.awt.event.WindowEvent e) {
+                        hotelEventManager.pauze();
+                        simulatieLus.start();
+                        receptieScherm = null;
+                    }
+                });
+            } else {
+                receptieScherm.sluit();
+                hotelEventManager.pauze();
+                simulatieLus.start();
+                receptieScherm = null;
+            }
+        });
+
         layoutInladenKnop.addActionListener(e -> {
             try {
-                String tekst = "";
                 List<OpgeslagenLayouts> layouts = OpgeslagenLayouts.laadLayoutsUitMap();
 
                 if (layouts.isEmpty()){
