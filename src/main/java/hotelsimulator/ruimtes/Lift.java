@@ -20,6 +20,8 @@ public class Lift extends HotelRuimte {
     private boolean beschikbaar = true;
     private boolean omhoog      = true;
     private int verdiepingen;
+    private double liftPixelY;
+    private static final double LIFT_SPEED = 2.0;
 
     // ── Passagiers ───────────────────────────────────────────
     private final List<Gast>       gastenInLift        = new ArrayList<>();
@@ -34,10 +36,11 @@ public class Lift extends HotelRuimte {
     private final LinkedList<Integer> verzoeken = new LinkedList<>();
 
     public Lift(String areaType, int sterrenAantal, int y, int x,
-                int breedte, int hoogte, int maxPersonen, int verdiepingen) {
+                int breedte, int hoogte, int maxPersonen, int verdiepingen, int maxHoogte) {
         super(areaType, sterrenAantal, y, x, breedte, hoogte, maxPersonen);
         this.verdiepingen = verdiepingen;
-        kiesVerdiepingenY();
+        this.liftPixelY = maxHoogte * 50.0; // begint net onder het hotel
+        kiesVerdiepingenY(maxHoogte);
         for (int stop : verdiepingenY) {
             gastWachtrij.put(stop, new ArrayList<>());
             schoonmakerWachtrij.put(stop, new ArrayList<>());
@@ -95,18 +98,22 @@ public class Lift extends HotelRuimte {
             beschikbaar = true;
         }
     }
-    public void kiesVerdiepingenY(){
-        int p = 2;
-        for(int i = 0; i < verdiepingen; i++){
-            tijdelijkeArray.add(p);
-            p +=3;
+    public void kiesVerdiepingenY(int maxHoogte) {
+        tijdelijkeArray.clear();
+        int rest = maxHoogte % 3;
+        // Eerste stop: midden van de begane grond (lobby verdieping)
+        // Als er een rest is, schuift de eerste stop omhoog
+        int eersteStop = maxHoogte - 1;
+        if (rest == 1) eersteStop = maxHoogte - 1; // 1 rij extra → bij de onderste verdieping
+        if (rest == 2) eersteStop = maxHoogte - 1;
+
+        for (int i = 0; i < verdiepingen; i++) {
+            tijdelijkeArray.add(eersteStop - (i * 3));
         }
         verdiepingenY = tijdelijkeArray.stream().mapToInt(Integer::intValue).toArray();
     }
 
-    // ────────────────────────────────────────────────────────
     // Instappen en uitstappen op een verdieping
-    // ────────────────────────────────────────────────────────
     private void ladenEnLossen(int verdieping) {
 
         // Gasten uitstappen
@@ -248,7 +255,7 @@ public class Lift extends HotelRuimte {
     // ────────────────────────────────────────────────────────
     // Getters
     // ────────────────────────────────────────────────────────
-    public int     getCurrentLiftY()  { return y; }
+    public int getCurrentLiftPixelY() { return (y - 1) * 50; }
     public int[]   getVerdiepingenY() { return verdiepingenY; }
     public boolean getBeschikbaar()   { return beschikbaar; }
     public int     getStopPositie()   { return stopPositie; }

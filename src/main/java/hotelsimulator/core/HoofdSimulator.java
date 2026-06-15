@@ -99,7 +99,7 @@ public class HoofdSimulator {
 
         //de juiste scenario inladen
         eventManager.start(config.getScenario());
-
+        eventManagerGestart = true;
         //debug om te kijken welke scenario we hebben
         System.out.println(config.getScenario());
     }

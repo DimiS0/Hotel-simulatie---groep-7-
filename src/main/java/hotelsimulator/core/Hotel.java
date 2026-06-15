@@ -138,13 +138,13 @@ public class Hotel {
         lobby.herberekenY(maxHoogte);
 
         //Trap object aanmaken staat niet in JSON komt altijd rechts van het hotel
-        trap = new Trap("trap", 0, 0, maxBreedte, 1, maxHoogte, 999, getverdiepingen());
+        trap = new Trap("trap", 0, 0, maxBreedte, 1, maxHoogte, 999, getverdiepingen(), maxHoogte);
 
         //Trap herberekenen zodat het op alle layouts past
         trap.herberekenY(maxHoogte);
 
         //lift aanmaken, geen herbereken methode nodig positie wordt bepaald
-        lift = new Lift("Lift", 0, maxHoogte + 1, 0, 1, 1, 5, getverdiepingen());
+        lift = new Lift("Lift", 0, maxHoogte + 1, 0, 1, 1, 5, getverdiepingen(), maxHoogte);
 
         //alle ruimtes die we net hebben gemaakt toevoegen aan de lijst
         ruimtes.add(schacht);
@@ -153,10 +153,16 @@ public class Hotel {
         ruimtes.add(lift);
     }
 
-    public void kiesVerdiepingen(){
-        int x = maxHoogte % 3;
-        int p = maxHoogte - x;
-        verdiepingen = p / 3;
+    public void kiesVerdiepingen() {
+        int rest = maxHoogte % 3;
+        if (rest == 0) {
+            verdiepingen = maxHoogte / 3;
+        } else {
+            // Rest rijen samenvoegen met de laatste verdieping
+            verdiepingen = maxHoogte / 3;
+            // Als er maar 1 verdieping is en rest > 0, toch minimaal 1
+            if (verdiepingen == 0) verdiepingen = 1;
+        }
     }
 
     //hoteleventmanager opvragen voor testcase

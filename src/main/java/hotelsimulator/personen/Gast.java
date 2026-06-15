@@ -198,6 +198,10 @@ public class Gast extends Persoon {
                 }
 
                 if (System.currentTimeMillis() >= verblijfEinde) {
+                    if (doelKamer == null) {
+                        status = Status.WACHT_IN_LOBBY;
+                        return;
+                    }
                     Point ingang = Pathfinder.getKamerIngang(doelKamer);
                     Point midden = getTrueMidden(doelKamer);
                     List<Point> naarIngang = new ArrayList<>();
@@ -293,11 +297,9 @@ public class Gast extends Persoon {
         }
     }
 
-    public void berekenHuidigeVerdiepingEnDoelVerdieping(){
-        huidigeVerdieping = 2;
-        for(int i = 1; i < hotel.getverdiepingen(); i++){
-            huidigeVerdieping += 3;
-        }
+    public void berekenHuidigeVerdiepingEnDoelVerdieping() {
+        // Begane grond = twee rijen boven de lobby, ongeacht de hotelgrootte
+        huidigeVerdieping = hotel.getMaxHoogte() - 1;
         doelVerdieping = huidigeVerdieping;
     }
 

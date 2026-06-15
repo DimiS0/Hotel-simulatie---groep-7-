@@ -31,9 +31,9 @@ public class Schoonmaker extends Persoon {
     private HotelKamer doelKamer;
     private long verblijfEinde = 0;
     private static final long VERBLIJF_MS = 7000;
-
-    private int doelVerdieping    = 8;
-    private int huidigeVerdieping = 8;
+    private boolean gaatTerugNaarPost = false;
+    private int doelVerdieping;
+    private int huidigeVerdieping;
 
     // Wachtpositie: naast de lobby (rechts van de lift/schacht, op de lobbyverdieping)
     protected int WACHT_Y;
@@ -45,8 +45,9 @@ public class Schoonmaker extends Persoon {
         super(berekenSchoonmakerPauzePositie(maxBreedte), maxHoogte * 50, lift, schacht, hotel, hotelEventManager, simulatieConfig);
         this.WACHT_X = berekenSchoonmakerPauzePositie(maxBreedte);
         this.WACHT_Y = maxHoogte * 50;
-        this.doelVerdieping = maxHoogte - 1;
-        this.huidigeVerdieping = maxHoogte - 1;
+        int[] stops = lift.getVerdiepingenY();
+        this.doelVerdieping = stops[0];
+        this.huidigeVerdieping = stops[0];
     }
 
     @Override
@@ -162,6 +163,9 @@ public class Schoonmaker extends Persoon {
                         doelKamer.verlaatAlsSchoonmaker();
                         doelKamer = null;
                     }
+                    if (gaatTerugNaarPost) {
+                        gaatTerugNaarPost = false;
+                    }
                     loopTerugNaarPost();
                 }
             }
@@ -170,7 +174,8 @@ public class Schoonmaker extends Persoon {
                 if (!pad.isEmpty()) {
                     beweeg();
                 } else {
-                    huidigeVerdieping = 8;
+                    int[] stops = hotel.getLift().getVerdiepingenY();
+                    huidigeVerdieping = stops[0];  // ← was stops[length-1] of -1
                     status = Status.WACHT_OP_WERK;
                 }
             }
@@ -207,19 +212,32 @@ public class Schoonmaker extends Persoon {
     }
 
     private void loopTerugNaarPost() {
+        int[] stops = hotel.getLift().getVerdiepingenY();
+        int lobbyVerdieping = stops[0];
+
+        if (huidigeVerdieping != lobbyVerdieping) {
+            // Eerst via lift/trap naar de lobbyverdieping
+            doelVerdieping = lobbyVerdieping;
+            gaatTerugNaarPost = true;
+            loopNaarSchachtOfTrap();
+            return;
+        }
+
         List<Point> terugPad = Pathfinder.vindPad(
                 pixelX, pixelY, WACHT_X, WACHT_Y, hotel.getRuimtes(), hotel);
         if (!terugPad.isEmpty()) {
             setPad(terugPad);
             status = Status.LOOP_TERUG_NAAR_POST;
         } else {
-            // Direct naar post teleporteren als pad niet gevonden
             setPositie(WACHT_X, WACHT_Y);
-            huidigeVerdieping = hotel.getMaxHoogte()-1;
+            huidigeVerdieping = lobbyVerdieping;
             status = Status.WACHT_OP_WERK;
         }
     }
-
+    public void berekenHuidigeVerdiepingEnDoelVerdieping() {
+        huidigeVerdieping = hotel.getMaxHoogte() - 1; // middelste rij van begane grond
+        doelVerdieping = huidigeVerdieping;
+    }
     private void loopNaarSchachtOfTrap() {
         loopNaarSchachtOfTrapGemeen(
                 huidigeVerdieping,
@@ -247,6 +265,9 @@ public class Schoonmaker extends Persoon {
             doelKamer.verlaatAlsSchoonmaker();
             doelKamer = null;
         }
+        if (gaatTerugNaarPost) {
+            gaatTerugNaarPost = false;
+        }
         loopTerugNaarPost();
     }
 
@@ -258,7 +279,8 @@ public class Schoonmaker extends Persoon {
         setPositie(WACHT_X, WACHT_Y);
         pad.clear();
         doelKamer = null;
-        huidigeVerdieping = hotel.getMaxHoogte() - 1;
+        int[] stops = hotel.getLift().getVerdiepingenY();
+        huidigeVerdieping = stops[0];
         status = Status.WACHT_OP_WERK;
     }
 
