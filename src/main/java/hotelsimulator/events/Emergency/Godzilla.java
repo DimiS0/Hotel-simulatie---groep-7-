@@ -5,6 +5,6 @@ import hotelsimulator.events.Core.EventStrategie;
 public class Godzilla implements EventStrategie {
     @Override
     public void eventUitvoeren() {
-
+    // leeg voor Unit Test
     }
 }

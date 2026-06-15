@@ -19,10 +19,12 @@ public class SimulatieConfig  {
     //  listeners
     private final List<ConfigListener> listeners = new ArrayList<>();
 
+    //toevoegen aan observer Lijst
     public void addListener(ConfigListener listener) {
         listeners.add(listener);
     }
 
+    //loopen door list en updaten
     private void notifyListeners() {
         for (ConfigListener listener : listeners) {
             listener.onConfigChanged();
@@ -73,7 +75,4 @@ public class SimulatieConfig  {
         this.scenario = value;
     }
 
-    public void clearListeners() {
-        listeners.clear();
-    }
 }

@@ -11,6 +11,7 @@ public class NeedFood implements EventStrategie {
     }
     @Override
     public void eventUitvoeren() {
+        //in gast startGoToRestaurant starten
 gast.startGoToRestaurant();
     }
 }
