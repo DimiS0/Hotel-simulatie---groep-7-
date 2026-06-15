@@ -1,13 +1,9 @@
 package hotelsimulator.gui;
 
-import hotelevents.HotelEventManager;
-import hotelsimulator.core.Hotel;
-import hotelsimulator.core.SimulatieLus;
 import hotelsimulator.korting.KortingFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Random;
 
 
@@ -27,7 +23,7 @@ public class ReceptieScherm {
     private JLabel foutLabel = new JLabel();
     private JLabel dialoog;
     private double [] prijsKamers = {100.0,150.0,200.0,250.0,300.0};
-    private double saldoBerekenen = 0.0;
+    private double saldoDouble = 0.0;
     private String[][] klantenDialoog = {
             // 1 ster
             {
@@ -177,13 +173,6 @@ public class ReceptieScherm {
         });
     }
 
-    public void receptie(double kortingFactor, int sterrenAantal){
-        saldo.setText("Totale hotel Saldo €");
-        this.saldoBerekenen = saldoBerekenen + prijsKamers[sterrenAantal] * kortingFactor;
-        saldoString = String.valueOf(saldoBerekenen);
-        saldo.setText("Totale hotel Saldo € "+saldoString);
-    }
-
     public void verversen(){
         kortingScherm.removeAll();
         kortingScherm.add(studentenKorting);
@@ -202,5 +191,19 @@ public class ReceptieScherm {
 
     public JFrame getKortingFrame() {
         return kortingFrame;
+    }
+
+    public double getSaldoDouble() {
+        return saldoDouble;
+    }
+
+    public void setSaldoDouble(double saldoDouble){
+        this.saldoDouble = saldoDouble;
+        saldoString = String.valueOf(saldoDouble);
+        saldo.setText("Totale hotel Saldo € "+ saldoString);
+    }
+
+    public double[] getPrijsKamers() {
+        return prijsKamers;
     }
 }
