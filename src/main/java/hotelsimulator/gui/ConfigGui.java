@@ -37,11 +37,6 @@ public class ConfigGui {
 
         JPanel panel = new JPanel(new GridLayout(5, 2, 10, 10));
 
-        JLabel testLabel = new JLabel("Volume: " + config.getVolume(), SwingConstants.CENTER);
-        testLabel.setOpaque(true);
-        testLabel.setBackground(Color.GRAY);
-        frame.add(testLabel, BorderLayout.SOUTH);
-
         panel.add(new JLabel("Scenario"));
         JSlider scenarioSlider = new JSlider(1, 4, config.getScenario());
 
@@ -100,25 +95,6 @@ public class ConfigGui {
         });
 
         panel.add(snelheidSlider);
-
-        panel.add(new JLabel("Brightness:"));
-        JSlider brightnessSlider = new JSlider(0, 100, config.getBrightness());
-        brightnessSlider.addChangeListener(e -> {
-            int value = brightnessSlider.getValue();
-            config.setBrightness(value);
-            int c = value * 255 / 100;
-            testLabel.setBackground(new Color(c, c, c));
-        });
-        panel.add(brightnessSlider);
-
-        panel.add(new JLabel("Volume:"));
-        JSlider volumeSlider = new JSlider(0, 100, config.getVolume());
-        volumeSlider.addChangeListener(e -> {
-            int value = volumeSlider.getValue();
-            config.setVolume(value);
-            testLabel.setText("Volume: " + value);
-        });
-        panel.add(volumeSlider);
 
         frame.add(panel, BorderLayout.CENTER);
         frame.setVisible(true);
