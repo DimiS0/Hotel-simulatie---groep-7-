@@ -11,10 +11,10 @@ import java.util.ArrayList;
 import java.util.Random;
 
 
-public class ReceptieScherm extends JFrame {
+public class ReceptieScherm {
     private JFrame kortingFrame = new JFrame();
     private JPanel kortingScherm = new JPanel(new GridLayout(2,2));
-    private JLabel saldo = new JLabel("€ "+"0");
+    private JLabel saldo = new JLabel("Totale hotel Saldo € "+"0");
     private String saldoString = "";
     private Timer timer;
 
@@ -72,9 +72,9 @@ public class ReceptieScherm extends JFrame {
         kortingFrame.setTitle("ReceptieScherm");
         kortingFrame.setMinimumSize(new Dimension(800, 650));
         kortingFrame.pack();
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setResizable(false);
-        setLocationRelativeTo(null);
+        kortingFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        kortingFrame.setResizable(false);
+        kortingFrame.setLocationRelativeTo(null);
 
         foutLabel.setForeground(Color.RED);
         foutLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -88,16 +88,22 @@ public class ReceptieScherm extends JFrame {
         JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.add(kortingScherm, BorderLayout.CENTER);
 
+        saldo.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 0));
 
-        saldo.setBorder(BorderFactory.createEmptyBorder(10,50,0,0));
+        //de euro linksboven hebben met een nieuwe panel north
+        JPanel saldoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        saldoPanel.add(saldo);
+
+        //dialoog in midden
         dialoog.setHorizontalAlignment(SwingConstants.CENTER);
+        dialoog.setVerticalAlignment(SwingConstants.CENTER);
 
-        JPanel noordPanel = new JPanel(new GridLayout(4, 1));
-        noordPanel.add(saldo);
+        JPanel noordPanel = new JPanel(new BorderLayout());
         noordPanel.add(dialoog, BorderLayout.CENTER);
-        noordPanel.add(foutLabel);
+        noordPanel.add(foutLabel, BorderLayout.SOUTH);
 
         kortingFrame.setLayout(new BorderLayout());
+        kortingFrame.add(saldoPanel, BorderLayout.NORTH);
         kortingFrame.add(noordPanel, BorderLayout.CENTER);
         kortingFrame.add(wrapper, BorderLayout.SOUTH);
 
@@ -108,7 +114,7 @@ public class ReceptieScherm extends JFrame {
         timer = new Timer(500, e -> SwingUtilities.invokeLater(this::verversen));
         timer.start();
 
-        addWindowListener(new java.awt.event.WindowAdapter() {
+        kortingFrame.addWindowListener( new java.awt.event.WindowAdapter() {
             public void windowClosed(java.awt.event.WindowEvent e) {
                 timer.start();
             }
@@ -172,10 +178,10 @@ public class ReceptieScherm extends JFrame {
     }
 
     public void receptie(double kortingFactor, int sterrenAantal){
-        saldo.setText("€");
+        saldo.setText("Totale hotel Saldo €");
         this.saldoBerekenen = saldoBerekenen + prijsKamers[sterrenAantal] * kortingFactor;
         saldoString = String.valueOf(saldoBerekenen);
-        saldo.setText("€ "+saldoString);
+        saldo.setText("Totale hotel Saldo € "+saldoString);
     }
 
     public void verversen(){
