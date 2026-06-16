@@ -13,7 +13,6 @@ import java.util.Hashtable;
 import java.util.function.Consumer;
 
 public class ConfigGui {
-    private Snelheid valueHTE;
     private final SimulatieConfig config;
     private final Consumer<Integer> onSpeedChange;
 
@@ -37,43 +36,57 @@ public class ConfigGui {
 
         JPanel panel = new JPanel(new GridLayout(5, 2, 10, 10));
 
+        //scenario label en slider maken
         panel.add(new JLabel("Scenario"));
         JSlider scenarioSlider = new JSlider(1, 4, config.getScenario());
 
+        //voor onder de slider om visueel te laten ien waar je bent
         Hashtable<Integer, JLabel> scenarios = new Hashtable<>();
         scenarios.put(1, new JLabel("1"));
         scenarios.put(2, new JLabel("2"));
         scenarios.put(3, new JLabel("3"));
         scenarios.put(4, new JLabel("4"));
 
+        // voegt | streepjes toe en de labels
         scenarioSlider.setLabelTable(scenarios);
         scenarioSlider.setPaintLabels(true);
         scenarioSlider.setPaintTicks(true);
         scenarioSlider.setMajorTickSpacing(1);
 
+        //listener om de waarde op te halen van de slider en opslaan
         scenarioSlider.addChangeListener(e ->{
             int scenarioValue = scenarioSlider.getValue();
             config.setScenario(scenarioValue);
         });
         panel.add(scenarioSlider);
 
+        //label voor gasten en een tetfeld aanmaken
         panel.add(new JLabel("Aantal gasten:"));
         JTextField gastenField = new JTextField(String.valueOf(config.getAantalGasten()));
+
+        //wanneer de gastenveld geen focus heeft
         gastenField.addFocusListener(new FocusAdapter() {
 
             public void focusLost(FocusEvent e) {
                 try {
+                    //de tekst ophalen en in een int zetten
                     int g = Integer.parseInt(gastenField.getText());
+
+                    //opslaan in config
                     config.setAantalGasten(g);
                 } catch (NumberFormatException ex) {
+                    //crashes opvangen
                     JOptionPane.showMessageDialog(frame, "Ongeldige waarde");
                 }}});
 
+        //aan paneel toevoegen
         panel.add(gastenField);
 
+        //nu voor snelheid label en slider
         panel.add(new JLabel("Snelheid"));
         JSlider snelheidSlider = new JSlider(1, 5, mapHTEToSlider(config.getSnelheid()));
 
+        //weer labels maken voor onder de slider
         Hashtable<Integer, JLabel> labels = new Hashtable<>();
         labels.put(1, new JLabel("0.25x"));
         labels.put(2, new JLabel("0.5x"));
@@ -81,16 +94,21 @@ public class ConfigGui {
         labels.put(4, new JLabel("2x"));
         labels.put(5, new JLabel("4x"));
 
+        //labels toevoegen en tekenen, met de |
         snelheidSlider.setLabelTable(labels);
         snelheidSlider.setPaintLabels(true);
         snelheidSlider.setPaintTicks(true);
         snelheidSlider.setMajorTickSpacing(1);
 
-
+        //changelistener om een waarde optehalen als het veranderd
         snelheidSlider.addChangeListener(e -> {
+            //opslaan in een int
             int value = snelheidSlider.getValue();
+            //ometten in een case
             Snelheid snelheid = mapSliderToHTE(value);
+            //opslaan
             config.setSnelheid(snelheid);
+            //voor gui schermen zodat ze kunnen updaten
             onSpeedChange.accept(value);
         });
 

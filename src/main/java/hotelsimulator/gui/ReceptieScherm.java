@@ -67,6 +67,7 @@ public class ReceptieScherm {
     };
 
     public ReceptieScherm(){
+        //dialoog opbouwen met random gekoen sterren en dialoog
         dialoog = new JLabel("<html><div style='width: 300px'>" + klantenDialoog[randomSterren][randomDialoog] + "</div></html>");
 
         kortingFrame.setTitle("ReceptieScherm");
@@ -76,21 +77,29 @@ public class ReceptieScherm {
         kortingFrame.setResizable(false);
         kortingFrame.setLocationRelativeTo(null);
 
+        //fout label kleur
         foutLabel.setForeground(Color.RED);
+
+        //center
         foutLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
+        //kortingen buttons toevoegen
         kortingScherm.add(studentenKorting);
         kortingScherm.add(loyaliteitskorting);
         kortingScherm.add(lastMinuteKorting);
         kortingScherm.add(geenKorting);
+
+        //korting panel grootte
         kortingScherm.setPreferredSize(new Dimension(600, 300));
 
+        //paneel om de knoppen heen
         JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.add(kortingScherm, BorderLayout.CENTER);
 
+        //ruimte rondom de salo label
         saldo.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 0));
 
-        //de euro linksboven hebben met een nieuwe panel north
+        //de euro linksboven hebben met een nieuwe panel north, appart paneel
         JPanel saldoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         saldoPanel.add(saldo);
 
@@ -98,36 +107,52 @@ public class ReceptieScherm {
         dialoog.setHorizontalAlignment(SwingConstants.CENTER);
         dialoog.setVerticalAlignment(SwingConstants.CENTER);
 
+       // paneel voor de dialoog met foutlabel eronder
         JPanel noordPanel = new JPanel(new BorderLayout());
         noordPanel.add(dialoog, BorderLayout.CENTER);
         noordPanel.add(foutLabel, BorderLayout.SOUTH);
+
 
         kortingFrame.setLayout(new BorderLayout());
         kortingFrame.add(saldoPanel, BorderLayout.NORTH);
         kortingFrame.add(noordPanel, BorderLayout.CENTER);
         kortingFrame.add(wrapper, BorderLayout.SOUTH);
 
+        //venster ichtbaar
         kortingFrame.setVisible(true);
 
+        //knopen direct vullen bij openen
         verversen();
 
+        //timer die elke 500ms ververst
         timer = new Timer(500, e -> SwingUtilities.invokeLater(this::verversen));
         timer.start();
 
+        // luisteren wanneer het venster gesloten wordt
         kortingFrame.addWindowListener( new java.awt.event.WindowAdapter() {
             public void windowClosed(java.awt.event.WindowEvent e) {
+                //timer opnieuw starten wanneer dat gebeurt
                 timer.start();
             }
         });
 
         studentenKorting.addActionListener(e -> {
+            // check of de klant daadwerkelijk recht heeft op studentenkorting
             if(randomDialoog == 0){
+                // foutmelding leegmaken
                 foutLabel.setText("");
+
+                // korting toepassen via de factory
                 new KortingFactory("StudentenKorting",this, randomSterren);
+
+                // nieuwe random klant kiezen voor de volgende ronde
                 randomDialoog = new Random().nextInt(0,4);
                 randomSterren = new Random().nextInt(0,5);
+
+                //dialoog tekst bijwerken met de nieuwe klant
                 dialoog.setText("<html><div style='width: 300px'>" + klantenDialoog[randomSterren][randomDialoog] + "</div></html>");
             } else {
+                // foutmelding tonen als de klant geen recht heeft op deze korting
                 foutLabel.setText("Deze klant is GEEN student en heeft geen recht op studentenkorting!");
                 kortingFrame.revalidate();
                 kortingFrame.repaint();
@@ -135,13 +160,22 @@ public class ReceptieScherm {
         });
 
         loyaliteitskorting.addActionListener(e -> {
+            // check of de klant daadwerkelijk recht heeft op loyaliteitskorting
             if(randomDialoog == 1){
+                // foutmelding leegmaken
                 foutLabel.setText("");
+
+                //korting toepassem
                 new KortingFactory("LoyaliteitsKorting",this, randomSterren);
+
+                //nieuwe random klant kiezen voor de volgende ronde
                 randomDialoog = new Random().nextInt(0,4);
                 randomSterren = new Random().nextInt(0,5);
+
+                //dialoog tekst bijwerken met de nieuwe klant
                 dialoog.setText("<html><div style='width: 300px'>" + klantenDialoog[randomSterren][randomDialoog] + "</div></html>");
             } else {
+                // foutmelding tonen als de klant geen recht heeft op deze korting
                 foutLabel.setText("Deze klant heeft GEEN loyaliteitskorting!");
                 kortingFrame.revalidate();
                 kortingFrame.repaint();
@@ -149,13 +183,23 @@ public class ReceptieScherm {
         });
 
         lastMinuteKorting.addActionListener(e -> {
+            // check of de klant daadwerkelijk recht heeft op lastminutekorting
             if(randomDialoog == 2){
+                //fout label leeg maken
                 foutLabel.setText("");
+
+                //korting toepassen
                 new KortingFactory("LastMinuteKorting",this, randomSterren);
+
+                //nieuwe random klant kiezen voor de volgende ronde
                 randomDialoog = new Random().nextInt(0,4);
                 randomSterren = new Random().nextInt(0,5);
+
+                //dialoog tekst bijwerken met de nieuwe klant
                 dialoog.setText("<html><div style='width: 300px'>" + klantenDialoog[randomSterren][randomDialoog] + "</div></html>");
+
             } else {
+                // foutmelding tonen als de klant geen recht heeft op deze korting
                 foutLabel.setText("Deze klant heeft GEEN lastminutekorting");
                 kortingFrame.revalidate();
                 kortingFrame.repaint();
@@ -163,13 +207,23 @@ public class ReceptieScherm {
         });
 
         geenKorting.addActionListener(e -> {
+            // check of de klant daadwerkelijk geen recht heeft op korting
             if(randomDialoog == 3){
+
+                //fout label legen
                 foutLabel.setText("");
+
+                //korting toepassen
                 new KortingFactory("GEENKORTING",this, randomSterren);
+
+                //nieuwe random klant kiezen voor de volgende ronde
                 randomDialoog = new Random().nextInt(0,4);
                 randomSterren = new Random().nextInt(0,5);
+
+                //dialoog tekst bijwerken met de nieuwe klant
                 dialoog.setText("<html><div style='width: 300px'>" + klantenDialoog[randomSterren][randomDialoog] + "</div></html>");
             } else {
+                // foutmelding tonen als de klant geen recht heeft op deze korting
                 foutLabel.setText("Deze klant heeft WEL recht op korting");
                 kortingFrame.revalidate();
                 kortingFrame.repaint();
@@ -178,6 +232,7 @@ public class ReceptieScherm {
     }
 
     public void receptie(double kortingFactor, int sterrenAantal){
+        //saldo zetten tijdelijk
         saldo.setText("Totale hotel Saldo €");
         this.saldoBerekenen = saldoBerekenen + prijsKamers[sterrenAantal] * kortingFactor;
         saldoString = String.valueOf(saldoBerekenen);
@@ -185,21 +240,29 @@ public class ReceptieScherm {
     }
 
     public void verversen(){
+        //oude knoppen verwijderen
         kortingScherm.removeAll();
+
+        //knoppen toevoeen
         kortingScherm.add(studentenKorting);
         kortingScherm.add(loyaliteitskorting);
         kortingScherm.add(lastMinuteKorting);
         kortingScherm.add(geenKorting);
 
+        //paneel opnieuw laten teken
         kortingScherm.revalidate();
         kortingScherm.repaint();
     }
 
     public void sluit() {
+        //timer stoppen
         timer.stop();
+
+        //venster vrijlatem voor geheugen
         kortingFrame.dispose();
     }
 
+    //kortingFrame ophalen
     public JFrame getKortingFrame() {
         return kortingFrame;
     }
