@@ -9,29 +9,28 @@ import java.util.List;
 
 public class Lift extends HotelRuimte {
 
-    // ── Verdiepingen waar de lift kan stoppen ────────────────
+    // Verdiepingen waar de lift kan stoppen
     private ArrayList<Integer> tijdelijkeArray = new ArrayList();
     private int [] verdiepingenY;
 
 
-    // ── Rijgedrag ────────────────────────────────────────────
+    // Rijgedrag
     private int  doelVerdieping = 8;
     private int  stopPositie    = 8;
     private boolean beschikbaar = true;
     private boolean omhoog      = true;
     private int verdiepingen;
-    private double liftPixelY;
-    private static final double LIFT_SPEED = 2.0;
 
-    // ── Passagiers ───────────────────────────────────────────
+
+    // Passagiers
     private final List<Gast>       gastenInLift        = new ArrayList<>();
     private final List<Schoonmaker> schoonmakersInLift  = new ArrayList<>();
 
-    // ── Wachtrijen per verdieping ────────────────────────────
+    // Wachtrijen per verdieping
     private final Map<Integer, List<Gast>>       gastWachtrij        = new HashMap<>();
     private final Map<Integer, List<Schoonmaker>> schoonmakerWachtrij = new HashMap<>();
 
-    // ── Verzoekenwachtrij: verdiepingen die nog bezocht moeten worden ──
+    // Verzoekenwachtrij: verdiepingen die nog bezocht moeten worden
     // Dit vervangt hotel.getLiftOproepen() als bron van waarheid.
     private final LinkedList<Integer> verzoeken = new LinkedList<>();
 
@@ -39,7 +38,6 @@ public class Lift extends HotelRuimte {
                 int breedte, int hoogte, int maxPersonen, int verdiepingen, int maxHoogte) {
         super(areaType, sterrenAantal, y, x, breedte, hoogte, maxPersonen);
         this.verdiepingen = verdiepingen;
-        this.liftPixelY = maxHoogte * 50.0; // begint net onder het hotel
         kiesVerdiepingenY(maxHoogte);
         for (int stop : verdiepingenY) {
             gastWachtrij.put(stop, new ArrayList<>());
@@ -47,13 +45,13 @@ public class Lift extends HotelRuimte {
         }
     }
 
-    // ────────────────────────────────────────────────────────
-    // Wordt elke frame aangeroepen vanuit HotelGui / SimulatieLus
-    // ────────────────────────────────────────────────────────
+
+    // Wordt elke frame aangeroepen vanuit SimulatieLus
+
     public void liftBwegen() {
         if (beschikbaar) return;
 
-        // ── Beweeg één stap richting doel ────────────────────
+        // Beweeg één stap richting doel
         if (y > doelVerdieping) {
             y--;
             omhoog = true;
@@ -62,7 +60,7 @@ public class Lift extends HotelRuimte {
             omhoog = false;
         }
 
-        // ── Tussenstop: iemand moet hier in of uit ───────────
+        // Tussenstop: iemand moet hier in of uit
         if (y != doelVerdieping) {
             for (int stop : verdiepingenY) {
                 if (y == stop && isRelevanteStop(stop)) {
@@ -72,7 +70,7 @@ public class Lift extends HotelRuimte {
             return;
         }
 
-        // ── Eindstop bereikt ─────────────────────────────────
+        // Eindstop bereikt─
         ladenEnLossen(doelVerdieping);
         stopPositie = doelVerdieping;
 
@@ -160,11 +158,11 @@ public class Lift extends HotelRuimte {
         }
     }
 
-    // ────────────────────────────────────────────────────────
-    // Publieke aanroep-methodes (vanuit Gast / Schoonmaker)
-    // ────────────────────────────────────────────────────────
 
-    /**
+    // Publieke aanroep-methodes (vanuit Gast / Schoonmaker)
+
+
+    /*
      * Voeg een wachtende gast toe op de opgegeven verdieping.
      * Lift wordt automatisch ingeschakeld als hij stilstaat.
      */
@@ -175,9 +173,9 @@ public class Lift extends HotelRuimte {
         startAlsNodig(verdieping);
     }
 
-    /**
-     * Voeg een wachtende schoonmaker toe op de opgegeven verdieping.
-     */
+
+    //Voeg een wachtende schoonmaker toe op de opgegeven verdieping.
+
     public void voegWachtendeSchoonmakerToe(Schoonmaker schoonmaker, int verdieping) {
         if (schoonmaker == null) return;
         schoonmakerWachtrij.computeIfAbsent(verdieping, k -> new ArrayList<>()).add(schoonmaker);
@@ -185,7 +183,7 @@ public class Lift extends HotelRuimte {
         startAlsNodig(verdieping);
     }
 
-    /**
+    /*
      * Directe aanroep: lift moet naar deze verdieping.
      * Gebruikt door Persoon.liftVerzoek().
      */
@@ -194,32 +192,32 @@ public class Lift extends HotelRuimte {
         startAlsNodig(verdieping);
     }
 
-    // ────────────────────────────────────────────────────────
-    // Interne hulpmethodes
-    // ────────────────────────────────────────────────────────
 
-    /** Voegt verdieping toe aan de wachtrij als hij er nog niet in zit. */
+    // Interne hulpmethodes
+
+
+    // Voegt verdieping toe aan de wachtrij als hij er nog niet in zit.
     private void voegVerzoekToe(int verdieping) {
         if (!verzoeken.contains(verdieping)) {
             verzoeken.addLast(verdieping);
         }
     }
 
-    /** Start de lift richting de opgegeven verdieping als hij stilstaat. */
+    // Start de lift richting de opgegeven verdieping als hij stilstaat.
     private void startAlsNodig(int verdieping) {
         if (beschikbaar) {
             rijNaar(verdieping);
         }
     }
 
-    /** Zet de lift in beweging richting een verdieping. */
+    // Zet de lift in beweging richting een verdieping.
     private void rijNaar(int verdieping) {
         doelVerdieping = verdieping;
         beschikbaar    = false;
         omhoog         = verdieping < y;
     }
 
-    /**
+    /*
      * Checkt of er een reden is om op deze tussenstop te stoppen:
      * iemand wil hier uitstappen OF iemand staat hier te wachten
      * in de richting die de lift op gaat.
@@ -238,9 +236,9 @@ public class Lift extends HotelRuimte {
         return (uitstapper || wachtend) && opDeWeg;
     }
 
-    // ────────────────────────────────────────────────────────
+
     // Tekenen
-    // ────────────────────────────────────────────────────────
+
     @Override
     public void print(Graphics g, int cellSize) {
         Color zachtrose = new Color(255, 128, 139);
@@ -252,9 +250,9 @@ public class Lift extends HotelRuimte {
         g.drawString("Lift", (x + 1) * cellSize + 5, (y - 1) * cellSize + 15);
     }
 
-    // ────────────────────────────────────────────────────────
+
     // Getters
-    // ────────────────────────────────────────────────────────
+
     public int getCurrentLiftPixelY() { return (y - 1) * 50; }
     public int[]   getVerdiepingenY() { return verdiepingenY; }
     public boolean getBeschikbaar()   { return beschikbaar; }

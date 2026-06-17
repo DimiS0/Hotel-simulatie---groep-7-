@@ -249,11 +249,6 @@ public abstract class Persoon {
         this.pad = new LinkedList<>(nieuwPad);
     }
 
-    // Geeft true als het pad leeg is en de persoon op zijn bestemming staat
-    public boolean isOpDoel() {
-        return pad.isEmpty();
-    }
-
     // Snelheidsfactor ophalen uit de config (gebruikt door subklassen)
     public double getFactor() {
         return simulatieConfig.getSnelheid().getFactor();
@@ -266,6 +261,5 @@ public abstract class Persoon {
 
     public abstract void print(Graphics g);
 
-    public int getPixelX() { return pixelX; }
     public int getPixelY() { return pixelY; }
 }

@@ -28,9 +28,12 @@ public class Schoonmaker extends Persoon {
     }
 
     private Status status = Status.WACHT_OP_SPAWN;
+    // de kamer die de schoonmaker aan het schoonmaken is
     private HotelKamer doelKamer;
     private long verblijfEinde = 0;
+    // hoelang de schoonmaker in een kamer blijft om te schoonmaken
     private static final long VERBLIJF_MS = 7000;
+    // vlag om bij te houden of de schoonmaker na lift/trap naar de post moet
     private boolean gaatTerugNaarPost = false;
     private int doelVerdieping;
     private int huidigeVerdieping;
@@ -45,6 +48,7 @@ public class Schoonmaker extends Persoon {
         super(berekenSchoonmakerPauzePositie(maxBreedte), maxHoogte * 50, lift, schacht, hotel, hotelEventManager, simulatieConfig);
         this.WACHT_X = berekenSchoonmakerPauzePositie(maxBreedte);
         this.WACHT_Y = maxHoogte * 50;
+        // verdieping instellen op de lobbyverdieping (eerste stop = hoogste gridY = onderste verdieping)
         int[] stops = lift.getVerdiepingenY();
         this.doelVerdieping = stops[0];
         this.huidigeVerdieping = stops[0];
@@ -70,6 +74,8 @@ public class Schoonmaker extends Persoon {
                 } else {
                     Point ingang = Pathfinder.getKamerIngang(doelKamer);
                     Point midden = getTrueMidden(doelKamer);
+
+                    // controleer of de ingang boven het midden ligt, anders is de kamer ongeldig
                     if (midden.y >= ingang.y) {
                         // Ongeldige kamer — terugzetten en verder wachten
                         doelKamer.verlaatAlsSchoonmaker();
@@ -77,6 +83,8 @@ public class Schoonmaker extends Persoon {
                         loopTerugNaarPost();
                         return;
                     }
+
+                    // pad berekenen van ingang naar midden van de kamer om binnen te lopen
                     List<Point> instap = new ArrayList<>();
                     instap.add(new Point(midden.x, ingang.y));
                     instap.add(midden);
@@ -89,6 +97,7 @@ public class Schoonmaker extends Persoon {
                 if (!pad.isEmpty()) {
                     beweeg();
                 } else {
+                    // schoonmaker aanmelden bij de lift op de huidige verdieping
                     hotel.getLift().voegWachtendeSchoonmakerToe(this, huidigeVerdieping);
                     status = Status.WACHT_OP_LIFT;
                 }
@@ -102,6 +111,7 @@ public class Schoonmaker extends Persoon {
                 if (!pad.isEmpty()) {
                     beweeg();
                 } else {
+                    // kamer betreden en schoonmaaktimer starten
                     doelKamer.betreedAlsSchoonmaker();
                     status = Status.IN_KAMER;
                     verblijfEinde = System.currentTimeMillis() + VERBLIJF_MS;
@@ -109,6 +119,7 @@ public class Schoonmaker extends Persoon {
             }
 
             case IN_KAMER -> {
+                // schoonmaaktijd verstreken, kamer verlaten
                 if (System.currentTimeMillis() >= verblijfEinde) {
                     // Klaar met schoonmaken
                     Point ingang = Pathfinder.getKamerIngang(doelKamer);
@@ -125,9 +136,11 @@ public class Schoonmaker extends Persoon {
                 if (!pad.isEmpty()) {
                     beweeg();
                 } else {
+                    // schoonmaker op de ingangspositie van de verlaten kamer zetten
                     Point ingang = Pathfinder.getKamerIngang(doelKamer);
                     pixelX = ingang.x;
                     pixelY = ingang.y;
+                    // cleaning emergency uitzetten en kamer vrijgeven voor nieuwe gasten
                     doelKamer.setCleaningEmergency(false);
                     doelKamer.maakReserveringVrij();   // kamer vrijgeven zodat nieuwe gasten kunnen inchecken
                     doelKamer.verlaatAlsSchoonmaker();
@@ -141,6 +154,7 @@ public class Schoonmaker extends Persoon {
                 if (!pad.isEmpty()) {
                     beweeg();
                 } else {
+                    // schoonmaker op de trapkolom zetten en trap beweging starten
                     pixelX = TRAP_PIXEL_X;
                     pixelYDouble = pixelY;
                     status = Status.LOOP_DOOR_TRAP;
@@ -151,6 +165,8 @@ public class Schoonmaker extends Persoon {
                 boolean aangekomen = updateInTrap(doelVerdieping);
                 if (aangekomen) {
                     huidigeVerdieping = doelVerdieping;
+
+                    // als de schoonmaker een doelkamer heeft, daarheen lopen
                     if (doelKamer != null) {
                         Point ingang = Pathfinder.getKamerIngang(doelKamer);
                         List<Point> p = Pathfinder.vindPad(
@@ -163,9 +179,12 @@ public class Schoonmaker extends Persoon {
                         doelKamer.verlaatAlsSchoonmaker();
                         doelKamer = null;
                     }
+
+                    // vlag resetten als we op de lobbyverdieping zijn aangekomen
                     if (gaatTerugNaarPost) {
                         gaatTerugNaarPost = false;
                     }
+                    // terugkeren naar de wachtpost
                     loopTerugNaarPost();
                 }
             }
@@ -174,21 +193,23 @@ public class Schoonmaker extends Persoon {
                 if (!pad.isEmpty()) {
                     beweeg();
                 } else {
+                    // verdieping bijwerken naar de lobbyverdieping na aankomst op de post
                     int[] stops = hotel.getLift().getVerdiepingenY();
-                    huidigeVerdieping = stops[0];  // ← was stops[length-1] of -1
+                    huidigeVerdieping = stops[0];
                     status = Status.WACHT_OP_WERK;
                 }
             }
         }
     }
 
-
     private void startSchoonmaakRonde(HotelKamer kamer) {
         doelKamer = kamer;
         kamer.betreedAlsSchoonmaker();
 
+        // dichtstbijzijnde liftstop bepalen voor de doelkamer
         int kamerVerdieping = getNabijeStop(kamer.getY());
 
+        // als de kamer op de huidige verdieping zit, direct een pad berekenen
         if (kamerVerdieping == huidigeVerdieping) {
             Point ingang = Pathfinder.getKamerIngang(kamer);
             List<Point> p = Pathfinder.vindPad(
@@ -203,11 +224,14 @@ public class Schoonmaker extends Persoon {
                 doelKamer = null;
             }
         } else {
+            // kamer op andere verdieping, lift of trap nemen
             doelVerdieping = kamerVerdieping;
             loopNaarSchachtOfTrap();
         }
     }
-    private static int berekenSchoonmakerPauzePositie(int maxBreedte){
+
+    // wachtpositie berekenen op basis van de breedte van het hotel
+    private static int berekenSchoonmakerPauzePositie(int maxBreedte) {
         return (maxBreedte) * 50;
     }
 
@@ -215,29 +239,33 @@ public class Schoonmaker extends Persoon {
         int[] stops = hotel.getLift().getVerdiepingenY();
         int lobbyVerdieping = stops[0];
 
+        // als de schoonmaker niet op de lobbyverdieping zit, eerst daarheen via lift of trap
         if (huidigeVerdieping != lobbyVerdieping) {
-            // Eerst via lift/trap naar de lobbyverdieping
             doelVerdieping = lobbyVerdieping;
             gaatTerugNaarPost = true;
             loopNaarSchachtOfTrap();
             return;
         }
 
+        // pad berekenen naar de wachtpost op de lobbyverdieping
         List<Point> terugPad = Pathfinder.vindPad(
                 pixelX, pixelY, WACHT_X, WACHT_Y, hotel.getRuimtes(), hotel);
         if (!terugPad.isEmpty()) {
             setPad(terugPad);
             status = Status.LOOP_TERUG_NAAR_POST;
         } else {
+            // Direct naar post teleporteren als pad niet gevonden
             setPositie(WACHT_X, WACHT_Y);
             huidigeVerdieping = lobbyVerdieping;
             status = Status.WACHT_OP_WERK;
         }
     }
+
     public void berekenHuidigeVerdiepingEnDoelVerdieping() {
         huidigeVerdieping = hotel.getMaxHoogte() - 1; // middelste rij van begane grond
         doelVerdieping = huidigeVerdieping;
     }
+
     private void loopNaarSchachtOfTrap() {
         loopNaarSchachtOfTrapGemeen(
                 huidigeVerdieping,
@@ -253,6 +281,8 @@ public class Schoonmaker extends Persoon {
     public void stapUit(int pixelYPos) {
         setPositie(SCHACHT_PIXEL_X, pixelYPos);
         huidigeVerdieping = doelVerdieping;
+
+        // als de schoonmaker een doelkamer heeft, daarheen lopen na uitstappen
         if (doelKamer != null) {
             Point ingang = Pathfinder.getKamerIngang(doelKamer);
             List<Point> p = Pathfinder.vindPad(
@@ -265,9 +295,12 @@ public class Schoonmaker extends Persoon {
             doelKamer.verlaatAlsSchoonmaker();
             doelKamer = null;
         }
+
+        // vlag resetten als we op de lobbyverdieping zijn aangekomen via lift
         if (gaatTerugNaarPost) {
             gaatTerugNaarPost = false;
         }
+        // terugkeren naar de wachtpost
         loopTerugNaarPost();
     }
 
@@ -279,6 +312,7 @@ public class Schoonmaker extends Persoon {
         setPositie(WACHT_X, WACHT_Y);
         pad.clear();
         doelKamer = null;
+        // verdieping instellen op de lobbyverdieping bij activeren
         int[] stops = hotel.getLift().getVerdiepingenY();
         huidigeVerdieping = stops[0];
         status = Status.WACHT_OP_WERK;
@@ -300,10 +334,10 @@ public class Schoonmaker extends Persoon {
         if (status == Status.WACHT_OP_SPAWN) return;
 
         Color kleur = switch (status) {
-            case WACHT_OP_WERK                           -> new Color(180, 180, 180); // grijs = wacht
-            case WACHT_OP_LIFT                           -> new Color(200, 100, 255);
+            case WACHT_OP_WERK -> new Color(180, 180, 180); // grijs = wacht
+            case WACHT_OP_LIFT -> new Color(200, 100, 255);
             case BETREEDT_KAMER, VERLAAT_KAMER, IN_KAMER -> new Color(180, 50, 220);
-            default                                       -> new Color(160, 32, 240);
+            default -> new Color(160, 32, 240);
         };
 
         g.setColor(kleur);
@@ -313,6 +347,7 @@ public class Schoonmaker extends Persoon {
         g.setColor(Color.WHITE);
         g.drawString("S", pixelX - 4, pixelY + 5);
 
+        // emoji boven de schoonmaker tonen op basis van de huidige status
         if (status == Status.WACHT_OP_WERK) {
             g.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 11));
             g.setColor(Color.BLACK);

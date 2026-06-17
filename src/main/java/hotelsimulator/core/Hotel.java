@@ -154,15 +154,7 @@ public class Hotel {
     }
 
     public void kiesVerdiepingen() {
-        int rest = maxHoogte % 3;
-        if (rest == 0) {
-            verdiepingen = maxHoogte / 3;
-        } else {
-            // Rest rijen samenvoegen met de laatste verdieping
-            verdiepingen = maxHoogte / 3;
-            // Als er maar 1 verdieping is en rest > 0, toch minimaal 1
-            if (verdiepingen == 0) verdiepingen = 1;
-        }
+        verdiepingen = Math.max(maxHoogte / 3, 1);
     }
 
     //hoteleventmanager opvragen voor testcase
