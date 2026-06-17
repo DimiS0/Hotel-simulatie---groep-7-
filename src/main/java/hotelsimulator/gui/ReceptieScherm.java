@@ -216,24 +216,29 @@ public class ReceptieScherm {
         });
     }
 
+    //sluit hele frame
     public void sluit() {
         kortingFrame.dispose();
     }
 
+    //getter voor kortingframe
     public JFrame getKortingFrame() {
         return kortingFrame;
     }
 
+    //getter voor huidige saldo
     public double getSaldoDouble() {
         return saldoDouble;
     }
 
+    //setter voor huidige saldo
     public void setSaldoDouble(double saldoDouble){
         this.saldoDouble = saldoDouble;
         saldoString = String.valueOf(saldoDouble);
         saldo.setText("Totale hotel Saldo € "+ saldoString);
     }
 
+    //prijs voor kamers met x aantal sterren
     public double[] getPrijsKamers() {
         return prijsKamers;
     }
