@@ -55,22 +55,30 @@ public class StarterGui {
 		//standaard layout knop
 		defaultLayout.addActionListener(e -> {
 
-			//Sluit de instellingen venster in standaardlayout button, config sluiten en scherm
+			//Als frame bestaat / is visible
 			if (configFrame != null && configFrame.isVisible()) {
+                // instellingen weghalen om geheugen vrij te maken
 				configFrame.dispose();
 			}
+            //hetzelfde met starter gui
 			scherm1.dispose();
+
+            //hoofdsimulator methode uitvoeren
 			this.hoofdSimulator.laadStandaardLayout();
 		});
 
 		//eigen layout kiezen button
 		customLayout.addActionListener(e -> {
 
-			//Sluit de instellingenvenster in eigen layout modus, config sluiten en scherm
+            //Als frame bestaat / is visible
 			if (configFrame != null && configFrame.isVisible()) {
+                // instellingen weghalen om geheugen vrij te maken
 				configFrame.dispose();
 			}
+            //hetzelfde met de huidige scherm
 			scherm1.dispose();
+
+            //hoofdsimulator methode uitvoeren
 			this.hoofdSimulator.LayoutKiezer();
 		});
 
@@ -78,16 +86,20 @@ public class StarterGui {
 		instellingenBtn.addActionListener(e -> {
 
 			// sla het instellingen venster op in config, later als gebruiker layout kiest sluiten
+
+            // als er nog geen configvenster is, of als het al gesloten is
             if(configFrame == null || !configFrame.isDisplayable()) {
-                configFrame = new ConfigGui(hoofdSimulator.getConfig(), value -> {
-                }).getFrame();
+                // nieuw instellingenvenster aanmaken
+                configFrame = new ConfigGui(hoofdSimulator.getConfig(), value -> {}).getFrame();
             } else
+                // als het venster al open is, naar de voorkant halen
                 configFrame.toFront();
 
         });
 	}
 
 	public void guiStart() {
+        // hoofdvenster zichtbaar maken
 		scherm1.setVisible(true);
 	}
 }
