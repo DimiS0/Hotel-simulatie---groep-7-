@@ -49,15 +49,6 @@ public abstract class HotelRuimte {
         return orgineleY;
     }
 
-    public int getAantalGasten() {
-        return aantalGasten;
-    }
-    public int getAantalSchoonmakers() {
-        return aantalSchoonmakers;
-    }
-    public int getAantalAanwezig() {
-        return aantalGasten + aantalSchoonmakers;
-    }
     public boolean isBeloopbaar(int gridX, int gridY) {
         return true;
     }

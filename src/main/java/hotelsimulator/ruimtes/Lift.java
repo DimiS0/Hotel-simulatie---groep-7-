@@ -256,9 +256,4 @@ public class Lift extends HotelRuimte {
     public int getCurrentLiftPixelY() { return (y - 1) * 50; }
     public int[]   getVerdiepingenY() { return verdiepingenY; }
     public boolean getBeschikbaar()   { return beschikbaar; }
-    public int     getStopPositie()   { return stopPositie; }
-
-    // Geeft de interne verzoekenwachtrij terug (voor Hotel als die
-    // nog ergens getLiftOproepen() gebruikt — anders mag dit weg)
-    public LinkedList<Integer> getVerzoeken() { return verzoeken; }
 }
