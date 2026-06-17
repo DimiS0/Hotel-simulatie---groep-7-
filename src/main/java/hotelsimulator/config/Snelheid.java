@@ -8,6 +8,4 @@ public interface Snelheid {
     // Vertraging in milliseconden voor de event-loop timer.
     int getDelay();
 
-    // Leesbaar label voor in de GUI (bijv. "1.0x").
-    String getLabel();
 }

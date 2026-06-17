@@ -20,7 +20,6 @@ public class HoofdSimulator {
 	private Hotel hotel;
 	private StarterGui swingGui;
 	private Evenement event;
-	private HTE hte;
 	private SimulatieConfig config;
 
     //voorkomt dat de eventmanager stopt als hij nog niet gestart is
