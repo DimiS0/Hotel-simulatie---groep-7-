@@ -12,7 +12,6 @@ public class ReceptieScherm {
     private JPanel kortingScherm = new JPanel(new GridLayout(2,2));
     private JLabel saldo = new JLabel("Totale hotel Saldo € "+"0");
     private String saldoString = "";
-    private Timer timer;
 
     private JButton studentenKorting = new JButton("StudentenKorting");
     private JButton loyaliteitskorting = new JButton("LoyaliteitsKorting");
@@ -105,15 +104,7 @@ public class ReceptieScherm {
 
         kortingFrame.setVisible(true);
 
-        verversen();
-
-        timer = new Timer(500, e -> SwingUtilities.invokeLater(this::verversen));
-        timer.start();
-
         kortingFrame.addWindowListener( new java.awt.event.WindowAdapter() {
-            public void windowClosed(java.awt.event.WindowEvent e) {
-                timer.start();
-            }
         });
 
         studentenKorting.addActionListener(e -> {
@@ -173,19 +164,7 @@ public class ReceptieScherm {
         });
     }
 
-    public void verversen(){
-        kortingScherm.removeAll();
-        kortingScherm.add(studentenKorting);
-        kortingScherm.add(loyaliteitskorting);
-        kortingScherm.add(lastMinuteKorting);
-        kortingScherm.add(geenKorting);
-
-        kortingScherm.revalidate();
-        kortingScherm.repaint();
-    }
-
     public void sluit() {
-        timer.stop();
         kortingFrame.dispose();
     }
 
