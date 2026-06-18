@@ -299,6 +299,8 @@ public class Gast extends Persoon {
                     // na aankomst op lobbyverdieping via trap naar de lobby lopen
                     if (gaatNaarLobby && huidigeVerdieping == doelVerdieping) {
                         gaatNaarLobby = false;
+                        // zet gast naast de trap zodat Pathfinder een geldig startpunt heeft
+                        setPositie(TRAP_PIXEL_X - 50, pixelY);
                         Point lobbyPunt = new Point(SPAWN_X, SPAWN_Y);
                         List<Point> naarLobby = Pathfinder.vindPad(
                                 pixelX, pixelY, lobbyPunt.x, lobbyPunt.y, hotel.getRuimtes(), hotel);
@@ -315,6 +317,8 @@ public class Gast extends Persoon {
                     if (doelKamer == null) {
                         int lobbyVerdieping = hotel.getLift().getVerdiepingenY()[hotel.getLift().getVerdiepingenY().length - 1];
                         if (huidigeVerdieping == lobbyVerdieping) {
+                            // zet gast naast de trap zodat Pathfinder een geldig startpunt heeft
+                            setPositie(TRAP_PIXEL_X - 50, pixelY);
                             Point lobbyPunt = new Point(SPAWN_X, SPAWN_Y);
                             List<Point> naarLobby = Pathfinder.vindPad(
                                     pixelX, pixelY, lobbyPunt.x, lobbyPunt.y, hotel.getRuimtes(), hotel);
