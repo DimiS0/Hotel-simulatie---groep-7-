@@ -24,8 +24,6 @@ public class Pathfinder {
     // Het hotel is dynamisch, elk vakje is 50 pixels breed/hoog
     public static final int PIXELS_PER_VAKJE = 50;
 
-    // Aliassen zodat andere klassen de oude namen nog kennen
-    public static final int CEL_GROOTTE  = PIXELS_PER_VAKJE;
 
 
     // vindPad: zoekt de kortste route en geeft die terug als pixelpunten

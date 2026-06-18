@@ -16,6 +16,7 @@ public class Lift extends HotelRuimte {
 
     // Rijgedrag
     private int  doelVerdieping = 8;
+    @SuppressWarnings("unused")
     private int  stopPositie    = 8;
     private boolean beschikbaar = true;
     private boolean omhoog      = true;
@@ -31,7 +32,6 @@ public class Lift extends HotelRuimte {
     private final Map<Integer, List<Schoonmaker>> schoonmakerWachtrij = new HashMap<>();
 
     // Verzoekenwachtrij: verdiepingen die nog bezocht moeten worden
-    // Dit vervangt hotel.getLiftOproepen() als bron van waarheid.
     private final LinkedList<Integer> verzoeken = new LinkedList<>();
 
     public Lift(String areaType, int sterrenAantal, int y, int x,
@@ -47,7 +47,6 @@ public class Lift extends HotelRuimte {
 
 
     // Wordt elke frame aangeroepen vanuit SimulatieLus
-
     public void liftBwegen() {
         if (beschikbaar) return;
 
@@ -87,7 +86,7 @@ public class Lift extends HotelRuimte {
             return;
         }
 
-        // Lift is leeg — pak het volgende verzoek uit de wachtrij
+        // Lift is leeg?  pak het volgende verzoek uit de wachtrij
         if (!verzoeken.isEmpty()) {
             int volgend = verzoeken.getFirst();
             rijNaar(volgend);

@@ -4,8 +4,6 @@ import hotelevents.HotelEvent;
 import hotelevents.HotelEventType;
 import hotelsimulator.core.Hotel;
 import hotelsimulator.events.Emergency.CleaningEmergency;
-import hotelsimulator.events.Emergency.Evacuate;
-import hotelsimulator.events.Emergency.Godzilla;
 import hotelsimulator.events.Guest.*;
 import hotelsimulator.events.Ruimte.StartCinema;
 import hotelsimulator.personen.Gast;

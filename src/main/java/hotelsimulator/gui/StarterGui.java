@@ -9,7 +9,6 @@ import java.awt.*;
 
 public class StarterGui {
 	private HoofdSimulator hoofdSimulator;
-    private Hotel hotel;
 	JFrame scherm1 = new JFrame();
 	JPanel bestandinvoegen = new JPanel();
 	JButton defaultLayout = new JButton("Laad standaard layout");

@@ -24,7 +24,6 @@ public class HotelGui extends JPanel {
     private ConfigGui configGui;
     private JFrame frame;
     private JLabel speed;
-    boolean setDefaultSpeed;
     private HotelOverzicht overzicht;
     private SimulatieLus simulatieLus;
     private HoofdSimulator hoofdSimulator;
@@ -37,7 +36,6 @@ public class HotelGui extends JPanel {
         this.hotelEventManager = eventManager;
         this.hoofdSimulator = hoofdSimulator;
         this.config = config;
-        this.setDefaultSpeed = false;
         this.speed = new JLabel("1x");
 
 

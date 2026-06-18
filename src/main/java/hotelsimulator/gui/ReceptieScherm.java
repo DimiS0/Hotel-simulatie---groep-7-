@@ -1,13 +1,8 @@
 package hotelsimulator.gui;
 
-import hotelevents.HotelEventManager;
-import hotelsimulator.core.Hotel;
-import hotelsimulator.core.SimulatieLus;
 import hotelsimulator.korting.KortingFactory;
-
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Random;
 
 
@@ -16,7 +11,6 @@ public class ReceptieScherm {
     private JPanel kortingScherm = new JPanel(new GridLayout(2,2));
     private JLabel saldo = new JLabel("Totale hotel Saldo € "+"0");
     private String saldoString = "";
-    private Timer timer;
 
     private JButton studentenKorting = new JButton("StudentenKorting");
     private JButton loyaliteitskorting = new JButton("LoyaliteitsKorting");

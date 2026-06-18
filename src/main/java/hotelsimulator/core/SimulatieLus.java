@@ -12,10 +12,8 @@ public class SimulatieLus {
 
     private final Timer bewegingsTimer;
     private final Timer spawnTimer;
-    private final Hotel hotel;
 
     public SimulatieLus(Hotel hotel, HotelGui gui) {
-        this.hotel = hotel;
 
         // Bewegingstimer: ~60 FPS
         bewegingsTimer = new Timer(16, e -> {

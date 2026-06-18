@@ -49,6 +49,7 @@ public abstract class HotelRuimte {
         return orgineleY;
     }
 
+    @SuppressWarnings("unused")
     public boolean isBeloopbaar(int gridX, int gridY) {
         return true;
     }

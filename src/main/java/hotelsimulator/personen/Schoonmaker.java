@@ -43,9 +43,8 @@ public class Schoonmaker extends Persoon {
     protected int WACHT_X;
 
     public Schoonmaker(Lift lift, Schacht schacht, Hotel hotel,
-                       HotelEventManager hotelEventManager,
                        SimulatieConfig simulatieConfig, int maxBreedte, int maxHoogte) {
-        super(berekenSchoonmakerPauzePositie(maxBreedte), maxHoogte * 50, lift, schacht, hotel, hotelEventManager, simulatieConfig);
+        super(berekenSchoonmakerPauzePositie(maxBreedte), maxHoogte * 50, lift, schacht, hotel, simulatieConfig);
         this.WACHT_X = berekenSchoonmakerPauzePositie(maxBreedte);
         this.WACHT_Y = maxHoogte * 50;
         // verdieping instellen op de lobbyverdieping (eerste stop = hoogste gridY = onderste verdieping)
@@ -259,11 +258,6 @@ public class Schoonmaker extends Persoon {
             huidigeVerdieping = lobbyVerdieping;
             status = Status.WACHT_OP_WERK;
         }
-    }
-
-    public void berekenHuidigeVerdiepingEnDoelVerdieping() {
-        huidigeVerdieping = hotel.getMaxHoogte() - 1; // middelste rij van begane grond
-        doelVerdieping = huidigeVerdieping;
     }
 
     private void loopNaarSchachtOfTrap() {

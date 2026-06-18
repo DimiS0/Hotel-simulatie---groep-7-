@@ -3,7 +3,6 @@ package hotelsimulator.events.Emergency;
 import hotelsimulator.core.Hotel;
 import hotelsimulator.events.Core.EventStrategie;
 import hotelsimulator.ruimtes.HotelKamer;
-import hotelsimulator.ruimtes.HotelRuimte;
 
 import java.util.Random;
 

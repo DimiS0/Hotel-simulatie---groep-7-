@@ -10,6 +10,8 @@ import hotelsimulator.ruimtes.Bioscoop;
 public class StartCinema implements EventStrategie {
     private final Hotel hotel;
     private static final long FILM_DUUR_MS = 60000;
+
+    @SuppressWarnings("unused")
     private static long filmEinde = -1;
 
     public StartCinema(Hotel hotel) {

@@ -2,7 +2,6 @@ package hotelsimulator.events.Guest;
 
 import hotelsimulator.events.Core.EventStrategie;
 import hotelsimulator.personen.Gast;
-import hotelsimulator.ruimtes.Restaurant;
 
 public class NeedFood implements EventStrategie {
     private final Gast gast;

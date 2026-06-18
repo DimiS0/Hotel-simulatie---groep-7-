@@ -1,9 +1,6 @@
 package hotelsimulator.ruimtes;
 
 import java.awt.*;
-import java.awt.BasicStroke;
-import java.awt.Font;
-import java.awt.Graphics2D;
 
 public class Restaurant extends HotelRuimte {
 	public Restaurant(String areaType, int sterrenAantal, int y, int x, int breedte, int hoogte, int maxPersonen) {

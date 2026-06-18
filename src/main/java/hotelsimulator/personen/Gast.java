@@ -42,8 +42,8 @@ public class Gast extends Persoon {
     private int SPAWN_Y;
 
     public Gast(Lift lift, Schacht schacht, Hotel hotel,
-                HotelEventManager hotelEventManager, SimulatieConfig simulatieConfig, int guestID, int maxBreedte, int maxHoogte) {
-        super(berekenGastSpawnLocatie(maxBreedte), (maxHoogte + 1) * 50 - 25, lift, schacht, hotel, hotelEventManager, simulatieConfig);
+                 SimulatieConfig simulatieConfig, int guestID, int maxBreedte, int maxHoogte) {
+        super(berekenGastSpawnLocatie(maxBreedte), (maxHoogte + 1) * 50 - 25, lift, schacht, hotel, simulatieConfig);
         this.guestID = guestID;
         this.SPAWN_X = berekenGastSpawnLocatie(maxBreedte);
         this.SPAWN_Y = (maxHoogte + 1) * 50 - 25;

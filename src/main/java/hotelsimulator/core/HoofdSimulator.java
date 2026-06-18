@@ -3,7 +3,6 @@ package hotelsimulator.core;
 import javax.swing.*;
 
 import hotelevents.HotelEventManager;
-import hotelsimulator.config.HTE;
 import hotelsimulator.config.SimulatieConfig;
 import hotelsimulator.events.Core.Evenement;
 import hotelsimulator.gui.HotelGui;
@@ -19,7 +18,8 @@ public class HoofdSimulator {
 	private hotelevents.HotelEventManager eventManager;
 	private Hotel hotel;
 	private StarterGui swingGui;
-	private Evenement event;
+	@SuppressWarnings("unused")
+    private Evenement event;
 	private SimulatieConfig config;
 
     //voorkomt dat de eventmanager stopt als hij nog niet gestart is
@@ -40,9 +40,6 @@ public class HoofdSimulator {
 		});
 	}
 
-    public Hotel getHotel() {
-        return hotel;
-    }
 
     // start de applicatie scherm
 	public void start() {

@@ -14,6 +14,7 @@ public class LoyaliteitsKorting implements SoortKortingen{
     }
     @Override
     public void kortingToepassen(){
+        //berekening maken voor loyaliteits korting
         receptieScherm.setSaldoDouble(receptieScherm.getSaldoDouble() + prijsKamers[aantSterren] * 0.80);
     }
 }

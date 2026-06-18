@@ -14,6 +14,7 @@ public class StudentenKorting implements SoortKortingen{
     }
     @Override
     public void kortingToepassen(){
+        //berekening maken voor studenten korting
         receptieScherm.setSaldoDouble(receptieScherm.getSaldoDouble() + prijsKamers[aantSterren] * 0.85);
     }
 }

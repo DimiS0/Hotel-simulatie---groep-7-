@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+@SuppressWarnings("ALL")
 public class Hotel {
     private HotelEventManager hotelEventManager;
     private SimulatieConfig simulatieConfig;
@@ -192,6 +193,7 @@ public class Hotel {
 
     // Hulpklasse die één item uit het bestand voorstelt.
     private class JsonItem {
+        @SuppressWarnings("unused")
         String AreaType, Position, Dimension, Capacity, Classification;
     }
 
@@ -212,12 +214,12 @@ public class Hotel {
 
             // Voeg een groep van maximaal 5 gasten toe
             for (int i = 0; i < 5 && gastIndex < aantalGasten; i++, gastIndex++) {
-                personen.add(new Gast(lift, schacht, this, hotelEventManager, simulatieConfig, gastIndex + 1, getMaxBreedte(),getMaxHoogte()));
+                personen.add(new Gast(lift, schacht, this, simulatieConfig, gastIndex + 1, getMaxBreedte(),getMaxHoogte()));
             }
 
             // Voeg daarna maximaal 2 schoonmakers toe
             for (int i = 0; i < 2 && schoonmakerIndex < aantalSchoonmakers; i++, schoonmakerIndex++) {
-                personen.add(new Schoonmaker(lift, schacht, this, hotelEventManager, simulatieConfig, getMaxBreedte(),getMaxHoogte()));
+                personen.add(new Schoonmaker(lift, schacht, this, simulatieConfig, getMaxBreedte(),getMaxHoogte()));
             }
         }
     }

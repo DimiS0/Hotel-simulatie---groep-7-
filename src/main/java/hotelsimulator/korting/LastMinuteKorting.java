@@ -14,6 +14,7 @@ public class LastMinuteKorting implements SoortKortingen{
     }
     @Override
     public void kortingToepassen(){
+        //berekening maken voor last minute korting
         receptieScherm.setSaldoDouble(receptieScherm.getSaldoDouble() + prijsKamers[aantSterren] * 0.90);
     }
 }

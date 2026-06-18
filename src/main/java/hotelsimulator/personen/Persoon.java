@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+@SuppressWarnings("unused")
 public abstract class Persoon {
 
     // Huidige pixelpositie (int voor tekenen, double voor vloeiende beweging)
@@ -27,7 +28,6 @@ public abstract class Persoon {
     protected SimulatieConfig simulatieConfig;
     protected Schacht schacht;
     protected Lift lift;
-    protected HotelEventManager hotelEventManager;
 
     // Bewegingsconstanten en het huidige looppad
     protected LinkedList<Point> pad = new LinkedList<>();
@@ -49,13 +49,12 @@ public abstract class Persoon {
 
     // Sla alle referenties op en bereken de vaste X-posities uit de lay-out
     public Persoon(int startX, int startY, Lift lift, Schacht schacht,
-                   Hotel hotel, HotelEventManager hotelEventManager,
+                   Hotel hotel,
                    SimulatieConfig simulatieConfig) {
         this.hotel             = hotel;
         this.simulatieConfig   = simulatieConfig;
         this.schacht           = schacht;
         this.lift              = lift;
-        this.hotelEventManager = hotelEventManager;
 
         // Schacht begint 1 cel rechts van kolom 0, lift-centrum zit in het midden van de schachtkolom
         this.SCHACHT_PIXEL_X       = (schacht.getX() + 2) * 50;

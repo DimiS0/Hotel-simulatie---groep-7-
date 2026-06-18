@@ -14,6 +14,7 @@ public class GeenKorting implements SoortKortingen{
     }
     @Override
     public void kortingToepassen(){
+        //berekening maken
         receptieScherm.setSaldoDouble(receptieScherm.getSaldoDouble() + prijsKamers[aantSterren]);
     }
 }
