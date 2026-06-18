@@ -11,6 +11,8 @@ public class GoToFitness implements EventStrategie {
     }
     @Override
     public void eventUitvoeren() {
+
+        //In gast methode startGoToFitness starten
 gast.startGoToFitness();
     }
 }

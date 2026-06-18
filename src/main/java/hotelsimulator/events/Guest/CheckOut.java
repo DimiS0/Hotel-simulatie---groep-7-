@@ -11,6 +11,7 @@ public class CheckOut implements EventStrategie {
 
     @Override
     public void eventUitvoeren() {
+        //checkout handle in gast uitvoeren
         gast.checkOutHandleIn();
 
     }

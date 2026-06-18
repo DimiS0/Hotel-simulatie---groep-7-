@@ -36,8 +36,7 @@ public class Hotel {
         this(eventManager, simulatieConfig, new HotelRuimteFactory());
     }
 
-    public Hotel(HotelEventManager eventManager,
-                 SimulatieConfig simulatieConfig, IRuimteFactory factory) {
+    public Hotel(HotelEventManager eventManager, SimulatieConfig simulatieConfig, IRuimteFactory factory) {
         this.hotelEventManager = eventManager;
         this.simulatieConfig = simulatieConfig;
         this.ruimteFactory = factory;
@@ -138,13 +137,13 @@ public class Hotel {
         lobby.herberekenY(maxHoogte);
 
         //Trap object aanmaken staat niet in JSON komt altijd rechts van het hotel
-        trap = new Trap("trap", 0, 0, maxBreedte, 1, maxHoogte, 999, getverdiepingen());
+        trap = new Trap("trap", 0, 0, maxBreedte, 1, maxHoogte, 999, getverdiepingen(), maxHoogte);
 
         //Trap herberekenen zodat het op alle layouts past
         trap.herberekenY(maxHoogte);
 
         //lift aanmaken, geen herbereken methode nodig positie wordt bepaald
-        lift = new Lift("Lift", 0, maxHoogte + 1, 0, 1, 1, 5, getverdiepingen());
+        lift = new Lift("Lift", 0, maxHoogte + 1, 0, 1, 1, 5, getverdiepingen(), maxHoogte);
 
         //alle ruimtes die we net hebben gemaakt toevoegen aan de lijst
         ruimtes.add(schacht);
@@ -153,16 +152,8 @@ public class Hotel {
         ruimtes.add(lift);
     }
 
-    public void kiesVerdiepingen(){
-        int x = maxHoogte % 3;
-        int p = maxHoogte - x;
-        verdiepingen = p / 3;
-    }
-
-    //hoteleventmanager opvragen voor testcase
-
-    public HotelEventManager getHotelEventManager() {
-        return hotelEventManager;
+    public void kiesVerdiepingen() {
+        verdiepingen = Math.max(maxHoogte / 3, 1);
     }
 
     //max breedte opvragen
@@ -190,7 +181,6 @@ public class Hotel {
         return lift;
     }
 
-    // Hulpklasse die één item uit het bestand voorstelt.
     // Dit is  geen echte ruimte in het hotel, alleen data.
     public Trap getTrap(){
         return trap;
@@ -200,11 +190,13 @@ public class Hotel {
         return schacht;
     }
 
+    // Hulpklasse die één item uit het bestand voorstelt.
     private class JsonItem {
         String AreaType, Position, Dimension, Capacity, Classification;
     }
 
     public void maakPersonen(int aantalGasten) {
+
         //personen die gemaakt worden opslaan
         personen = new ArrayList<>();
 
@@ -279,6 +271,8 @@ public class Hotel {
         //geen kamer gevonden? return null
         return null;
     }
+
+    //getter om de lobby hoogte te pakken
     public int getLobbyVerdieping() {
         return maxHoogte;
     }

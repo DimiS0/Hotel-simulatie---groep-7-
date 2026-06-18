@@ -4,12 +4,16 @@ import hotelsimulator.gui.ReceptieScherm;
 
 public class StudentenKorting implements SoortKortingen{
     private ReceptieScherm receptieScherm;
-    public StudentenKorting(ReceptieScherm receptieScherm){
+    private int aantSterren;
+    private double [] prijsKamers;
+    public StudentenKorting(ReceptieScherm receptieScherm, int aantSterren){
+        this.aantSterren = aantSterren;
         this.receptieScherm = receptieScherm;
+        this.prijsKamers = receptieScherm.getPrijsKamers();
         kortingToepassen();
     }
     @Override
     public void kortingToepassen(){
-        receptieScherm.receptie(0.85);
+        receptieScherm.setSaldoDouble(receptieScherm.getSaldoDouble() + prijsKamers[aantSterren] * 0.85);
     }
 }

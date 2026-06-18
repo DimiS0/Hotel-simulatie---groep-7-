@@ -14,6 +14,8 @@ public class GoToCinema implements EventStrategie {
 
     @Override
     public void eventUitvoeren() {
+
+        //in gast de methode startgoTiBioscoop
         gast.startGoToBioscoop();
     }
 }

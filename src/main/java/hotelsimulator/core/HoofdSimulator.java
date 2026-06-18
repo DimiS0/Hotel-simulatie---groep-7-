@@ -20,7 +20,6 @@ public class HoofdSimulator {
 	private Hotel hotel;
 	private StarterGui swingGui;
 	private Evenement event;
-	private HTE hte;
 	private SimulatieConfig config;
 
     //voorkomt dat de eventmanager stopt als hij nog niet gestart is
@@ -99,7 +98,7 @@ public class HoofdSimulator {
 
         //de juiste scenario inladen
         eventManager.start(config.getScenario());
-
+        eventManagerGestart = true;
         //debug om te kijken welke scenario we hebben
         System.out.println(config.getScenario());
     }

@@ -42,32 +42,36 @@ public class HotelGui extends JPanel {
 
 
 // preferredSize in constructor:
-        setPreferredSize(new Dimension((hotel.getMaxBreedte() + 4) * cellSize, (hotel.getMaxHoogte() + 2) * cellSize));
+        setPreferredSize(new Dimension((hotel.getMaxBreedte() + 3) * cellSize, (hotel.getMaxHoogte() + 2) * cellSize));
     }
 
     @Override
     protected void paintComponent(Graphics g) {
+
+        //scherm leeg maken om te tekenen
         super.paintComponent(g);
 
-        int breedte = hotel.getMaxBreedte() + 4;
+        // breeedte en hoofte opslaan,
+        int breedte = hotel.getMaxBreedte() + 3;
         int hoogte  = hotel.getMaxHoogte() + 2;
 
-        // Horizontale lijnen
+        // Horizontale lijnen tekenen, x blijft het zelfde, y veranderdt
         for (int i = 0; i <= hoogte; i++) {
             g.setColor(Color.LIGHT_GRAY);
             g.drawLine(0, i * cellSize, breedte * cellSize, i * cellSize);
         }
 
-        // Verticale lijnen + ruimtes tekenen
+        // Verticale lijnen tekenen, Y blijft het zelfde, x veranderd 1 opzij
         for (int i = 0; i <= breedte; i++) {
             g.setColor(Color.LIGHT_GRAY);
             g.drawLine(i * cellSize, 0, i * cellSize, hoogte * cellSize);
 
+            //elke kamer zichzelf laten printen
             for (HotelRuimte r : hotel.getRuimtes()) {
                 r.print(g, cellSize);
             }
         }
-
+        //daarna persoonen printen
         if (hotel.getPersonen() != null) {
             for (Persoon p : hotel.getPersonen()) {
                 p.print(g);
@@ -100,51 +104,82 @@ public class HotelGui extends JPanel {
         frame.add(topPanel, BorderLayout.NORTH);
         frame.add(speed, BorderLayout.SOUTH);
 
+        //layout + knop action listener
         layoutPlusKnop.addActionListener(e -> {
+            //layout beheer methode runnen
             LayoutBeheer.layoutOpslaanInMap();
         });
 
+        //receptie minigame knop
         receptieKnop.addActionListener(e -> {
+
+            //geen receptie scherm dan
             if (receptieScherm == null) {
+                //pauze van beide timers
                 hotelEventManager.pauze();
                 simulatieLus.stop();
+
+                //scherm aanmaken
                 receptieScherm = new ReceptieScherm();
 
+                //luisteren of het scherm gesloten is met het kruisje
                 receptieScherm.getKortingFrame().addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
+
+                        //unpauzeren timers
                         hotelEventManager.pauze();
                         simulatieLus.start();
+
+                        //receptie op null zetten
                         receptieScherm = null;
                     }
                 });
+                // Scherm is al open en de knop wordt opnieuw geklikt
             } else {
+
+                //scherm sluiten
                 receptieScherm.sluit();
+
+                //timers starten
                 hotelEventManager.pauze();
                 simulatieLus.start();
+
+                //receptie scherm op null ette
                 receptieScherm = null;
             }
         });
 
+        //layout inladen knop
         layoutInladenKnop.addActionListener(e -> {
             try {
+
+                //lijst met de layouts ophalen uit de map
                 List<OpgeslagenLayouts> layouts = OpgeslagenLayouts.laadLayoutsUitMap();
 
+                //als het leeg is
                 if (layouts.isEmpty()){
                     JOptionPane.showMessageDialog(null, "Er zijn geen layouts opgeslagen in de map!");
                     return;
                 }
-                //Jlist omdat  het een duidelijk selecteert, zodat de gebruiker ziet welke layout gekozen is
+                //JList omdat het een duidelijke selectie geeft, zodat de gebruiker ziet welke layout gekozen is
                 JList  <OpgeslagenLayouts> lijst = new JList<>(layouts.toArray(new OpgeslagenLayouts[0]));
+
+                // cancel en oke knoppen toevoegen
                 int resultaat = JOptionPane.showConfirmDialog(null,new JScrollPane(lijst), "Kies layout", JOptionPane.OK_CANCEL_OPTION);
 
+                //als er op oke is gedrukt
                 if (resultaat == JOptionPane.OK_OPTION) {
+
+                    //geselecteerde layout ophalen
                     OpgeslagenLayouts gekozenLayout = lijst.getSelectedValue();
 
-
+                    //als de layout null is dan niks doen
                     if (gekozenLayout == null) {
                         JOptionPane.showMessageDialog(null, "Er is geeb geselecteerde layout");
                         return;
                     }
+
+                    //de string ophalen om hotel
                     String layoutStr = gekozenLayout.getLayoutStr();
 
                     //ruimte vrij maken
@@ -153,38 +188,61 @@ public class HotelGui extends JPanel {
                         overzicht = null;
                     }
 
+                    //simulatielus stoppen
                     simulatieLus.stop();
+
+                    //hotel reste emthode aanropeen
                     hotel.reset();
+
+                    //en een nieuwe hotel maken met de gekozen layout string
                     hotel.maakHotelLayout(layoutStr);
+
+                    //de eventmanager herstarten met een scenario nummer
                     hoofdSimulator.herstart(hoofdSimulator.getConfig().getScenario());
 
-                    setPreferredSize(new Dimension((hotel.getMaxBreedte() + 4) * cellSize, (hotel.getMaxHoogte() + 2) * cellSize));
+                    //frame aanmaken met de juiste hoogte en breedte
+                    setPreferredSize(new Dimension((hotel.getMaxBreedte() + 3) * cellSize, (hotel.getMaxHoogte() + 2) * cellSize));
+
+                    //hertekenen
                     revalidate();
                     repaint();
 
+                    //eventmanager opvragen om gekopeld te zijn
                     hotelEventManager = hoofdSimulator.getEventManager();
 
+                    //schoonmakers activeren
                     for (Persoon p : hotel.getPersonen()) {
                         if (p instanceof Schoonmaker schoonmaker) {
                             schoonmaker.activeer();
                         }
                     }
 
+                    //simulatie lus maken
                     simulatieLus = new SimulatieLus(hotel, this);
+
+                    //simulatie starten
                     simulatieLus.start();
                     repaint();
                 }
 
             } catch (IOException ex) {
-                throw new RuntimeException(ex);
+                //crash opvangen en dialoog tonen implaats van een crash geven
+                JOptionPane.showMessageDialog(null, "Fout bij het laden van layouts: " + ex.getMessage());
             }
 
         });
 
+        //insteling button action lsistener
         instellingenBtn.addActionListener(e -> {
+
+            //als het schemr null is  en frame is niet op display
             if (configGui == null || !configGui.getFrame().isDisplayable()) {
+
+                //nieuwe gui aanmaken
                 configGui = new ConfigGui(config, value -> updateSpeedLabel(value));
+
             } else {
+                //als het al open is / displayable, scherm op de voorkant laten zien
                 configGui.getFrame().toFront();
             }
         });
@@ -203,7 +261,7 @@ public class HotelGui extends JPanel {
         hotel.maakPersonen(config.getAantalGasten());
         frame.setVisible(true);
 
-        // Activeer alle schoonmakers direct bij de start — zij zijn al aanwezig in het hotel
+        // Activeer alle schoonmakers direct bij de start, zij zijn al aanwezig in het hotel
         for (Persoon p : hotel.getPersonen()) {
             if (p instanceof Schoonmaker schoonmaker) {
                 schoonmaker.activeer();
@@ -220,30 +278,50 @@ public class HotelGui extends JPanel {
                 int gridX = e.getX() / cellSize;
                 int gridY = e.getY() / cellSize;
 
+                //lobby ophalen
                 for (HotelRuimte r : hotel.getRuimtes()) {
                     if (r instanceof hotelsimulator.ruimtes.Lobby) {
-                        // zelfde offset als in Lobby.print()
+
+                        // zelfde offset als in Lobby.print() methode
                         int lobbyX = r.getX() + 1;
                         int lobbyY = r.getY() - 1;
+
+                        //kijken of er in de lobby is geklikt
                         if (gridX >= lobbyX && gridX < lobbyX + r.getBreedte() &&
                                 gridY >= lobbyY && gridY < lobbyY + r.getHoogte()) {
+
+                            //nog een check om te kijken of de overszicht zelf null is of niet visable
                             if (overzicht == null || !overzicht.isVisible()){
+                                //timers op pause
                                 hotelEventManager.pauze();
                                 simulatieLus.stop();
+
+                                //overicht maken
                                 overzicht = new HotelOverzicht(hotel,hotelEventManager);
 
+                                //overzicht kijken of die is gesloten met het kruisje
                                 overzicht.addWindowListener(new java.awt.event.WindowAdapter() {
                                     public void windowClosing(java.awt.event.WindowEvent e) {
+                                        //timers starten
                                         hotelEventManager.pauze();
                                         simulatieLus.start();
+
+                                        //overicht op null zetten voor veiligheid
                                         overzicht = null;
                                     }
                                 });
                             }
+                            //als je weer op lobby klikt
                             else{
+
+                                //timers starten
                                 hotelEventManager.pauze();
                                 simulatieLus.start();
+
+                                //overicht verwijderen
                                 overzicht.dispose();
+
+                                //op null zetten om veilig te zijn
                                 overzicht = null;
                             }
 
@@ -256,27 +334,16 @@ public class HotelGui extends JPanel {
 
 
     }
-    public void sluitVenster() {
-        // Stop de bewegings- en spawntimer zodat gasten niet meer updaten
-        // op een hotel dat al gereset is
-        if (simulatieLus != null) {
-            simulatieLus.stop();
-        }
-        // Sluit het venster en geeft geheugen vrij
-        if (frame != null) {
-            frame.dispose();
-        }
-    }
+
+    //voor de hotelgui label
     public void updateSpeedLabel(int value) {
         switch (value) {
-            case 1 -> speed.setText("0.25x");
-            case 2 -> speed.setText("0.50x");
-            case 3 -> speed.setText("1.0x");
-            case 4 -> speed.setText("2.0x");
-            case 5 -> speed.setText("4.0x");
+            case 1 -> speed.setText("Simulatie snelheid op 0.25x");
+            case 2 -> speed.setText("Simulatie snelheid op 0.50x");
+            case 3 -> speed.setText("Simulatie snelheid op 1.0x");
+            case 4 -> speed.setText("Simulatie snelheid op 2.0x");
+            case 5 -> speed.setText("Simulatie snelheid op 4.0x");
         }
-        frame.remove(speed);
-        frame.add(speed, BorderLayout.SOUTH);
         frame.revalidate();
         frame.repaint();
     }
